@@ -1,623 +1,1112 @@
-%Version 3.1 December 2024
-% See section 11 of the User Manual for version history
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                                                 %%
-%% Please do not use \input{...} to include other tex files.       %%
-%% Submit your LaTeX manuscript as one .tex document.              %%
-%%                                                                 %%
-%% All additional figures and files should be attached             %%
-%% separately and not embedded in the \TeX\ document itself.       %%
-%%                                                                 %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Nature Computational Science submission
+%% Draft — [DATE]
+\documentclass[pdflatex,sn-nature]{sn-jnl}
 
-%%\documentclass[referee,sn-basic]{sn-jnl}% referee option is meant for double line spacing
-
-%%=======================================================%%
-%% to print line numbers in the margin use lineno option %%
-%%=======================================================%%
-
-%%\documentclass[lineno,pdflatex,sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
-
-%%=========================================================================================%%
-%% the documentclass is set to pdflatex as default. You can delete it if not appropriate.  %%
-%%=========================================================================================%%
-
-%%\documentclass[sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
-
-%%Note: the following reference styles support Namedate and Numbered referencing. By default the style follows the most common style. To switch between the options you can add or remove Numbered in the optional parenthesis. 
-%%The option is available for: sn-basic.bst, sn-chicago.bst%  
- 
-%%\documentclass[pdflatex,sn-nature]{sn-jnl}% Style for submissions to Nature Portfolio journals
-%%\documentclass[pdflatex,sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
-\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}% Math and Physical Sciences Numbered Reference Style
-%%\documentclass[pdflatex,sn-mathphys-ay]{sn-jnl}% Math and Physical Sciences Author Year Reference Style
-%%\documentclass[pdflatex,sn-aps]{sn-jnl}% American Physical Society (APS) Reference Style
-%%\documentclass[pdflatex,sn-vancouver-num]{sn-jnl}% Vancouver Numbered Reference Style
-%%\documentclass[pdflatex,sn-vancouver-ay]{sn-jnl}% Vancouver Author Year Reference Style
-%%\documentclass[pdflatex,sn-apa]{sn-jnl}% APA Reference Style
-%%\documentclass[pdflatex,sn-chicago]{sn-jnl}% Chicago-based Humanities Reference Style
-
-%%%% Standard Packages
-%%<additional latex packages if required can be included here>
-
-\usepackage{graphicx}%
-\usepackage{multirow}%
-\usepackage{amsmath,amssymb,amsfonts}%
-\usepackage{amsthm}%
-\usepackage{mathrsfs}%
-\usepackage[title]{appendix}%
-\usepackage{xcolor}%
-\usepackage{textcomp}%
-\usepackage{manyfoot}%
-\usepackage{booktabs}%
-\usepackage{algorithm}%
-\usepackage{algorithmicx}%
-\usepackage{algpseudocode}%
-\usepackage{listings}%
-%%%%
-
-%%%%%=============================================================================%%%%
-%%%%  Remarks: This template is provided to aid authors with the preparation
-%%%%  of original research articles intended for submission to journals published 
-%%%%  by Springer Nature. The guidance has been prepared in partnership with 
-%%%%  production teams to conform to Springer Nature technical requirements. 
-%%%%  Editorial and presentation requirements differ among journal portfolios and 
-%%%%  research disciplines. You may find sections in this template are irrelevant 
-%%%%  to your work and are empowered to omit any such section if allowed by the 
-%%%%  journal you intend to submit to. The submission guidelines and policies 
-%%%%  of the journal take precedence. A detailed User Manual is available in the 
-%%%%  template package for technical guidance.
-%%%%%=============================================================================%%%%
-
-%% as per the requirement new theorem styles can be included as shown below
-\theoremstyle{thmstyleone}%
-\newtheorem{theorem}{Theorem}%  meant for continuous numbers
-%%\newtheorem{theorem}{Theorem}[section]% meant for sectionwise numbers
-%% optional argument [theorem] produces theorem numbering sequence instead of independent numbers for Proposition
-\newtheorem{proposition}[theorem]{Proposition}% 
-%%\newtheorem{proposition}{Proposition}% to get separate numbers for theorem and proposition etc.
-
-\theoremstyle{thmstyletwo}%
-\newtheorem{example}{Example}%
-\newtheorem{remark}{Remark}%
-
-\theoremstyle{thmstylethree}%
-\newtheorem{definition}{Definition}%
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsthm}
+\usepackage[title]{appendix}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
 
 \raggedbottom
-%%\unnumbered% uncomment this for unnumbered level heads
 
 \begin{document}
 
-\title[Article Title]{Article Title}
+%%==============================================================%%
+%% Title
+%%==============================================================%%
+\title[Temporal multimodal ALL prediction]{%
+  Temporally-structured multimodal prediction of relapse risk and
+  survival outcomes in pediatric acute lymphoblastic leukaemia}
 
-%%=============================================================%%
-%% GivenName	-> \fnm{Joergen W.}
-%% Particle	-> \spfx{van der} -> surname prefix
-%% FamilyName	-> \sur{Ploeg}
-%% Suffix	-> \sfx{IV}
-%% \author*[1,2]{\fnm{Joergen W.} \spfx{van der} \sur{Ploeg} 
-%%  \sfx{IV}}\email{iauthor@gmail.com}
-%%=============================================================%%
+%%==============================================================%%
+%% Authors — fill in before submission
+%%==============================================================%%
+\author*[1,2]{\fnm{Yanbei} \sur{Jiang}}\email{yanbeijiang0@gmail.com}
 
-\author*[1,2]{\fnm{First} \sur{Author}}\email{iauthor@gmail.com}
+\author[1]{\fnm{[Author 2 Given]} \sur{[Author 2 Family]}}
 
-\author[2,3]{\fnm{Second} \sur{Author}}\email{iiauthor@gmail.com}
-\equalcont{These authors contributed equally to this work.}
+\author[1]{\fnm{[Author 3 Given]} \sur{[Author 3 Family]}}
 
-\author[1,2]{\fnm{Third} \sur{Author}}\email{iiiauthor@gmail.com}
-\equalcont{These authors contributed equally to this work.}
+\affil*[1]{\orgdiv{[Department]},
+           \orgname{[HOSPITAL NAME / University]},
+           \orgaddress{\city{[City]}, \country{China}}}
 
-\affil*[1]{\orgdiv{Department}, \orgname{Organization}, \orgaddress{\street{Street}, \city{City}, \postcode{100190}, \state{State}, \country{Country}}}
+\affil[2]{\orgdiv{School of Computing and Information Systems},
+           \orgname{The University of Melbourne},
+           \orgaddress{\city{Melbourne}, \country{Australia}}}
 
-\affil[2]{\orgdiv{Department}, \orgname{Organization}, \orgaddress{\street{Street}, \city{City}, \postcode{10587}, \state{State}, \country{Country}}}
+%%==============================================================%%
+%% Abstract
+%%==============================================================%%
+\abstract{%
+Acute lymphoblastic leukaemia (ALL) is the most prevalent malignancy
+in children, and although contemporary treatment achieves five-year
+survival rates exceeding 90\%, approximately 15--20\% of patients
+relapse after apparent remission, with markedly worse prognosis upon
+re-induction. Existing risk-stratification approaches rely primarily on
+single-timepoint diagnostic features and fail to integrate the
+longitudinal nature of clinical data acquisition or to prospectively
+predict future adverse events.
+Here we present a temporally-structured multimodal prediction framework
+applied to a cohort of 301 paediatric ALL patients (2015--2019,
+Chinese single-centre).
+We define twelve feature sets~($\mathcal{F}_1 \subseteq \cdots
+\subseteq \mathcal{F}_{12}$) whose incremental composition strictly
+follows the clinical data-acquisition timeline, from white blood cell
+count and age at Day~0 to minimal residual disease (MRD) measurements
+at Day~46.
+A two-phase system is evaluated: Phase~1 deploys four large language
+models (LLMs) in a zero-shot setting to probe the upper bound of
+prediction without training, while Phase~2 trains decision trees and
+random survival forests on a dynamic case database that grows with
+annual patient cohorts, explicitly simulating real-world hospital
+deployment.
+On the primary risk-stratification task (Final Risk), Phase~2 achieves
+an AUROC of 0.949 using features available by Day~46, with
+interpretable decision paths provided by the decision tree.
+For survival prediction, the best model attains a concordance index of
+0.746 and a time-dependent AUC at 24~months of 0.775 for
+event-free survival (EFS).
+A retrieval-augmented generation (RAG) case-study component further
+grounds each prediction in historically similar patients, supporting
+clinical interpretability.
+This framework demonstrates that temporally stratified multimodal
+learning, aligned with clinical workflows, enables effective prediction
+at every decision node of paediatric ALL management.
+}
 
-\affil[3]{\orgdiv{Department}, \orgname{Organization}, \orgaddress{\street{Street}, \city{City}, \postcode{610101}, \state{State}, \country{Country}}}
-
-%%==================================%%
-%% Sample for unstructured abstract %%
-%%==================================%%
-
-\abstract{The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. Authors are advised to check the author instructions for the journal they are submitting to for word limits and if structural elements like subheadings, citations, or equations are permitted.}
-
-%%================================%%
-%% Sample for structured abstract %%
-%%================================%%
-
-% \abstract{\textbf{Purpose:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
-% 
-% \textbf{Methods:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
-% 
-% \textbf{Results:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
-% 
-% \textbf{Conclusion:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.}
-
-\keywords{keyword1, Keyword2, Keyword3, Keyword4}
-
-%%\pacs[JEL Classification]{D8, H51}
-
-%%\pacs[MSC Classification]{35A01, 65L10, 65L12, 65L20, 65L70}
+\keywords{paediatric acute lymphoblastic leukaemia, temporal feature
+design, large language models, risk stratification, survival analysis,
+retrieval-augmented generation}
 
 \maketitle
 
-\section{Introduction}\label{sec1}
+%%==============================================================%%
+\section{Introduction}\label{sec:intro}
+%%==============================================================%%
 
-The Introduction section, of referenced text \cite{bib1} expands on the background of the work (some overlap with the Abstract is acceptable). The introduction should not include subheadings.
+Acute lymphoblastic leukaemia (ALL) is the most common childhood
+malignancy, accounting for approximately 25\% of all paediatric
+cancers~\cite{[CITE:Hunger2015]}. Advances in risk-adapted chemotherapy
+regimens and supportive care have elevated five-year event-free
+survival (EFS) rates above 90\% in high-income settings; however, the
+15--20\% of patients who relapse face substantially worse outcomes,
+with long-term survival dropping to 30--50\% following
+re-induction~\cite{[CITE:Bhojwani2013],[CITE:Pui2008]}.
+Critically, the majority of relapses occur after apparent clinical
+remission, making prospective identification of high-risk patients
+a central yet unsolved challenge in paediatric oncology.
+Current standard-of-care risk stratification (Initial Risk at
+diagnosis; Final Risk after Day~46 induction assessment) relies on
+pre-specified clinical cut-offs for age, white blood cell count,
+cytogenetics, immunophenotype, and MRD, but these categorical rules do
+not fully exploit the rich multimodal information accumulated
+progressively during treatment, nor do they yield personalised
+probability estimates for future relapse or survival.
 
-Springer Nature does not impose a strict layout as standard however authors are advised to check the individual requirements for the journal they are planning to submit to as there may be journal-level preferences. When preparing your text please also be aware that some stylistic choices are not supported in full text XML (publication version), including coloured font. These will not be replicated in the typeset article if it is accepted. 
+Computational approaches have been applied to ALL outcome prediction
+with increasing frequency. Machine learning models trained on flow
+cytometry profiles~\cite{[CITE:Good2018]}, gene expression
+signatures~\cite{[CITE:Fitter2021]}, DNA methylation
+arrays~\cite{[CITE:Mosquera2024]}, and electronic medical
+records~\cite{[CITE:Pan2017]} have demonstrated improved risk
+separation beyond standard criteria.
+Nevertheless, two fundamental limitations persist across this
+literature.
+First, most methods operate on a \emph{fixed, single-timepoint}
+feature snapshot at diagnosis, ignoring the structured temporal
+ordering in which clinical data actually become available—molecular
+cytogenetics results are routinely unavailable until Day~7--10, and
+MRD until Day~19--46.
+A model trained on features pooled from all timepoints may implicitly
+rely on information that would not be available at the point of
+clinical decision-making, producing optimistic but
+non-deployable estimates~\cite{[CITE:Steyerberg2019]}.
+Second, standard train-test splits shuffle patients
+chronologically, whereas in practice a hospital's knowledge base
+grows year by year; temporal validation is required to confirm
+that predictive performance generalises to truly \emph{prospective}
+patients.
+Computational flow cytometry approaches have further shown that
+immunophenotypic data at diagnosis alone may be insufficient for
+relapse prediction~\cite{[CITE:Martinez2025]}, highlighting the need
+for multimodal and longitudinal integration.
 
-\section{Results}\label{sec2}
+The emergence of large language models (LLMs) with strong zero-shot
+reasoning capabilities opens a complementary avenue: given structured
+clinical notes or reports describing a patient's feature profile, an
+LLM may distil prognostic patterns encoded in its pre-training without
+requiring labelled examples from the target
+cohort~\cite{[CITE:Phaterpekar2026]}.
+However, systematic evaluations of LLM zero-shot performance on
+paediatric oncology outcome prediction—particularly for future events
+such as relapse and survival—remain absent from the literature.
+Equally unexplored is whether LLM-based risk scores can serve as
+survival predictors comparable to purpose-built survival models.
 
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+Here we address these gaps with a cohort of 301 Chinese paediatric ALL
+patients and a \emph{temporally-structured} prediction framework.
+Our contributions are: (\textit{i})~a twelve-level feature set
+hierarchy $\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_{12}$
+whose boundaries align exactly with the clinical data-acquisition
+timeline (Day~0 through Day~46+); (\textit{ii})~Phase~1, a systematic
+zero-shot evaluation of four LLMs across all feature levels and six
+prediction targets, establishing performance baselines without any
+model training; (\textit{iii})~Phase~2, a decision tree and random
+survival forest system trained on a dynamic case database partitioned
+by patient enrolment year, validating performance under three temporal
+splits that mimic real-world database growth; (\textit{iv})~a bone
+marrow morphology pipeline converting microscopy images to structured
+text reports via SAM-based cell segmentation and BiomedCLIP clustering,
+which augments LLM inputs; and (\textit{v})~a RAG component that
+retrieves the most similar historical cases to support interpretable
+clinical narratives for each prediction.
 
-\section{This is an example for first level head---section head}\label{sec3}
+%%==============================================================%%
+\section{Results}\label{sec:results}
+%%==============================================================%%
 
-\subsection{This is an example for second level head---subsection head}\label{subsec2}
+\subsection{Study cohort and temporally-structured feature design}
+\label{sec:cohort}
 
-\subsubsection{This is an example for third level head---subsubsection head}\label{subsubsec2}
+We assembled a single-centre retrospective cohort of 301 paediatric
+ALL patients treated at [HOSPITAL NAME] between 2015 and 2019
+(Table~\ref{tab:cohort}).
+Median age at diagnosis was [X] years (range [X--X]); 163 (54.2\%)
+patients had B-cell ALL and [X] (XX\%) had T-cell ALL.
+The four primary prediction targets span the treatment timeline:
+Day~19 MRD positivity (D19MRD $\geq 1\%$; positive in [X]\% of
+evaluable patients), Day~46 MRD positivity (D46MRD $\geq 0.01\%$),
+final risk classification (Final Risk: low-risk~[LR] vs
+intermediate/high-risk~[IR/HR], with 159~LR and 142~IR/HR), and
+relapse occurrence (Yes in 44/301, 14.6\%).
+For survival analysis, EFS events (relapse, induction failure, or
+death) occurred in 75 patients (24.9\%) and overall survival (OS)
+events (death) in 24 patients (8.0\%).
 
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. 
-
-\section{Equations}\label{sec4}
-
-Equations in \LaTeX\ can either be inline or on-a-line by itself (``display equations''). For
-inline equations use the \verb+$...$+ commands. E.g.: The equation
-$H\psi = E \psi$ is written via the command \verb+$H \psi = E \psi$+.
-
-For display equations (with auto generated equation numbers)
-one can use the equation or align environments:
-\begin{equation}
-\|\tilde{X}(k)\|^2 \leq\frac{\sum\limits_{i=1}^{p}\left\|\tilde{Y}_i(k)\right\|^2+\sum\limits_{j=1}^{q}\left\|\tilde{Z}_j(k)\right\|^2 }{p+q}.\label{eq1}
-\end{equation}
-where,
-\begin{align}
-D_\mu &=  \partial_\mu - ig \frac{\lambda^a}{2} A^a_\mu \nonumber \\
-F^a_{\mu\nu} &= \partial_\mu A^a_\nu - \partial_\nu A^a_\mu + g f^{abc} A^b_\mu A^a_\nu \label{eq2}
-\end{align}
-Notice the use of \verb+\nonumber+ in the align environment at the end
-of each line, except the last, so as not to produce equation numbers on
-lines where no equation numbers are required. The \verb+\label{}+ command
-should only be used at the last line of an align environment where
-\verb+\nonumber+ is not used.
-\begin{equation}
-Y_\infty = \left( \frac{m}{\textrm{GeV}} \right)^{-3}
-    \left[ 1 + \frac{3 \ln(m/\textrm{GeV})}{15}
-    + \frac{\ln(c_2/5)}{15} \right]
-\end{equation}
-The class file also supports the use of \verb+\mathbb{}+, \verb+\mathscr{}+ and
-\verb+\mathcal{}+ commands. As such \verb+\mathbb{R}+, \verb+\mathscr{R}+
-and \verb+\mathcal{R}+ produces $\mathbb{R}$, $\mathscr{R}$ and $\mathcal{R}$
-respectively (refer Subsubsection~\ref{subsubsec2}).
-
-\section{Tables}\label{sec5}
-
-Tables can be inserted via the normal table and tabular environment. To put
-footnotes inside tables you should use \verb+\footnotetext[]{...}+ tag.
-The footnote appears just below the table itself (refer Tables~\ref{tab1} and \ref{tab2}). 
-For the corresponding footnotemark use \verb+\footnotemark[...]+
-
-\begin{table}[h]
-\caption{Caption text}\label{tab1}%
-\begin{tabular}{@{}llll@{}}
-\toprule
-Column 1 & Column 2  & Column 3 & Column 4\\
-\midrule
-row 1    & data 1   & data 2  & data 3  \\
-row 2    & data 4   & data 5\footnotemark[1]  & data 6  \\
-row 3    & data 7   & data 8  & data 9\footnotemark[2]  \\
-\botrule
-\end{tabular}
-\footnotetext{Source: This is an example of table footnote. This is an example of table footnote.}
-\footnotetext[1]{Example for a first table footnote. This is an example of table footnote.}
-\footnotetext[2]{Example for a second table footnote. This is an example of table footnote.}
-\end{table}
-
-\noindent
-The input format for the above table is as follows:
-
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-\bigskip
-\begin{verbatim}
-\begin{table}[<placement-specifier>]
-\caption{<table-caption>}\label{<table-label>}%
-\begin{tabular}{@{}llll@{}}
-\toprule
-Column 1 & Column 2 & Column 3 & Column 4\\
-\midrule
-row 1 & data 1 & data 2	 & data 3 \\
-row 2 & data 4 & data 5\footnotemark[1] & data 6 \\
-row 3 & data 7 & data 8	 & data 9\footnotemark[2]\\
-\botrule
-\end{tabular}
-\footnotetext{Source: This is an example of table footnote. 
-This is an example of table footnote.}
-\footnotetext[1]{Example for a first table footnote.
-This is an example of table footnote.}
-\footnotetext[2]{Example for a second table footnote. 
-This is an example of table footnote.}
-\end{table}
-\end{verbatim}
-\bigskip
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-
-\begin{table}[h]
-\caption{Example of a lengthy table which is set to full textwidth}\label{tab2}
-\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lcccccc}
-\toprule%
-& \multicolumn{3}{@{}c@{}}{Element 1\footnotemark[1]} & \multicolumn{3}{@{}c@{}}{Element 2\footnotemark[2]} \\\cmidrule{2-4}\cmidrule{5-7}%
-Project & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ \\
-\midrule
-Element 3  & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$\\
-Element 4  & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$\\
-\botrule
-\end{tabular*}
-\footnotetext{Note: This is an example of table footnote. This is an example of table footnote this is an example of table footnote this is an example of~table footnote this is an example of table footnote.}
-\footnotetext[1]{Example for a first table footnote.}
-\footnotetext[2]{Example for a second table footnote.}
-\end{table}
-
-In case of double column layout, tables which do not fit in single column width should be set to full text width. For this, you need to use \verb+\begin{table*}+ \verb+...+ \verb+\end{table*}+ instead of \verb+\begin{table}+ \verb+...+ \verb+\end{table}+ environment. Lengthy tables which do not fit in textwidth should be set as rotated table. For this, you need to use \verb+\begin{sidewaystable}+ \verb+...+ \verb+\end{sidewaystable}+ instead of \verb+\begin{table*}+ \verb+...+ \verb+\end{table*}+ environment. This environment puts tables rotated to single column width. For tables rotated to double column width, use \verb+\begin{sidewaystable*}+ \verb+...+ \verb+\end{sidewaystable*}+.
-
-\begin{sidewaystable}
-\caption{Tables which are too long to fit, should be written using the ``sidewaystable'' environment as shown here}\label{tab3}
-\begin{tabular*}{\textheight}{@{\extracolsep\fill}lcccccc}
-\toprule%
-& \multicolumn{3}{@{}c@{}}{Element 1\footnotemark[1]}& \multicolumn{3}{@{}c@{}}{Element\footnotemark[2]} \\\cmidrule{2-4}\cmidrule{5-7}%
-Projectile & Energy	& $\sigma_{calc}$ & $\sigma_{expt}$ & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ \\
-\midrule
-Element 3 & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$ \\
-Element 4 & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$ \\
-Element 5 & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$ \\
-Element 6 & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$ \\
-\botrule
-\end{tabular*}
-\footnotetext{Note: This is an example of table footnote this is an example of table footnote this is an example of table footnote this is an example of~table footnote this is an example of table footnote.}
-\footnotetext[1]{This is an example of table footnote.}
-\end{sidewaystable}
-
-\section{Figures}\label{sec6}
-
-As per the \LaTeX\ standards you need to use eps images for \LaTeX\ compilation and \verb+pdf/jpg/png+ images for \verb+PDFLaTeX+ compilation. This is one of the major difference between \LaTeX\ and \verb+PDFLaTeX+. Each image should be from a single input .eps/vector image file. Avoid using subfigures. The command for inserting images for \LaTeX\ and \verb+PDFLaTeX+ can be generalized. The package used to insert images in \verb+LaTeX/PDFLaTeX+ is the graphicx package. Figures can be inserted via the normal figure environment as shown in the below example:
-
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-\bigskip
-\begin{verbatim}
-\begin{figure}[<placement-specifier>]
+\begin{table}[ht]
+\caption{Cohort characteristics and prediction target distributions.}
+\label{tab:cohort}
 \centering
-\includegraphics{<eps-file>}
-\caption{<figure-caption>}\label{<figure-label>}
-\end{figure}
-\end{verbatim}
-\bigskip
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.9\textwidth]{fig.eps}
-\caption{This is a widefig. This is an example of long caption this is an example of long caption  this is an example of long caption this is an example of long caption}\label{fig1}
-\end{figure}
-
-In case of double column layout, the above format puts figure captions/images to single column width. To get spanned images, we need to provide \verb+\begin{figure*}+ \verb+...+ \verb+\end{figure*}+.
-
-For sample purpose, we have included the width of images in the optional argument of \verb+\includegraphics+ tag. Please ignore this. 
-
-\section{Algorithms, Program codes and Listings}\label{sec7}
-
-Packages \verb+algorithm+, \verb+algorithmicx+ and \verb+algpseudocode+ are used for setting algorithms in \LaTeX\ using the format:
-
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-\bigskip
-\begin{verbatim}
-\begin{algorithm}
-\caption{<alg-caption>}\label{<alg-label>}
-\begin{algorithmic}[1]
-. . .
-\end{algorithmic}
-\end{algorithm}
-\end{verbatim}
-\bigskip
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-
-You may refer above listed package documentations for more details before setting \verb+algorithm+ environment. For program codes, the ``verbatim'' package is required and the command to be used is \verb+\begin{verbatim}+ \verb+...+ \verb+\end{verbatim}+. 
-
-Similarly, for \verb+listings+, use the \verb+listings+ package. \verb+\begin{lstlisting}+ \verb+...+ \verb+\end{lstlisting}+ is used to set environments similar to \verb+verbatim+ environment. Refer to the \verb+lstlisting+ package documentation for more details.
-
-A fast exponentiation procedure:
-
-\lstset{texcl=true,basicstyle=\small\sf,commentstyle=\small\rm,mathescape=true,escapeinside={(*}{*)}}
-\begin{lstlisting}
-begin
-  for $i:=1$ to $10$ step $1$ do
-      expt($2,i$);  
-      newline() od                (*\textrm{Comments will be set flush to the right margin}*)
-where
-proc expt($x,n$) $\equiv$
-  $z:=1$;
-  do if $n=0$ then exit fi;
-     do if odd($n$) then exit fi;                 
-        comment: (*\textrm{This is a comment statement;}*)
-        $n:=n/2$; $x:=x*x$ od;
-     { $n>0$ };
-     $n:=n-1$; $z:=z*x$ od;
-  print($z$). 
-end
-\end{lstlisting}
-
-\begin{algorithm}
-\caption{Calculate $y = x^n$}\label{algo1}
-\begin{algorithmic}[1]
-\Require $n \geq 0 \vee x \neq 0$
-\Ensure $y = x^n$ 
-\State $y \Leftarrow 1$
-\If{$n < 0$}\label{algln2}
-        \State $X \Leftarrow 1 / x$
-        \State $N \Leftarrow -n$
-\Else
-        \State $X \Leftarrow x$
-        \State $N \Leftarrow n$
-\EndIf
-\While{$N \neq 0$}
-        \If{$N$ is even}
-            \State $X \Leftarrow X \times X$
-            \State $N \Leftarrow N / 2$
-        \Else[$N$ is odd]
-            \State $y \Leftarrow y \times X$
-            \State $N \Leftarrow N - 1$
-        \EndIf
-\EndWhile
-\end{algorithmic}
-\end{algorithm}
-
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-\bigskip
-\begin{minipage}{\hsize}%
-\lstset{frame=single,framexleftmargin=-1pt,framexrightmargin=-17pt,framesep=12pt,linewidth=0.98\textwidth,language=pascal}% Set your language (you can change the language for each code-block optionally)
-%%% Start your code-block
-\begin{lstlisting}
-for i:=maxint to 0 do
-begin
-{ do nothing }
-end;
-Write('Case insensitive ');
-Write('Pascal keywords.');
-\end{lstlisting}
-\end{minipage}
-
-\section{Cross referencing}\label{sec8}
-
-Environments such as figure, table, equation and align can have a label
-declared via the \verb+\label{#label}+ command. For figures and table
-environments use the \verb+\label{}+ command inside or just
-below the \verb+\caption{}+ command. You can then use the
-\verb+\ref{#label}+ command to cross-reference them. As an example, consider
-the label declared for Figure~\ref{fig1} which is
-\verb+\label{fig1}+. To cross-reference it, use the command 
-\verb+Figure \ref{fig1}+, for which it comes up as
-``Figure~\ref{fig1}''. 
-
-To reference line numbers in an algorithm, consider the label declared for the line number 2 of Algorithm~\ref{algo1} is \verb+\label{algln2}+. To cross-reference it, use the command \verb+\ref{algln2}+ for which it comes up as line~\ref{algln2} of Algorithm~\ref{algo1}.
-
-\subsection{Details on reference citations}\label{subsec7}
-
-Standard \LaTeX\ permits only numerical citations. To support both numerical and author-year citations this template uses \verb+natbib+ \LaTeX\ package. For style guidance please refer to the template user manual.
-
-Here is an example for \verb+\cite{...}+: \cite{bib1}. Another example for \verb+\citep{...}+: \citep{bib2}. For author-year citation mode, \verb+\cite{...}+ prints Jones et al. (1990) and \verb+\citep{...}+ prints (Jones et al., 1990).
-
-All cited bib entries are printed at the end of this article: \cite{bib3}, \cite{bib4}, \cite{bib5}, \cite{bib6}, \cite{bib7}, \cite{bib8}, \cite{bib9}, \cite{bib10}, \cite{bib11}, \cite{bib12} and \cite{bib13}.
-
-\section{Examples for theorem like environments}\label{sec10}
-
-For theorem like environments, we require \verb+amsthm+ package. There are three types of predefined theorem styles exists---\verb+thmstyleone+, \verb+thmstyletwo+ and \verb+thmstylethree+ 
-
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-\bigskip
-\begin{tabular}{|l|p{19pc}|}
-\hline
-\verb+thmstyleone+ & Numbered, theorem head in bold font and theorem text in italic style \\\hline
-\verb+thmstyletwo+ & Numbered, theorem head in roman font and theorem text in italic style \\\hline
-\verb+thmstylethree+ & Numbered, theorem head in bold font and theorem text in roman style \\\hline
+\small
+\begin{tabular}{lcc}
+\toprule
+\textbf{Characteristic} & \textbf{Value} & \textbf{N (\%)} \\
+\midrule
+Total patients & & 301 \\
+Enrolment years & 2015--2019 & \\
+\midrule
+\multicolumn{3}{l}{\textit{Prediction targets}} \\
+Final Risk: LR & & 159 (52.8\%) \\
+Final Risk: IR/HR & & 142 (47.2\%) \\
+Relapse: Yes & & 44 (14.6\%) \\
+D19MRD $\geq 1\%$ & & [X] ([X]\%) \\
+D46MRD $\geq 0.01\%$ & & [X] ([X]\%) \\
+\midrule
+\multicolumn{3}{l}{\textit{Survival endpoints}} \\
+EFS events & relapse+failure+death & 75 (24.9\%) \\
+OS events & death & 24 (8.0\%) \\
+\midrule
+\multicolumn{3}{l}{\textit{Multimodal data availability}} \\
+Bone marrow images & & [X] (XX\%) \\
+Pathology text reports & & [X] (XX\%) \\
+Morphology features & & 287 (95.3\%) \\
+\bottomrule
 \end{tabular}
-\bigskip
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
+\end{table}
 
-For mathematics journals, theorem styles can be included as shown in the following examples:
+Central to our framework is a twelve-level feature hierarchy
+$\mathcal{F}_1 \subseteq \mathcal{F}_2 \subseteq \cdots \subseteq
+\mathcal{F}_{12}$ (Table~\ref{tab:expdesign}), where each level
+$\mathcal{F}_k$ corresponds to features available at clinical
+timepoint~$\tau_k$.
+$\mathcal{F}_1$ contains only white blood cell count and age—information
+present at the moment of hospital admission—while $\mathcal{F}_{8}$
+additionally includes Day~19 and Day~46 MRD values obtained at the
+end of induction chemotherapy.
+Feature sets with image-derived inputs ($\mathcal{F}_4$, $\mathcal{F}_{11}$,
+$\mathcal{F}_{12}$) further incorporate bone marrow morphology in the
+form of either raw microscopy tiles or structured text reports produced
+by our automated pipeline (Section~\ref{sec:morph}).
+This design ensures that any model trained or evaluated at level~$k$
+uses only information that would be accessible in clinical practice at
+timepoint~$\tau_k$, avoiding temporal leakage.
 
-\begin{theorem}[Theorem subhead]\label{thm1}
-Example theorem text. Example theorem text. Example theorem text. Example theorem text. Example theorem text. 
-Example theorem text. Example theorem text. Example theorem text. Example theorem text. Example theorem text. 
-Example theorem text. 
-\end{theorem}
+\begin{table}[ht]
+\caption{Feature set design aligned with the clinical data-acquisition timeline.}
+\label{tab:expdesign}
+\centering
+\small
+\begin{tabular}{llp{7cm}l}
+\toprule
+\textbf{Exp} & \textbf{Timepoint} & \textbf{Cumulative features added} & \textbf{Targets} \\
+\midrule
+$\mathcal{F}_1$ & Day 0 & WBC, Age & 4 \\
+$\mathcal{F}_2$ & Day 1 & + Blast\% & 4 \\
+$\mathcal{F}_3$ & Day 1 & + Immunophenotype + 51 flow cytometry markers & 4 \\
+$\mathcal{F}_{4}$ & Day 1 & Same as $\mathcal{F}_3$ + bone marrow images & 4 \\
+$\mathcal{F}_{4.1}$ & Day 1 & Same as $\mathcal{F}_3$ + blast morphology text report & 4 \\
+$\mathcal{F}_5$ & Day 1 & $\mathcal{F}_3$ + non-risk clinical factors & 4 \\
+$\mathcal{F}_6$ & Day 5 & $\mathcal{F}_3$ + CNS status + Day~5 blast\% + Initial Risk & 4 \\
+$\mathcal{F}_7$ & Day 7--10 & $\mathcal{F}_6$ + Fusion gene + Karyotype + FISH & 4 \\
+$\mathcal{F}_8$ & Day 46 & $\mathcal{F}_7$ + D19MRD + D46MRD & 2$^\dagger$ \\
+$\mathcal{F}_9$ & Day 46 & D19MRD + D46MRD only & 2$^\dagger$ \\
+$\mathcal{F}_{10}$ & Day 7--10 & $\mathcal{F}_7$ + diagnostic bone marrow text report & 4 \\
+$\mathcal{F}_{11}$ & Day 46+ & $\mathcal{F}_8$ + initial + follow-up images \& reports & 2$^\dagger$ \\
+$\mathcal{F}_{12.1}$ & Day 7--10 & $\mathcal{F}_7$ + blast morphology text report & 4 \\
+\bottomrule
+\multicolumn{4}{l}{$\dagger$ D19/D46MRD are used as inputs; only Final Risk and Relapse predicted.}
+\end{tabular}
+\end{table}
 
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+%%--------------------------------------------------------------%%
+\subsection{Phase~1: LLM zero-shot prediction across the feature timeline}
+\label{sec:phase1}
+%%--------------------------------------------------------------%%
 
-\begin{proposition}
-Example proposition text. Example proposition text. Example proposition text. Example proposition text. Example proposition text. 
-Example proposition text. Example proposition text. Example proposition text. Example proposition text. Example proposition text. 
-\end{proposition}
+We evaluated four LLMs in a zero-shot setting across all twelve feature
+levels and four prediction targets, yielding a systematic picture of
+how predictive performance evolves as more clinical information becomes
+available (Fig.~\ref{fig:ablation}).
+Models included a proprietary cloud model (Gemini-3.1-Flash-Lite) and
+three open-weight models deployed locally via vLLM on dual A100~80G
+GPUs: Gemma-4-31B-it, InternVL3.5-30B-A3B, and Qwen3.6-35B-A3B.
+Each patient's feature vector was serialised into natural language and
+presented to the model with a task-specific system prompt
+(Methods, Section~\ref{sec:llm_inference}); the model output a
+categorical label or a continuous risk score depending on the task.
 
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+\textbf{Final Risk stratification.}
+At Day~0 ($\mathcal{F}_1$, WBC and age only), Gemini and Gemma already
+achieved macro-averaged AUROC values of approximately 0.65--0.70 on
+Final Risk, reflecting the known prognostic importance of WBC count.
+Performance increased incrementally through $\mathcal{F}_3$ (flow
+cytometry panel) and $\mathcal{F}_6$--$\mathcal{F}_7$ (cytogenetics
+and initial risk classification), with Gemma reaching AUROC~= 0.885
+at $\mathcal{F}_{10}$ (full Day~7--10 features plus diagnostic report).
+The addition of MRD values at $\mathcal{F}_8$ produced the largest
+single improvement across all feature levels, with Gemma achieving
+AUROC~= 0.885 and Gemini AUROC~= 0.842 at this level.
+These results confirm that MRD is the dominant signal for final
+risk classification, consistent with clinical guidelines.
 
-\begin{example}
-Phasellus adipiscing semper elit. Proin fermentum massa
-ac quam. Sed diam turpis, molestie vitae, placerat a, molestie nec, leo. Maecenas lacinia. Nam ipsum ligula, eleifend
-at, accumsan nec, suscipit a, ipsum. Morbi blandit ligula feugiat magna. Nunc eleifend consequat lorem. 
-\end{example}
+\textbf{Relapse prediction.}
+Relapse prediction proved substantially harder for all models and
+feature levels.
+Across $\mathcal{F}_1$--$\mathcal{F}_{12}$, AUROC values for relapse
+ranged from approximately 0.50 to 0.59 across the four LLMs, with no
+single feature set or model achieving consistent improvement.
+The best results were obtained with morphology-augmented feature sets:
+Gemma reached AUROC~= 0.585 at $\mathcal{F}_{4.1}$ (blast morphology
+text report added to $\mathcal{F}_3$), and similar improvements of
+0.017--0.036 AUROC over raw image inputs were observed across all
+four models (Fig.~\ref{fig:morph}), indicating that structured
+morphological statistics convey information about relapse biology
+beyond what raw tiles provide to LLMs.
 
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+\textbf{MRD prediction.}
+LLMs showed moderate performance on D19MRD and D46MRD prediction
+(AUROC~0.60--0.80) using pre-MRD features only, suggesting that the
+models can partially infer early treatment response from the
+immunophenotypic and cytogenetic profile alone.
 
-\begin{remark}
-Phasellus adipiscing semper elit. Proin fermentum massa
-ac quam. Sed diam turpis, molestie vitae, placerat a, molestie nec, leo. Maecenas lacinia. Nam ipsum ligula, eleifend
-at, accumsan nec, suscipit a, ipsum. Morbi blandit ligula feugiat magna. Nunc eleifend consequat lorem. 
-\end{remark}
+\textbf{Comparative model behaviour.}
+Gemini and Gemma consistently outperformed InternVL and Qwen on most
+tasks; notably, Qwen3.6-35B-A3B showed near-chance AUROC on D19/D46MRD
+and Relapse despite competitive performance on Final Risk, suggesting
+a tendency to predict only the majority class for highly imbalanced
+tasks.
+InternVL performed comparably on Final Risk (AUROC~$\approx$~0.58--0.66)
+but showed weaker text-comprehension of structured feature reports.
 
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+%%--------------------------------------------------------------%%
+\subsection{Bone marrow morphology pipeline}
+\label{sec:morph_results}
+%%--------------------------------------------------------------%%
 
-\begin{definition}[Definition sub head]
-Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. 
-\end{definition}
+Bone marrow smear images were processed by an automated four-stage
+pipeline: SAM-based cell segmentation, morphological feature extraction
+($\sim$37 features per cell including area, circularity,
+nucleus-to-cytoplasm ratio, and GLCM texture), BiomedCLIP zero-shot
+clustering ($k=7$ with Hungarian assignment to cell types), and
+structured text report generation (Methods, Section~\ref{sec:morph}).
+This converts heterogeneous microscopy data into a consistent natural
+language representation accessible to LLMs.
 
-Additionally a predefined ``proof'' environment is available: \verb+\begin{proof}+ \verb+...+ \verb+\end{proof}+. This prints a ``Proof'' head in italic font style and the ``body text'' in roman font style with an open square at the end of each proof environment. 
+Comparing $\mathcal{F}_{4}$ (raw images directly provided to
+multimodal LLMs) with $\mathcal{F}_{4.1}$ (blast-only morphology text
+report substituted for images), the text-report approach achieved
+higher Relapse AUROC for all four models (improvements of
++0.017~Gemini, +0.035~Gemma, +0.022~InternVL, +0.036~Qwen), while
+Final Risk AUROC remained comparable or slightly improved.
+The all-cell-type report ($\mathcal{F}_{4.2}$) improved Final Risk for
+Gemma (AUROC~0.854 vs 0.840 for raw images) but was less beneficial
+for Relapse, suggesting that blast-specific features are more
+informative for predicting treatment failure.
+These results demonstrate that domain-specific cell-level
+characterisation provides predictive signal complementary to global
+image appearance.
 
-\begin{proof}
-Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. 
-\end{proof}
+%%--------------------------------------------------------------%%
+\subsection{Phase~2: Temporal validation with a dynamic case database}
+\label{sec:phase2}
+%%--------------------------------------------------------------%%
 
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+Phase~2 evaluates whether predictive performance is maintained under a
+realistic deployment scenario in which a model can only be trained on
+patients enrolled before the prediction date.
+We defined three temporal splits based on patient enrolment year
+$\tau_i$:
 
-\begin{proof}[Proof of Theorem~{\upshape\ref{thm1}}]
-Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. 
-\end{proof}
+\begin{equation}
+\mathcal{D}_s^{\text{train}} = \{i : \tau_i \leq \mathcal{T}_s\},
+\quad
+\mathcal{D}_s^{\text{test}} = \{i : \tau_i > \mathcal{T}_s\},
+\label{eq:splits}
+\end{equation}
 
-\noindent
-For a quote environment, use \verb+\begin{quote}...\end{quote}+
-\begin{quote}
-Quoted text example. Aliquam porttitor quam a lacus. Praesent vel arcu ut tortor cursus volutpat. In vitae pede quis diam bibendum placerat. Fusce elementum
-convallis neque. Sed dolor orci, scelerisque ac, dapibus nec, ultricies ut, mi. Duis nec dui quis leo sagittis commodo.
-\end{quote}
+where $\mathcal{T}_1 = 2016$ ($n_{\text{train}}=99$,
+$n_{\text{test}}=201$), $\mathcal{T}_2 = 2017$
+($n_{\text{train}}=186$, $n_{\text{test}}=114$), and
+$\mathcal{T}_3 = 2018$ ($n_{\text{train}}=283$, $n_{\text{test}}=17$).
+All preprocessing statistics (means, standard deviations for
+z-scoring; one-hot encoding maps) were derived exclusively from
+$\mathcal{D}_s^{\text{train}}$ and applied to $\mathcal{D}_s^{\text{test}}$,
+ensuring strict temporal non-leakage.
+A decision tree classifier (DT; max depth~4, class-weight balanced) and
+random forest (RF; $n_{\text{estimators}}=100$) were trained for each
+feature level and split combination; we report DT as the primary model
+for interpretability and RF as an ensemble upper bound.
 
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text (refer Figure~\ref{fig1}). Sample body text. Sample body text. Sample body text (refer Table~\ref{tab3}). 
+\textbf{Final Risk — ablation across feature levels (Split~2).}
+Figure~\ref{fig:p2ablation} shows the DT AUROC for Final Risk
+across the feature hierarchy on Split~2 ($n_{\text{test}}=114$, the
+most statistically robust split).
+Performance rose from AUROC~=~0.810 at $\mathcal{F}_1$ (WBC, age) to
+AUROC~=~0.912 at $\mathcal{F}_7$ (full cytogenetic panel), with the
+largest gain occurring at $\mathcal{F}_6$ (+0.127 AUROC, reflecting
+the introduction of Initial Risk and Day~5 peripheral blast percentage
+into the feature set).
+Including MRD at $\mathcal{F}_8$ further raised DT AUROC to
+\textbf{0.949} (RF: 0.998), the highest performance across all
+experimental conditions.
+The RF AUC approaching 1.0 at $\mathcal{F}_8$ is consistent with the
+known clinical rule—patients with undetectable MRD at Day~46 are
+overwhelmingly low-risk—and should be interpreted as a sanity check
+rather than a novel discovery.
+The DT, constrained to depth~4, provides a more conservative and
+clinically transferable estimate.
 
-\section{Methods}\label{sec11}
+\begin{table}[ht]
+\caption{Phase~2 classification results on Split~2
+($n_{\text{train}}=186$, $n_{\text{test}}=114$).
+Best DT result per task shown; \textbf{bold} = best DT AUROC.}
+\label{tab:p2class}
+\centering
+\small
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Task} & \textbf{Best Exp} & \textbf{DT AUC} & \textbf{RF AUC}
+  & \textbf{DT F1-macro} & \textbf{DT Bal.Acc.} \\
+\midrule
+Final Risk   & $\mathcal{F}_8$   & \textbf{0.949} & 0.998 &
+  [X] & [X] \\
+D19MRD       & $\mathcal{F}_{4.1}$ & \textbf{0.743} & 0.807 &
+  [X] & [X] \\
+D46MRD       & $\mathcal{F}_5$   & \textbf{0.671} & 0.636 &
+  [X] & [X] \\
+Relapse      & $\mathcal{F}_1$   & 0.529 & 0.465 &
+  [X] & [X] \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Topical subheadings are allowed. Authors must ensure that their Methods section includes adequate experimental and characterization data necessary for others in the field to reproduce their work. Authors are encouraged to include RIIDs where appropriate. 
+\textbf{Temporal learning curve.}
+Across Split~1 ($n_{\text{train}}=99$) to Split~2
+($n_{\text{train}}=186$), Final Risk DT AUROC increased from [X] to
+0.949, consistent with the intuition that a growing case database
+enables better discrimination.
+Split~3 ($n_{\text{test}}=17$) is underpowered for most tasks and is
+reported with 95\% bootstrap confidence intervals in
+Supplementary Table~S1.
 
-\textbf{Ethical approval declarations} (only required where applicable) Any article reporting experiment/s carried out on (i)~live vertebrate (or higher invertebrates), (ii)~humans or (iii)~human samples must include an unambiguous statement within the methods section that meets the following requirements: 
+\textbf{Relapse prediction.}
+Relapse prediction remained challenging for DT and RF alike (best
+DT AUROC~= 0.529, Split~2), mirroring the difficulty observed in
+Phase~1 and corroborating findings from
+recent computational flow cytometry studies~\cite{[CITE:Martinez2025]}.
+This limitation likely reflects the multifactorial biology of
+relapse—involving treatment adherence, minimal residual disease
+kinetics, and late-emerging clonal evolution—that may not be
+fully captured by the features available in our cohort.
 
-\begin{enumerate}[1.]
-\item Approval: a statement which confirms that all experimental protocols were approved by a named institutional and/or licensing committee. Please identify the approving body in the methods section
+%%--------------------------------------------------------------%%
+\subsection{Survival prediction}
+\label{sec:survival}
+%%--------------------------------------------------------------%%
 
-\item Accordance: a statement explicitly saying that the methods were carried out in accordance with the relevant guidelines and regulations
+We evaluated risk stratification for event-free survival (EFS; 75
+events: 45 relapses, 23 induction failures, 7 deaths) and overall
+survival (OS; 24 deaths) using two complementary approaches.
+In Phase~1, LLM-derived risk scores (continuous values 0--1 output by
+the system prompt requesting event probability) were used directly as
+survival predictors evaluated via Harrell's concordance
+index~(\ref{eq:cindex}) and IPCW time-dependent
+AUC~(\ref{eq:itauc}).
+In Phase~2, a random survival forest (RSF) was trained on temporally
+partitioned data.
 
-\item Informed consent (for experiments involving humans or human tissue samples): include a statement confirming that informed consent was obtained from all participants and/or their legal guardian/s
-\end{enumerate}
+\textbf{EFS.}
+Phase~1 LLMs achieved peak EFS concordance indices of 0.716 (Gemma,
+$\mathcal{F}_8$), 0.705 (Gemini, $\mathcal{F}_9$), 0.694
+(Qwen, $\mathcal{F}_9$), and 0.682 (InternVL, $\mathcal{F}_9$)
+across all feature levels.
+The MRD-only feature set $\mathcal{F}_9$ was consistently optimal or
+near-optimal for LLM-based EFS prediction, confirming that residual
+disease burden encodes strong prognostic information accessible to
+LLMs without any exposure to labelled survival data.
+Phase~2 RSF on Split~2 attained C-index~= \textbf{0.746}
+(time-AUC at 24~months~= 0.775, log-rank $p = 0.010$) at
+$\mathcal{F}_8$, a modest but consistent improvement over the
+best Phase~1 LLM.
 
-If your manuscript includes potentially identifying patient/participant information, or if it describes human transplantation research, or if it reports results of a clinical trial then  additional information will be required. Please visit (\url{https://www.nature.com/nature-research/editorial-policies}) for Nature Portfolio journals, (\url{https://www.springer.com/gp/authors-editors/journal-author/journal-author-helpdesk/publishing-ethics/14214}) for Springer Nature journals, or (\url{https://www.biomedcentral.com/getpublished/editorial-policies\#ethics+and+consent}) for BMC.
+\textbf{Kaplan-Meier risk stratification.}
+For each model and feature level, patients were dichotomised at the
+median predicted risk score and Kaplan-Meier curves were estimated for
+the two strata (Fig.~\ref{fig:km}).
+Significant group separation (log-rank $p < 0.05$) was achieved by
+all four LLMs at $\mathcal{F}_8$/$\mathcal{F}_9$, and by the
+Phase~2 RSF at $\mathcal{F}_8$ (Split~2, $p = 0.010$).
 
-\section{Discussion}\label{sec12}
+\textbf{OS.}
+With only 24 OS events (8.0\% event rate), statistical power for OS
+models is limited; C-indices ranged from 0.629 to 0.772 across
+models and feature levels, with no consistent ordering.
+InternVL reached C-index~= 0.772 at $\mathcal{F}_{11}$ (C-index at
+24~months AUC~= 0.762, $p = 0.0001$); however, results at this
+feature level incorporate follow-up imaging and should be interpreted
+with caution regarding temporal availability.
+Phase~2 RSF Split~3 OS results are omitted due to zero OS events in
+the 17-patient 2019 test set.
+A larger cohort or multi-centre study would be required to draw
+robust conclusions about OS.
 
-Discussions should be brief and focused. In some disciplines use of Discussion or `Conclusion' is interchangeable. It is not mandatory to use both. Some journals prefer a section `Results and Discussion' followed by a section `Conclusion'. Please refer to Journal-level guidance for any specific requirements. 
+\begin{table}[ht]
+\caption{Survival prediction results. Phase~1: best LLM per model
+(all patients, no temporal split). Phase~2: Split~2.
+$\dagger$~p-value from log-rank test.}
+\label{tab:survival}
+\centering
+\footnotesize
+\begin{tabular}{llllcccc}
+\toprule
+\textbf{Phase} & \textbf{Model} & \textbf{EP}
+  & \textbf{Exp} & \textbf{C-idx}
+  & \textbf{AUC@12m} & \textbf{AUC@24m} & \textbf{p$^\dagger$} \\
+\midrule
+P1 & Gemma          & EFS & $\mathcal{F}_8$  & 0.716 & [X] & 0.771 & $<$0.001 \\
+P1 & Gemini         & EFS & $\mathcal{F}_9$  & 0.705 & [X] & 0.777 & $<$0.001 \\
+P1 & Qwen           & EFS & $\mathcal{F}_9$  & 0.694 & [X] & 0.752 & $<$0.001 \\
+P1 & InternVL       & EFS & $\mathcal{F}_9$  & 0.682 & [X] & 0.737 & $<$0.001 \\
+\midrule
+P2 & RSF (Split~2)  & EFS & $\mathcal{F}_8$  & \textbf{0.746} & [X] & \textbf{0.775} & 0.010 \\
+\midrule
+P1 & InternVL       & OS  & $\mathcal{F}_{11}$ & 0.772 & [X] & 0.762 & $<$0.001 \\
+P1 & Gemma          & OS  & $\mathcal{F}_8$  & 0.718 & [X] & 0.700 & $<$0.001 \\
+P2 & RSF (Split~2)  & OS  & $\mathcal{F}_8$  & 0.629 & [X] & 0.611 & 0.489 \\
+\midrule
+\multicolumn{8}{l}{[PLACEHOLDER: External baseline comparison — to be added]}\\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\section{Conclusion}\label{sec13}
+%%--------------------------------------------------------------%%
+\subsection{Interpretable prediction via retrieval-augmented generation}
+\label{sec:rag}
+%%--------------------------------------------------------------%%
 
-Conclusions may be used to restate your hypothesis or research question, restate your major findings, explain the relevance and the added value of your work, highlight any limitations of your study, describe future directions for research and recommendations. 
+To provide clinically grounded explanations for Phase~2 predictions,
+we implemented a RAG component that supplements each DT prediction
+with a set of the $K=5$ most similar historical cases retrieved from
+the training database, followed by an LLM-generated narrative
+synthesising the decision-tree path and the retrieved precedents
+(Methods, Section~\ref{sec:rag_methods}).
+Case retrieval used cosine similarity in the same z-scored feature
+space as the DT:
 
-In some disciplines use of Discussion or 'Conclusion' is interchangeable. It is not mandatory to use both. Please refer to Journal-level guidance for any specific requirements. 
+\begin{equation}
+\mathcal{N}(i) = \underset{j \in \mathcal{D}_s^{\text{train}}}
+  {\arg\text{top-}K}\
+  \frac{\mathbf{z}_i \cdot \mathbf{z}_j}
+       {\|\mathbf{z}_i\|_2 \|\mathbf{z}_j\|_2},
+\quad K = 5.
+\label{eq:rag}
+\end{equation}
 
-\backmatter
+Figure~\ref{fig:rag} illustrates two representative cases from the
+$\mathcal{F}_8$/Split~3 experiment.
+In Case~1, a patient correctly predicted as IR by the DT (path:
+$\text{WBC} > 34.5 \rightarrow \text{D46MRD} > 0.01\% \rightarrow
+\text{CD10+} = \text{true} \rightarrow \text{IR}$), the top-5
+retrieved historical cases all shared persistently elevated MRD and
+cytogenetic abnormalities, and the LLM narrative coherently attributed
+the high-risk classification to MRD non-clearance corroborated by
+historical precedent.
+In Case~2, a borderline patient whose prediction changed between
+Split~1 and Split~2 models, the narrative highlighted conflicting
+signals in the retrieved cases (similar MRD but divergent cytogenetic
+profiles), suggesting areas where additional investigation—such as
+next-generation sequencing—might resolve ambiguity.
+These examples demonstrate that the RAG component can produce
+clinically meaningful explanations that go beyond the rule statement
+of the decision tree alone.
 
-\bmhead{Supplementary information}
+%%==============================================================%%
+\section{Discussion}\label{sec:discussion}
+%%==============================================================%%
 
-If your article has accompanying supplementary file/s please state so here. 
+This study presents a temporally-structured multimodal framework for
+paediatric ALL outcome prediction that explicitly mirrors the clinical
+data-acquisition workflow, enabling meaningful predictions at each
+decision node from admission to end-of-induction.
+Several key findings warrant discussion.
 
-Authors reporting data from electrophoretic gels and blots should supply the full unprocessed scans for key as part of their Supplementary information. This may be requested by the editorial team/s if it is missing.
+\textbf{MRD as the dominant predictor.}
+The most striking result across both Phase~1 and Phase~2 is the
+predictive jump attributable to MRD values: DT AUROC for Final Risk
+increased from 0.912 ($\mathcal{F}_7$, cytogenetics) to 0.949
+($\mathcal{F}_8$, plus D19/D46 MRD) under Split~2 conditions.
+Similarly, LLM EFS C-index peaked at feature levels that included
+MRD.
+This quantitatively confirms the central role of MRD in the
+clinical risk-stratification guideline~\cite{[CITE:Conter2010]}, and
+provides an AUROC estimate that directly characterises the
+discriminative value of adding MRD to cytogenetic profiling.
+From a clinical translation perspective, the DT achieves 0.949 AUROC
+for Final Risk with a transparent depth-4 decision tree that can be
+directly audited by clinicians, which is important for institutional
+adoption~\cite{[CITE:Rudin2019]}.
 
-Please refer to Journal-level guidance for any specific requirements.
+\textbf{Temporal validation and database growth.}
+The consistent improvement in Final Risk AUROC as the training
+database grows from 99 (Split~1) to 186 (Split~2) patients suggests
+that accumulating historical cases continues to benefit predictive
+performance, motivating a prospective case-database design for
+clinical AI systems.
+The smallest test set (Split~3, $n=17$) also yielded the highest
+nominal DT AUROC (0.979), likely an artefact of the small and
+possibly unrepresentative 2019 cohort rather than genuine improvement,
+underscoring the importance of interpreting results from small test
+sets with bootstrap confidence intervals.
 
-\bmhead{Acknowledgements}
+\textbf{LLM zero-shot as a competitive baseline.}
+Phase~1 LLMs reached Final Risk AUROC values of 0.842--0.885 without
+any labelled training data, a result competitive with the Phase~2 DT
+($\leq \mathcal{F}_7$ conditions).
+This indicates that the clinical knowledge encoded during LLM
+pre-training includes a meaningful understanding of paediatric ALL risk
+factors.
+LLMs may therefore be particularly valuable in settings where
+historical case databases are small or absent—for example, at the
+time a new treatment protocol is introduced—serving as a strong
+prior until sufficient labelled data accumulate.
 
-Acknowledgements are not compulsory. Where included they should be brief. Grant or contribution numbers may be acknowledged.
+\textbf{The challenge of relapse prediction.}
+Relapse prediction proved intractable for both LLMs (AUROC $\approx$
+0.50--0.59) and DT/RF (best DT AUROC~= 0.529), consistent with the
+broader literature~\cite{[CITE:Martinez2025],[CITE:Good2018]}.
+Our feature set does not include genomic or epigenomic data (e.g.,
+copy-number variation, DNA methylation), which have shown modest
+incremental utility in single-centre studies~\cite{[CITE:Mosquera2024]}.
+Future work integrating multi-omics data within the temporal feature
+hierarchy may improve relapse prediction.
 
-Please refer to Journal-level guidance for any specific requirements.
+\textbf{Limitations.}
+This is a single-centre retrospective study; external validation in
+independent cohorts is required before clinical deployment.
+The relatively small cohort ($n=301$) limits the statistical power for
+OS analysis (24 events) and for the smallest temporal split ($n=17$).
+All Phase~1 LLM experiments used zero-shot prompting; fine-tuning on
+labelled clinical notes from this or similar cohorts may yield
+further improvements.
+External baseline comparisons against published methods trained on
+independent datasets have not yet been performed and are a planned
+extension of this work.
 
-\section*{Declarations}
+%%==============================================================%%
+\section{Methods}\label{sec:methods}
+%%==============================================================%%
 
-Some journals require declarations to be submitted in a standardised format. Please check the Instructions for Authors of the journal to which you are submitting to see if you need to complete this section. If yes, your manuscript must contain the following sections under the heading `Declarations':
+\subsection{Dataset and ethics}\label{sec:dataset}
 
-\begin{itemize}
-\item Funding
-\item Conflict of interest/Competing interests (check journal-specific guidelines for which heading to use)
-\item Ethics approval and consent to participate
-\item Consent for publication
-\item Data availability 
-\item Materials availability
-\item Code availability 
-\item Author contribution
-\end{itemize}
+The cohort comprised 301 patients diagnosed with acute lymphoblastic
+leukaemia at [HOSPITAL NAME] between 2015 and 2019.
+All patients were treated with risk-stratified chemotherapy protocols
+consistent with contemporary Chinese paediatric oncology
+guidelines.
+Ethics approval was obtained from [ETHICS NUMBER]; patient data were
+de-identified prior to analysis.
+For each patient the dataset includes:
+(i) structured clinical data (demographics, haematological indices,
+immunophenotype, 51-marker flow cytometry panel, cytogenetics,
+MRD values);
+(ii) bone marrow aspirate microscopy images (Giemsa-stained smear,
+$\sim$20 fields per patient, total [X]~images);
+(iii) diagnostic and follow-up bone marrow pathology text reports.
 
-\noindent
-If any of the sections are not relevant to your manuscript, please include the heading and write `Not applicable' for that section. 
+\subsection{Temporally-structured feature design}\label{sec:features}
 
-%%===================================================%%
-%% For presentation purpose, we have included        %%
-%% \bigskip command. Please ignore this.             %%
-%%===================================================%%
-\bigskip
-\begin{flushleft}%
-Editorial Policies for:
+We define feature sets as a strictly nested sequence
+\begin{equation}
+\mathcal{F}_1 \subseteq \mathcal{F}_2 \subseteq \cdots \subseteq
+\mathcal{F}_{12},
+\label{eq:featseq}
+\end{equation}
+where each $\mathcal{F}_k$ contains all features clinically available
+at timepoint $\tau_k$.
+Boundaries were established by consulting the standard ALL treatment
+protocol: $\mathcal{F}_1$~(Day~0): WBC count and age;
+$\mathcal{F}_2$~(Day~1): adds blast percentage from bone marrow
+aspirate; $\mathcal{F}_3$~(Day~1): adds immunophenotype classification
+and 51 flow cytometry surface markers (42 CD antigens and 9 other
+markers including cMPO, TdT, and HLADR); $\mathcal{F}_6$~(Day~5):
+adds CNS involvement status, Day~5 peripheral blast percentage, and
+Initial Risk classification; $\mathcal{F}_7$~(Day~7--10): adds fusion
+gene, karyotype, and FISH results; $\mathcal{F}_8$~(Day~46): adds
+D19MRD and D46MRD numerical values.
+Image-based feature sets $\mathcal{F}_{4}$, $\mathcal{F}_{4.1}$,
+$\mathcal{F}_{4.2}$, $\mathcal{F}_{11}$, and $\mathcal{F}_{12.x}$
+incorporate bone marrow morphology as described in
+Section~\ref{sec:morph}.
 
-\bigskip\noindent
-Springer journals and proceedings: \url{https://www.springer.com/gp/editorial-policies}
+For each patient $i$, the input vector at level $k$ is
+$\mathbf{x}_i^{(k)} \in \mathbb{R}^{|\mathcal{F}_k|}$.
+Categorical features (Immunophenotype, Fusion Gene) were encoded by
+natural-language description for LLM inputs, and by one-hot encoding
+for DT/RF inputs with mappings derived exclusively from the training
+split (Section~\ref{sec:dt}).
 
-\bigskip\noindent
-Nature Portfolio journals: \url{https://www.nature.com/nature-research/editorial-policies}
+\subsection{Bone marrow morphology pipeline}\label{sec:morph}
 
-\bigskip\noindent
-\textit{Scientific Reports}: \url{https://www.nature.com/srep/journal-policies/editorial-policies}
+Each bone marrow aspirate image was processed through a four-stage
+automated pipeline.
 
-\bigskip\noindent
-BMC journals: \url{https://www.biomedcentral.com/getpublished/editorial-policies}
-\end{flushleft}
+\textbf{Stage 1 — Cell segmentation.}
+We applied SAM~3.1~\cite{[CITE:SAM]} with a text prompt
+(\textit{``complete dark-stained nucleated cell''}) to each image
+after colour-based pre-filtering (HSV purple range 120--160°) to
+restrict prompt sampling to haematoxylin-stained regions.
+Segmented cell patches were filtered by darkness ratio ($<0.82$)
+and minimum stained pixel fraction ($>0.05$).
 
-\begin{appendices}
+\textbf{Stage 2 — Morphological feature extraction.}
+For each retained cell, $\sim$37 features were computed from the
+segmentation mask and corresponding RGB patch, including geometric
+descriptors (area, perimeter, circularity, eccentricity, solidity,
+major/minor axis, aspect ratio), textural descriptors (GLCM
+contrast, correlation, energy at multiple angles), nucleus-to-cytoplasm
+(N/C) ratio, nucleoli count, and vacuole percentage.
 
-\section{Section title of first appendix}\label{secA1}
+\textbf{Stage 3 — Cell-type classification.}
+BiomedCLIP~\cite{[CITE:BiomedCLIP]} was applied in a zero-shot
+clustering mode with $k=7$ prototype classes (blast, granulocyte,
+megakaryocyte, monocyte, plasma cell, red cell, other).
+Hungarian algorithm assignment mapped cluster indices to cell-type
+labels using cosine similarity to BiomedCLIP text embeddings.
 
-An appendix contains supplementary information that is not an essential part of the text itself but which may be helpful in providing a more comprehensive understanding of the research problem or it is information that is too cumbersome to be included in the body of the paper.
+\textbf{Stage 4 — Report generation.}
+Per-patient statistics (cell counts, mean morphological features per
+class, blast proportion) were aggregated across images and serialised
+into a structured natural-language report supplied as additional
+context to LLM prompts in $\mathcal{F}_{4.1}$, $\mathcal{F}_{4.2}$,
+$\mathcal{F}_{10}$, $\mathcal{F}_{12.1}$.
 
-%%=============================================%%
-%% For submissions to Nature Portfolio Journals %%
-%% please use the heading ``Extended Data''.   %%
-%%=============================================%%
+\subsection{Phase~1: LLM zero-shot inference}\label{sec:llm_inference}
 
-%%=============================================================%%
-%% Sample for another appendix section			       %%
-%%=============================================================%%
+Four LLMs were evaluated. Gemini-3.1-Flash-Lite was accessed via the
+Google AI API.
+Gemma-4-31B-it, InternVL3.5-30B-A3B, and Qwen3.6-35B-A3B were
+deployed locally with vLLM~\cite{[CITE:vLLM]} using tensor parallelism
+across two A100~80G GPUs.
 
-%% \section{Example of another appendix section}\label{secA2}%
-%% Appendices may be used for helpful, supporting or essential material that would otherwise 
-%% clutter, break up or be distracting to the text. Appendices can consist of sections, figures, 
-%% tables and equations etc.
+For classification tasks (D19MRD, D46MRD, Final Risk, Relapse), each
+patient's features were serialised into a key--value list and
+submitted with a task-specific system prompt instructing the model to
+output a bracketed label (e.g., \texttt{[[Positive]]} /
+\texttt{[[Negative]]}).
+For survival risk scoring, the model output a continuous probability
+(0.0--1.0) of an adverse event, parsed by extracting the first
+numerical token and clipping to $[0, 1]$.
+All experiments used temperature~$= 0$ (greedy decoding) to ensure
+reproducibility.
+Per-patient outputs were cached; the full cohort of 301 patients was
+scored for each combination of feature level, task, and model,
+yielding $12 \times 4 \times 4 = 192$ experimental cells for
+classification and $12 \times 2 \times 4 = 96$ for survival scoring.
 
-\end{appendices}
+\subsection{Phase~2: Decision tree and random forest with
+  temporal splits}\label{sec:dt}
 
-%%===========================================================================================%%
-%% If you are submitting to one of the Nature Portfolio journals, using the eJP submission   %%
-%% system, please include the references within the manuscript file itself. You may do this  %%
-%% by copying the reference list from your .bbl file, paste it into the main manuscript .tex %%
-%% file, and delete the associated \verb+\bibliography+ commands.                            %%
-%%===========================================================================================%%
+For each temporal split $s$ (Eq.~\ref{eq:splits}) and feature level $k$,
+numerical features were z-score normalised using training-set
+statistics only:
+\begin{equation}
+z_{ij}^{(\text{test})} =
+\frac{x_{ij}^{(\text{test})} - \mu_j^{(\text{train})}}
+     {\sigma_j^{(\text{train})}},
+\quad j = 1, \ldots, |\mathcal{F}_k|.
+\label{eq:zscore}
+\end{equation}
+Categorical features used one-hot encoding with maps derived from
+the training set.
+Missing values were imputed with the training-set median per feature.
 
-\bibliography{sn-bibliography}% common bib file
-%% if required, the content of .bbl file can be included here once bbl is generated
-%%\input sn-article.bbl
+A decision tree classifier was trained with
+\texttt{max\_depth}~=~4, \texttt{class\_weight}~=~`balanced',
+\texttt{criterion}~=~`gini', and \texttt{random\_state}~=~42.
+The Gini impurity at node~$t$ is
+\begin{equation}
+G(t) = 1 - \sum_{k=1}^{K} \hat{p}_{tk}^2,
+\label{eq:gini}
+\end{equation}
+where $\hat{p}_{tk}$ is the empirical class proportion.
+A random forest with $n_{\text{estimators}}=100$ and
+\texttt{class\_weight}~=~`balanced' was trained in parallel as an
+ensemble upper bound; RF results are reported in supplementary tables.
+
+Primary evaluation metric is AUROC; F1-macro and balanced accuracy
+are reported as secondary metrics.
+Bootstrap 95\% confidence intervals (1000 resamples) are reported for
+Split~3 ($n_{\text{test}}=17$).
+
+\subsection{Phase~2: RAG retrieval and LLM narration}\label{sec:rag_methods}
+
+For a test patient $i$, the $K=5$ most similar training cases were
+retrieved by cosine similarity in the training-standardised feature
+space (Eq.~\ref{eq:rag}).
+An LLM prompt was then constructed containing:
+(i) the patient's feature values, (ii) the DT-predicted label and
+probability with the human-readable decision path (split conditions
+from root to leaf), and (iii) the structured profiles of the top-5
+retrieved cases including their actual outcomes.
+The model was instructed to produce a 3--5 sentence clinical
+narrative explaining the prediction based on the decision path and the
+historical precedents.
+LLM narratives are produced by Gemini-3.1-Flash-Lite and are used
+exclusively for qualitative case-study presentation; they do not
+contribute to any quantitative evaluation.
+
+\subsection{Survival analysis}\label{sec:surv_methods}
+
+EFS was defined as time (months) from diagnosis to first of:
+relapse, induction failure, or death, with censoring at last
+follow-up.
+OS was defined as time from diagnosis to death, censored at last
+follow-up.
+
+Phase~1 continuous risk scores $\hat{r}_i \in [0,1]$ were treated as
+survival predictors.
+Harrell's concordance index is
+\begin{equation}
+\hat{C} =
+\frac{
+  \displaystyle\sum_{i \neq j}
+  \mathbf{1}[T_i < T_j]\,
+  \mathbf{1}[\delta_i = 1]\,
+  \mathbf{1}[\hat{r}_i > \hat{r}_j]
+}{
+  \displaystyle\sum_{i \neq j}
+  \mathbf{1}[T_i < T_j]\,
+  \mathbf{1}[\delta_i = 1]
+},
+\label{eq:cindex}
+\end{equation}
+where $T_i$ is follow-up time, $\delta_i \in \{0,1\}$ is the event
+indicator.
+
+Time-dependent AUC at time $t^*$ was computed using inverse
+probability of censoring weighting (IPCW)~\cite{[CITE:Uno2011]}:
+\begin{equation}
+\widehat{\text{AUC}}(t^*) =
+\frac{
+  \displaystyle\sum_{i:\,T_i \leq t^*,\,\delta_i=1}
+  \sum_{j:\,T_j > t^*}
+  \mathbf{1}[\hat{r}_i > \hat{r}_j]\,\hat{w}_i
+}{
+  \displaystyle\sum_{i:\,T_i \leq t^*,\,\delta_i=1}
+  \sum_{j:\,T_j > t^*}
+  \hat{w}_i
+},
+\label{eq:itauc}
+\end{equation}
+where $\hat{w}_i = 1/\hat{G}(T_i)^2$ and $\hat{G}(\cdot)$ is the
+Kaplan-Meier estimator of the censoring distribution.
+Time points evaluated: $t^* \in \{12, 24, 36\}$ months.
+
+Kaplan-Meier curves were estimated for high- and low-risk groups
+(dichotomised at the median predicted risk score):
+\begin{equation}
+\hat{S}(t) = \prod_{t_i \leq t}
+\left(1 - \frac{d_i}{n_i}\right),
+\label{eq:km}
+\end{equation}
+with group separation assessed by the log-rank test.
+
+Phase~2 survival used a random survival forest
+(RSF;~\cite{[CITE:Ishwaran2008]}; $n_{\text{trees}}=100$) with the
+same temporal train/test splits as the classification experiments;
+evaluation used identical C-index and IPCW time-AUC metrics.
+
+\subsection{Statistical analysis}
+
+AUROC was computed with the \texttt{scikit-learn}
+library~\cite{[CITE:sklearn]}; C-index and IPCW AUC with
+\texttt{scikit-survival}~\cite{[CITE:sksurv]}.
+No multiple testing correction was applied given the exploratory
+nature of this study; all reported $p$-values are two-sided.
+
+%%==============================================================%%
+\section*{Data availability}
+%%==============================================================%%
+
+The clinical dataset used in this study contains patient health
+information and cannot be made publicly available due to privacy
+regulations.
+De-identified data may be available to qualified researchers through a
+data access agreement with [HOSPITAL NAME]; requests should be
+directed to the corresponding author.
+
+%%==============================================================%%
+\section*{Code availability}
+%%==============================================================%%
+
+Analysis code, LLM prompts, and the bone marrow morphology pipeline
+will be made available at \url{https://github.com/YanbeiJiang/ALL_prediction_NCS}
+upon acceptance.
+
+%%==============================================================%%
+\section*{Acknowledgements}
+%%==============================================================%%
+
+[To be completed — funding sources, clinical collaborators]
+
+%%==============================================================%%
+\section*{Author contributions}
+%%==============================================================%%
+
+[To be completed]
+
+%%==============================================================%%
+\section*{Competing interests}
+%%==============================================================%%
+
+The authors declare no competing interests.
+
+%%==============================================================%%
+%% Figure captions (figures themselves to be provided separately)
+%%==============================================================%%
+
+\begin{figure}[ht]
+\caption{\textbf{Overview of the temporally-structured multimodal
+prediction framework.}
+\textbf{a,} The three parallel timelines defining the framework:
+the feature acquisition timeline (Day~0 to Day~46+, $\mathcal{F}_1$
+through $\mathcal{F}_{12}$), the prediction target timeline
+(D19MRD, D46MRD, Final Risk, Relapse, EFS, OS), and the dynamic
+case database timeline (patient enrolment year 2015--2019 defining
+temporal splits).
+\textbf{b,} Phase~1 architecture: four LLMs receive serialised patient
+features and output class labels (classification tasks) or risk scores
+(survival tasks) without task-specific training.
+\textbf{c,} Phase~2 architecture: a decision tree trained on
+historically accumulated cases generates a prediction and decision path;
+the RAG module retrieves the $K=5$ most similar historical cases; an
+LLM synthesises a clinical narrative.}
+\label{fig:overview}
+\end{figure}
+
+\begin{figure}[ht]
+\caption{\textbf{Phase~1 feature ablation: AUROC vs feature level.}
+\textbf{a,} Final Risk. \textbf{b,} Relapse. \textbf{c,}~D19MRD.
+\textbf{d,}~D46MRD.
+Each panel shows the macro-averaged AUROC across the twelve feature
+levels for four LLMs (Gemini, Gemma, InternVL, Qwen).
+Vertical dashed lines indicate clinically important timepoints:
+Day~1 (flow cytometry), Day~5 (early response), Day~10
+(cytogenetics), Day~46 (MRD; $\mathcal{F}_8$).}
+\label{fig:ablation}
+\end{figure}
+
+\begin{figure}[ht]
+\caption{\textbf{Bone marrow morphology pipeline and its predictive
+contribution.}
+\textbf{a,} Pipeline schematic: SAM cell segmentation $\rightarrow$
+morphological feature extraction $\rightarrow$ BiomedCLIP cell-type
+clustering $\rightarrow$ structured text report generation.
+\textbf{b,} Comparison of LLM AUROC for Relapse prediction across
+three image-handling strategies: raw images ($\mathcal{F}_4$),
+blast-only text report ($\mathcal{F}_{4.1}$), and all-cell-type text
+report ($\mathcal{F}_{4.2}$) for four LLMs.
+\textbf{c,} Same comparison for Final Risk AUROC.}
+\label{fig:morph}
+\end{figure}
+
+\begin{figure}[ht]
+\caption{\textbf{Phase~2 decision tree feature ablation and temporal
+learning curve.}
+\textbf{a,} Final Risk DT AUROC across feature levels
+$\mathcal{F}_1$--$\mathcal{F}_{12.1}$ for three temporal splits
+(Split~1: 2015--16 train; Split~2: 2015--17 train; Split~3: 2015--18
+train). Shaded band: 95\% bootstrap CI for Split~3.
+\textbf{b,} Training set size vs AUROC learning curve for Final Risk
+(DT and RF) and Relapse (DT and RF) at $\mathcal{F}_8$.}
+\label{fig:p2ablation}
+\end{figure}
+
+\begin{figure}[ht]
+\caption{\textbf{Survival prediction: Kaplan-Meier curves and
+performance summary.}
+\textbf{a,} EFS Kaplan-Meier curves (high vs low risk, median split)
+for the best Phase~1 model (Gemma, $\mathcal{F}_8$, all patients).
+\textbf{b,} EFS KM curves for Phase~2 RSF (Split~2, $\mathcal{F}_8$).
+\textbf{c,} C-index heatmap: all LLMs $\times$ all feature levels for
+EFS.
+\textbf{d,} Same for OS.
+Number at risk and shaded 95\% CI shown in panels a--b.}
+\label{fig:km}
+\end{figure}
+
+\begin{figure}[ht]
+\caption{\textbf{RAG case study.}
+Two representative cases from the $\mathcal{F}_8$/Split~3 experiment.
+For each case: patient feature summary, DT decision path (root to
+leaf), top-3 retrieved similar historical cases with outcomes, and
+LLM-generated clinical narrative.
+Case~1: correctly classified IR patient with persistent MRD.
+Case~2: borderline case with conflicting signals between MRD
+clearance and cytogenetic risk.}
+\label{fig:rag}
+\end{figure}
+
+%%==============================================================%%
+%% References — placeholders to be replaced with .bib entries
+%%==============================================================%%
+\begin{thebibliography}{99}
+
+\bibitem{[CITE:Hunger2015]}
+Hunger, S.P. \& Mullighan, C.G.
+Acute lymphoblastic leukemia in children.
+\textit{N. Engl. J. Med.} \textbf{373}, 1541--1552 (2015).
+
+\bibitem{[CITE:Bhojwani2013]}
+Bhojwani, D. \& Pui, C.-H.
+Relapsed childhood acute lymphoblastic leukaemia.
+\textit{Lancet Oncol.} \textbf{14}, e205--e217 (2013).
+
+\bibitem{[CITE:Pui2008]}
+Pui, C.-H., Robison, L.L. \& Look, A.T.
+Acute lymphoblastic leukaemia.
+\textit{Lancet} \textbf{371}, 1030--1043 (2008).
+
+\bibitem{[CITE:Good2018]}
+Good, Z. et al.
+Single-cell developmental classification of B cell precursor acute
+lymphoblastic leukemia at diagnosis reveals predictors of relapse.
+\textit{Nat. Med.} \textbf{24}, 474--483 (2018).
+
+\bibitem{[CITE:Fitter2021]}
+Fitter, S. et al.
+CKLF and IL1B transcript levels at diagnosis are predictive of
+relapse in children with pre-B-cell acute lymphoblastic leukaemia.
+\textit{Br. J. Haematol.} \textbf{193}, 107--118 (2021).
+
+\bibitem{[CITE:Mosquera2024]}
+Mosquera Orgueira, A. et al.
+Refining risk prediction in pediatric acute lymphoblastic leukemia
+through DNA methylation profiling.
+\textit{Clin. Epigenetics} \textbf{16}, 53 (2024).
+
+\bibitem{[CITE:Pan2017]}
+Pan, L. et al.
+Machine learning applications for prediction of relapse in childhood
+acute lymphoblastic leukemia.
+\textit{Sci. Rep.} \textbf{7}, 7402 (2017).
+
+\bibitem{[CITE:Martinez2025]}
+Mart\'inez-Rubio, \'{A}. et al.
+Computational flow cytometry immunophenotyping at diagnosis is unable
+to predict relapse in childhood B-cell Acute Lymphoblastic Leukemia.
+\textit{Comput. Biol. Med.} \textbf{185}, 109831 (2025).
+
+\bibitem{[CITE:Steyerberg2019]}
+Steyerberg, E.W.
+\textit{Clinical Prediction Models} 2nd edn (Springer, 2019).
+
+\bibitem{[CITE:Phaterpekar2026]}
+Phaterpekar, T. et al.
+Investigating fine-tuning versus zero-shot learning for general large
+language models when predicting cancer survival from initial oncology
+consultation documents.
+\textit{ESMO Real World Data Digit. Oncol.} (2026).
+doi:10.1016/j.esmorw.2026.100703.
+
+\bibitem{[CITE:Conter2010]}
+Conter, V. et al.
+Molecular response to treatment redefines all prognostic factors in
+children and adolescents with B-cell precursor acute lymphoblastic
+leukemia: results in 3184 patients of the AIEOP-BFM ALL 2000 study.
+\textit{Blood} \textbf{115}, 3206--3214 (2010).
+
+\bibitem{[CITE:Rudin2019]}
+Rudin, C.
+Stop explaining black box machine learning models for high stakes
+decisions and use interpretable models instead.
+\textit{Nat. Mach. Intell.} \textbf{1}, 206--215 (2019).
+
+\bibitem{[CITE:SAM]}
+Ravi, N. et al.
+SAM 2: Segment anything in images and videos.
+\textit{arXiv} 2408.00714 (2024).
+
+\bibitem{[CITE:BiomedCLIP]}
+Zhang, S. et al.
+BiomedCLIP: a multimodal biomedical foundation model pretrained from
+fifteen million scientific image-text pairs.
+\textit{arXiv} 2303.00915 (2023).
+
+\bibitem{[CITE:vLLM]}
+Kwon, W. et al.
+Efficient memory management for large language model serving with
+PagedAttention.
+\textit{Proc. ACM SOSP} (2023).
+
+\bibitem{[CITE:Uno2011]}
+Uno, H. et al.
+On the C-statistics for evaluating overall adequacy of risk prediction
+procedures with censored survival data.
+\textit{Stat. Med.} \textbf{30}, 1105--1117 (2011).
+
+\bibitem{[CITE:Ishwaran2008]}
+Ishwaran, H. et al.
+Random survival forests.
+\textit{Ann. Appl. Stat.} \textbf{2}, 841--860 (2008).
+
+\bibitem{[CITE:sklearn]}
+Pedregosa, F. et al.
+Scikit-learn: machine learning in Python.
+\textit{J. Mach. Learn. Res.} \textbf{12}, 2825--2830 (2011).
+
+\bibitem{[CITE:sksurv]}
+P\"olsterl, S.
+scikit-survival: a library for time-to-event analysis built on top
+of scikit-learn.
+\textit{J. Mach. Learn. Res.} \textbf{21}, 1--6 (2020).
+
+\end{thebibliography}
 
 \end{document}
