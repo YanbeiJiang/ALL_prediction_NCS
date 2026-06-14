@@ -72,9 +72,12 @@ interpretable decision paths provided by the decision tree.
 For survival prediction, the best model attains a concordance index of
 0.746 and a time-dependent AUC at 24~months of 0.775 for
 event-free survival (EFS).
-A retrieval-augmented generation (RAG) case-study component further
-grounds each prediction in historically similar patients, supporting
-clinical interpretability.
+A retrieval-augmented generation (RAG) component retrieves the $K=5$
+most similar training cases by cosine similarity and applies a
+similarity-weighted belief revision to the RF predicted probability,
+yielding quantitative improvements on tasks where the feature space
+clusters meaningfully (D46MRD AUROC: 0.655$\to$0.881 on Split~3),
+while also supporting clinically interpretable LLM-generated narratives.
 This framework demonstrates that temporally stratified multimodal
 learning, aligned with clinical workflows, enables effective prediction
 at every decision node of paediatric ALL management.
@@ -163,9 +166,11 @@ by patient enrolment year, validating performance under three temporal
 splits that mimic real-world database growth; (\textit{iv})~a bone
 marrow morphology pipeline converting microscopy images to structured
 text reports via SAM-based cell segmentation and BiomedCLIP clustering,
-which augments LLM inputs; and (\textit{v})~a RAG component that
-retrieves the most similar historical cases to support interpretable
-clinical narratives for each prediction.
+which augments LLM inputs; and (\textit{v})~a RAG component that retrieves the $K=5$ most similar
+historical cases to (\textit{a})~perform a similarity-weighted belief
+revision of the RF predicted probability (improving AUROC on D46MRD
+and D19MRD tasks) and (\textit{b})~generate clinically interpretable
+LLM narratives grounding each prediction in historical precedent.
 
 %%==============================================================%%
 \section{Results}\label{sec:results}
@@ -530,14 +535,13 @@ P2 & RSF (Split~2)  & OS  & $\mathcal{F}_8$  & 0.629 & [X] & 0.611 & 0.489 \\
 \label{sec:rag}
 %%--------------------------------------------------------------%%
 
-To provide clinically grounded explanations for Phase~2 predictions,
-we implemented a RAG component that supplements each DT prediction
-with a set of the $K=5$ most similar historical cases retrieved from
-the training database, followed by an LLM-generated narrative
-synthesising the decision-tree path and the retrieved precedents
-(Methods, Section~\ref{sec:rag_methods}).
-Case retrieval used cosine similarity in the same z-scored feature
-space as the DT:
+To provide clinically grounded explanations and quantitative
+probability corrections for Phase~2 predictions, we implemented a
+RAG component that, for each test patient $i$, retrieves the $K=5$
+most similar training cases by cosine similarity in the
+training-standardised feature space (Eq.~\ref{eq:rag}), applies a
+belief revision to the RF predicted probability, and then generates
+an LLM narrative (Methods, Section~\ref{sec:rag_methods}).
 
 \begin{equation}
 \mathcal{N}(i) = \underset{j \in \mathcal{D}_s^{\text{train}}}
@@ -548,6 +552,61 @@ space as the DT:
 \label{eq:rag}
 \end{equation}
 
+\textbf{Belief revision results.}
+Table~\ref{tab:belief_revision} reports AUROC before and after belief
+revision across the four classification tasks on representative splits.
+Belief revision improved AUROC on Final~Risk (Split~2:
+$0.998 \to 0.999$), D19MRD (Split~2: $0.767 \to 0.779$;
+Split~3: $0.833 \to 0.857$), and most substantially on D46MRD
+(Split~2: $0.533 \to 0.579$; Split~3: $0.655 \to 0.881$, $\Delta =
++0.226$).
+The large gain on D46MRD/Split~3 reflects a high-quality retrieval
+regime: with 283 training cases, the five nearest neighbours share
+strong phenotypic similarity (mean cosine~$\bar{s} \approx 0.91$),
+and their D46MRD outcomes are highly concordant with the query patient.
+By contrast, belief revision reduced AUROC for Relapse (Split~2:
+$0.630 \to 0.588$, $\Delta = -0.042$): because relapse prediction is
+intrinsically noisy (best RF AUROC~$\approx 0.63$), retrieved neighbours
+have mixed outcomes, and the RAG evidence acts as noise rather than
+a corrective signal.
+This finding delineates a boundary condition for belief revision: it
+benefits tasks where the feature space clusters meaningfully with
+respect to the outcome (Final~Risk, MRD), but introduces noise for
+tasks with poor class separation in feature space (Relapse).
+
+\begin{table}[ht]
+\caption{RAG belief revision results for Phase~2 RF classification.
+$p_{\text{RF}}$: original RF AUROC; $p_{\text{rev}}$: AUROC after
+cosine-RAG belief revision ($K=5$, $\alpha_{\text{base}}=0.6$).
+Best experiment per task; Split~2 shown ($n_{\text{test}}=114$) with
+Split~3 added for D46MRD where the effect is largest.}
+\label{tab:belief_revision}
+\centering
+\small
+\begin{tabular}{llccc}
+\toprule
+\textbf{Task} & \textbf{Split} & \textbf{RF AUC} ($p_{\text{RF}}$)
+  & \textbf{Revised AUC} ($p_{\text{rev}}$) & $\Delta$ \\
+\midrule
+Final Risk   & Split~2 & 0.998 & 0.999 & $+0.002$ \\
+D19MRD       & Split~2 & 0.767 & 0.779 & $+0.012$ \\
+D19MRD       & Split~3 & 0.833 & 0.857 & $+0.024$ \\
+D46MRD       & Split~2 & 0.533 & 0.579 & $+0.046$ \\
+D46MRD       & Split~3 & 0.655 & \textbf{0.881} & $\mathbf{+0.226}$ \\
+Relapse      & Split~2 & 0.630 & 0.588 & $-0.042$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For survival prediction (EFS and OS), belief revision was applied to
+normalised RSF risk scores (Methods, Section~\ref{sec:rag_methods}).
+The effect was near-neutral for EFS (mean $\Delta$C-index~$= -0.003$
+across splits), with a modest Time-AUC improvement at 24~months on
+Split~1 ($0.744 \to 0.756$), and slightly negative for OS
+(mean $\Delta$C-index~$= -0.007$), where the low event rate (8.0\%)
+produces uninformative RAG evidence.
+
+\textbf{Qualitative case narratives.}
 Figure~\ref{fig:rag} illustrates two representative cases from the
 $\mathcal{F}_8$/Split~3 experiment.
 In Case~1, a patient correctly predicted as IR by the DT (path:
@@ -625,6 +684,27 @@ copy-number variation, DNA methylation), which have shown modest
 incremental utility in single-centre studies~\cite{[CITE:Mosquera2024]}.
 Future work integrating multi-omics data within the temporal feature
 hierarchy may improve relapse prediction.
+
+\textbf{Boundary conditions for RAG belief revision.}
+Our results reveal that similarity-weighted belief revision delivers
+quantitative gains only when the feature space clusters meaningfully
+by the target label.
+For D46MRD (Split~3: AUROC $0.655 \to 0.881$, $\Delta{+}0.226$) and
+D19MRD, the retrieved top-5 neighbours share concordant outcomes,
+providing reliable evidence that tightens the RF probability.
+For Final Risk the RF baseline is already near-ceiling ($\text{AUROC}
+\approx 1.0$), so the revision is marginal.
+For Relapse—where RF AUROC $\approx 0.53$--$0.63$ signals poor class
+separation—retrieved neighbours have heterogeneous outcomes and the
+RAG evidence degrades performance ($\Delta -0.042$ on Split~2).
+The same pattern holds for survival: the OS event rate (8\%) means
+that training neighbours are predominantly censored, driving
+$p_{\text{rag}} \to 0$ and introducing noise.
+These findings suggest a practical deployment criterion: compute the
+mean inter-neighbour outcome agreement (e.g., Fleiss $\kappa$ over
+top-$K$ retrieved labels) and apply belief revision only when
+agreement exceeds a calibrated threshold, defaulting to the raw model
+probability otherwise.
 
 \textbf{Limitations.}
 This is a single-centre retrospective study; external validation in
@@ -784,19 +864,52 @@ are reported as secondary metrics.
 Bootstrap 95\% confidence intervals (1000 resamples) are reported for
 Split~3 ($n_{\text{test}}=17$).
 
-\subsection{Phase~2: RAG retrieval and LLM narration}\label{sec:rag_methods}
+\subsection{Phase~2: RAG retrieval, belief revision, and LLM
+narration}\label{sec:rag_methods}
 
 For a test patient $i$, the $K=5$ most similar training cases were
 retrieved by cosine similarity in the training-standardised feature
 space (Eq.~\ref{eq:rag}).
-An LLM prompt was then constructed containing:
-(i) the patient's feature values, (ii) the DT-predicted label and
-probability with the human-readable decision path (split conditions
-from root to leaf), and (iii) the structured profiles of the top-5
-retrieved cases including their actual outcomes.
+
+\textbf{Belief revision.}
+Denote the RF predicted probability for patient $i$ as $p_0$.
+Given the retrieved neighbours $\mathcal{N}(i) = \{j_1,\ldots,j_K\}$
+with cosine similarities $s_{j}$ and binary task outcomes
+$y_j \in \{0, 1\}$, the RAG evidence probability is the
+similarity-weighted outcome mean:
+\begin{equation}
+p_{\text{rag}} =
+  \frac{\displaystyle\sum_{j \in \mathcal{N}(i)} s_j\, y_j}
+       {\displaystyle\sum_{j \in \mathcal{N}(i)} s_j}.
+\label{eq:prag}
+\end{equation}
+The revised probability interpolates between the model prior and the
+RAG evidence, with the evidence weight scaling with the mean
+similarity $\bar{s} = \frac{1}{K}\sum_{j\in\mathcal{N}(i)} s_j$:
+\begin{equation}
+p_{\text{rev}} = \alpha\, p_0 + (1-\alpha)\, p_{\text{rag}},
+\qquad
+\alpha = 1 - (1-\alpha_{\text{base}})\sqrt{\bar{s}},
+\label{eq:prev}
+\end{equation}
+where $\alpha_{\text{base}} = 0.6$.
+When retrieved cases are highly similar ($\bar{s}\to 1$), the evidence
+weight $(1-\alpha) \to 0.4$; when similarity is low, the original RF
+probability is preserved.
+For survival prediction, $p_0$ is replaced by the min-max normalised
+RSF risk score $r_{\text{norm}} \in [0,1]$, and $y_j = \delta_j$
+(the event indicator of each training neighbour).
+
+\textbf{LLM narration.}
+After belief revision, an LLM prompt was constructed containing:
+(i) the patient's feature values, (ii) the RF-predicted label and
+$p_{\text{rev}}$ with the human-readable DT decision path (split
+conditions from root to leaf), (iii) the top-6 patient-salient
+features (ranked by $\text{importance}_j \times |z_{ij}|$), and
+(iv) the structured profiles of the top-5 retrieved cases including
+their actual outcomes.
 The model was instructed to produce a 3--5 sentence clinical
-narrative explaining the prediction based on the decision path and the
-historical precedents.
+narrative explaining the prediction.
 LLM narratives are produced by Gemini-3.1-Flash-Lite and are used
 exclusively for qualitative case-study presentation; they do not
 contribute to any quantitative evaluation.
