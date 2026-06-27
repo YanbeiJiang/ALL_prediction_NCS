@@ -53,30 +53,26 @@ single-timepoint diagnostic features and fail to integrate the
 longitudinal nature of clinical data acquisition or to prospectively
 predict future adverse events.
 Here we present a temporally-structured multimodal prediction framework
-applied to a cohort of 301 paediatric ALL patients (2015--2019,
-Chinese single-centre).
+applied to a cohort of paediatric ALL patients (from 2015--2019).
 We define twelve feature sets~($\mathcal{F}_1 \subseteq \cdots
 \subseteq \mathcal{F}_{12}$) whose incremental composition strictly
 follows the clinical data-acquisition timeline, from white blood cell
 count and age at Day~0 to minimal residual disease (MRD) measurements
 at Day~46.
-A two-phase system is evaluated: Phase~1 deploys four large language
+A two-phase system is evaluated: Phase~1 deploys large language
 models (LLMs) in a zero-shot setting to probe the upper bound of
-prediction without training, while Phase~2 trains decision trees and
-random survival forests on a dynamic case database that grows with
+prediction without training, while Phase~2 trains on a dynamic case database that grows with
 annual patient cohorts, explicitly simulating real-world hospital
 deployment.
-On the primary risk-stratification task (Final Risk), Phase~2 achieves
-an AUROC of 0.949 using features available by Day~46, with
-interpretable decision paths provided by the decision tree.
+% On the primary risk-stratification task (Final Risk), Phase~2 achieves
+% an AUROC of 0.949 using features available by Day~46, with
+% interpretable decision paths provided by the decision tree.
 For survival prediction, the best model attains a concordance index of
 0.746 and a time-dependent AUC at 24~months of 0.775 for
 event-free survival (EFS).
-A retrieval-augmented generation (RAG) component retrieves the $K=5$
-most similar training cases by cosine similarity and applies a
-similarity-weighted belief revision to the RF predicted probability,
+A retrieval-augmented generation (RAG) component retrieves most similar training cases and applies a similarity-weighted belief revision to the RF predicted probability,
 yielding quantitative improvements on tasks where the feature space
-clusters meaningfully (D46MRD AUROC: 0.655$\to$0.881 on Split~3),
+clusters meaningfully,
 while also supporting clinically interpretable LLM-generated narratives.
 This framework demonstrates that temporally stratified multimodal
 learning, aligned with clinical workflows, enables effective prediction
@@ -152,7 +148,7 @@ such as relapse and survival—remain absent from the literature.
 Equally unexplored is whether LLM-based risk scores can serve as
 survival predictors comparable to purpose-built survival models.
 
-Here we address these gaps with a cohort of 301 Chinese paediatric ALL
+Here we address these gaps with a cohort of paediatric ALL
 patients and a \emph{temporally-structured} prediction framework.
 Our contributions are: (\textit{i})~a twelve-level feature set
 hierarchy $\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_{12}$
