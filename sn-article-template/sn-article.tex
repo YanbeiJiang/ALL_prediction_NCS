@@ -90,58 +90,84 @@ Risk-adapted chemotherapy has elevated five-year event-free survival
 (EFS) rates above 90\% in high-income settings, yet the 15--20\% of
 patients who relapse face substantially worse outcomes, with long-term
 survival dropping to 30--50\% upon re-induction~\cite{[CITE:Bhojwani2013],[CITE:Pui2008]}.
-The majority of relapses occur after apparent clinical remission,
-making prospective identification of high-risk patients a central and
-unresolved challenge.
+Because the majority of relapses occur after apparent clinical
+remission, the prospective identification of high-risk patients—early
+enough to intensify or de-escalate therapy—remains a central and
+unresolved challenge in paediatric oncology.
 
 Current standard-of-care risk stratification—Initial Risk at
-diagnosis; Final Risk after Day~46 induction assessment—relies on
-pre-specified clinical cut-offs for age, white blood cell count,
+diagnosis and Final Risk after the Day~46 induction assessment—relies
+on pre-specified categorical cut-offs for age, white blood cell count,
 cytogenetics, immunophenotype, and minimal residual disease (MRD).
-These categorical rules do not fully exploit the rich multimodal
-information accumulated progressively during treatment, and do not
-yield personalised probability estimates for future relapse or
-survival.
-Moreover, most published machine learning models operate on a fixed,
-single-timepoint feature snapshot at diagnosis, ignoring the structured
-temporal ordering in which data actually become clinically
-available~\cite{[CITE:Steyerberg2019]}.
-A model trained on pooled features from all timepoints may implicitly
-rely on information unavailable at the point of decision-making,
-producing optimistic but non-deployable estimates.
+These rules do not fully exploit the multimodal information that
+accumulates during treatment, nor do they yield personalised
+probability estimates for future relapse or survival.
+Computational approaches promise to fill this gap, but most published
+models make simplifications that break down at the bedside: they treat
+outcome prediction as a static, single-shot problem, when in reality
+paediatric ALL management unfolds as a structured sequence of events in
+time.
 
-A second limitation is the absence of unified six-target evaluation:
-classification tasks (Final Risk, D19MRD, D46MRD, Relapse) and survival
-endpoints (EFS, OS) are typically studied in isolation, obscuring
-how a single feature-acquisition workflow supports sequential
-predictions across the entire induction period.
-Third, the emergence of large language models (LLMs) with strong
-zero-shot reasoning opens a complementary, training-free avenue for
-clinical prediction~\cite{[CITE:Phaterpekar2026]}, yet systematic
-evaluation on paediatric oncology outcome prediction remains absent.
-Fourth, most single-centre machine learning studies do not include
-external validation~\cite{[CITE:Martinez2025]}, limiting confidence
-in cross-institution generalisability.
+We argue that realistic clinical prediction is governed by three
+distinct and largely independent timelines, and that existing methods
+collapse or ignore all three.
+The first is the \emph{feature-acquisition timeline}: a patient's data
+do not arrive at once but in a fixed clinical order—white blood cell
+count and age at admission (Day~0), immunophenotype and bone marrow
+morphology (Day~1), fusion genes, karyotype and FISH (Day~7--10), and
+MRD (Day~19--46).
+A model trained on features pooled across all timepoints implicitly
+uses information unavailable at the moment of decision, producing
+optimistic but non-deployable estimates~\cite{[CITE:Steyerberg2019]}.
+The second is the \emph{prediction-target timeline}: clinicians do not
+make one prediction but a sequence of decisions—early response
+(D19MRD), end-of-induction response (D46MRD), Final Risk assignment,
+and long-horizon outcomes (relapse, EFS, overall survival [OS]).
+Studying any single target in isolation, as is common, obscures how one
+data-acquisition workflow must support all six decision nodes.
+The third is the \emph{data-accumulation timeline}: a hospital's
+reference database grows year by year, so a model deployed in a given
+year can only have learned from patients enrolled before it.
+Random shuffled train--test splits violate this constraint and report
+performance that is not prospectively attainable.
+Aligning a dataset and a method to all three timelines simultaneously,
+rather than one at a time, is the central novelty of this work and the
+source of its clinical realism.
 
-Here we address these gaps with a \emph{temporally-structured}
-prediction framework applied to a single-centre training cohort and
-validated at independent external sites.
-Our contributions are: (\textit{i})~a twelve-level feature hierarchy
-$\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_{12}$ whose
-boundaries align with the clinical data-acquisition timeline (Day~0
-through Day~46+), applied jointly to six prediction targets;
+Building on this principle, we construct a dataset in which twelve
+strictly nested feature sets
+($\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_{12}$) map onto
+the feature-acquisition timeline, six prediction targets map onto the
+target timeline, and patient enrolment year defines the
+data-accumulation timeline.
+On this substrate we evaluate two complementary methods.
+Phase~1 applies large language models (LLMs) in a zero-shot setting,
+probing the predictive upper bound reachable with \emph{no} accumulated
+training data—the regime a clinician faces when a new protocol or a new
+hospital comes online~\cite{[CITE:Phaterpekar2026]}.
+Phase~2 trains decision trees, random forests, and random survival
+forests on the growing case database under temporal splits, emulating
+prospective deployment as the data-accumulation timeline advances.
+A retrieval-augmented generation (RAG) component then leverages the
+accumulated database to apply a similarity-weighted belief revision to
+model probabilities and to generate interpretable clinical narratives.
+Within the earliest feature sets, a bone marrow morphology pipeline
+(SAM-based cell segmentation and BiomedCLIP clustering) converts
+microscopy images into structured text, providing a multimodal
+enrichment at Day~1 before molecular and MRD data become available.
+
+Our contributions are: (\textit{i})~a twelve-level, three-timeline
+feature-and-target hierarchy aligned with the clinical workflow, in
+which bone marrow morphology enters as an early multimodal enrichment;
 (\textit{ii})~Phase~1, a systematic zero-shot evaluation of four LLMs
-across all feature levels and all six targets, establishing
+across all feature levels and all six prediction targets, establishing
 training-free baselines; (\textit{iii})~Phase~2, a decision tree,
 random forest, and random survival forest system trained on a dynamic
-case database partitioned by enrolment year, validating performance
-under three temporal splits; (\textit{iv})~a bone marrow morphology
-pipeline converting microscopy images to structured text via
-SAM-based segmentation and BiomedCLIP clustering; (\textit{v})~a
-cosine RAG belief revision that applies similarity-weighted updates to
-RF predicted probabilities and generates interpretable LLM clinical
-narratives; and (\textit{vi})~multi-site external validation at an
-independent centre that received no training data.
+case database partitioned by enrolment year and validated under three
+temporal splits; (\textit{iv})~a cosine-similarity RAG belief revision
+that refines model probabilities and generates interpretable LLM
+clinical narratives; and (\textit{v})~multi-site external validation at
+independent centres that received no training data.
 
 %%==============================================================%%
 \section{Results}\label{sec:results}
