@@ -134,9 +134,9 @@ Aligning a dataset and a method to all three timelines simultaneously,
 rather than one at a time, is the central novelty of this work and the
 source of its clinical realism.
 
-Building on this principle, we construct a dataset in which twelve
+Building on this principle, we construct a dataset in which eight
 strictly nested feature sets
-($\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_{12}$) map onto
+($\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_{8}$) map onto
 the feature-acquisition timeline, six prediction targets map onto the
 target timeline, and patient enrolment year defines the
 data-accumulation timeline.
@@ -151,12 +151,13 @@ prospective deployment as the data-accumulation timeline advances.
 A retrieval-augmented generation (RAG) component then leverages the
 accumulated database to apply a similarity-weighted belief revision to
 model probabilities and to generate interpretable clinical narratives.
-Within the earliest feature sets, a bone marrow morphology pipeline
-(SAM-based cell segmentation and BiomedCLIP clustering) converts
-microscopy images into structured text, providing a multimodal
-enrichment at Day~1 before molecular and MRD data become available.
+Within the earliest feature sets, an automated bone marrow morphology
+pipeline (SAM-based cell segmentation and BiomedCLIP clustering) converts
+smear images into a structured cell-morphology profile, providing a
+multimodal enrichment at Day~1, before molecular and MRD data become
+available.
 
-Our contributions are: (\textit{i})~a twelve-level, three-timeline
+Our contributions are: (\textit{i})~an eight-level, three-timeline
 feature-and-target hierarchy aligned with the clinical workflow, in
 which bone marrow morphology enters as an early multimodal enrichment;
 (\textit{ii})~Phase~1, a systematic zero-shot evaluation of four LLMs
@@ -198,7 +199,7 @@ and the corresponding result cells are left empty.
 For external validation, all 301 internal patients were used as the
 training set and no external data were used in training.
 
-Feature sets $\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_{12}$
+Feature sets $\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_{8}$
 (Table~\ref{tab:expdesign}) are strictly nested: each level adds only
 features available at the corresponding clinical timepoint.
 $\mathcal{F}_1$ contains WBC count and age (Day~0);
@@ -249,8 +250,10 @@ Morphology features & 287 (95.3\%) & 19 & — \\
 \label{sec:phase1}
 %%--------------------------------------------------------------%%
 
-We evaluated four LLMs in a zero-shot setting across all twelve feature
-levels and all six prediction targets (Table~\ref{tab:summary}).
+We evaluated four LLMs in a zero-shot setting across all eight feature
+levels and all six prediction targets (Table~\ref{tab:summary} summarises
+the best level per model; Table~\ref{tab:phase1_full} reports the complete
+per-feature-level results).
 Models included Gemini-3.1-Flash-Lite (Google AI API) and three
 open-weight models deployed locally via vLLM: Gemma-4-31B-it,
 InternVL3.5-30B-A3B, and Qwen3.6-35B-A3B.
@@ -265,35 +268,34 @@ Final Risk was the easiest target for all models.
 At Day~0 features ($\mathcal{F}_1$: WBC and age), Gemini and Gemma
 already achieved AUROC~$\approx 0.65$--$0.70$, reflecting the known
 prognostic importance of WBC count.
-Performance increased incrementally through $\mathcal{F}_7$
-(cytogenetics panel: Gemini~0.834, Gemma~0.891, InternVL~0.848,
-Qwen~0.882), and reached its peak with MRD values included
-($\mathcal{F}_8$/$\mathcal{F}_{10}$), with best-feature-level AUROCs
-of 0.868 (Gemini), 0.900 (Gemma), 0.869 (InternVL), and
-0.899 (Qwen).
+Performance increased incrementally and peaked at the cytogenetics
+panel $\mathcal{F}_7$ (Gemini~0.834, Gemma~0.891, InternVL~0.848,
+Qwen~0.882), which was the best level for the three open-weight models;
+supplying the D19/D46 MRD values as inputs at $\mathcal{F}_8$ raised
+Gemini to 0.849 but did not further improve the others.
+Best-level Final Risk AUROCs were thus 0.849 (Gemini,~$\mathcal{F}_8$),
+0.891 (Gemma,~$\mathcal{F}_7$), 0.848 (InternVL,~$\mathcal{F}_7$), and
+0.882 (Qwen,~$\mathcal{F}_7$).
 Relapse prediction was substantially harder: best AUROCs were
-0.658 (Gemini), 0.643 (InternVL), 0.586 (Gemma), and 0.580 (Qwen)
-across all feature levels, with no consistent improvement as features
-accumulated.
-D19MRD and D46MRD showed moderate performance (AUROC~0.56--0.68),
+0.643 (InternVL,~$\mathcal{F}_7$), 0.599 (Gemini,~$\mathcal{F}_7$),
+0.586 (Gemma,~$\mathcal{F}_8$), and 0.573 (Qwen,~$\mathcal{F}_4$),
+with no consistent improvement as features accumulated.
+D19MRD and D46MRD showed moderate performance (AUROC~0.55--0.66),
 suggesting that LLMs can partially infer early treatment response from
 immunophenotypic and cytogenetic profiles but that these tasks remain
 harder without direct MRD measurement.
 
 \textbf{Survival performance on the internal cohort.}
-For EFS, best-level C-indices were 0.716 (Gemma,~$\mathcal{F}_8$),
-0.705 (Gemini,~$\mathcal{F}_9$), 0.694 (Qwen,~$\mathcal{F}_9$), and
-0.682 (InternVL,~$\mathcal{F}_9$).
-The MRD-only feature set $\mathcal{F}_9$ was consistently near-optimal
-for EFS, confirming that residual disease burden encodes strong
-prognostic information accessible to LLMs without labelled training
-data.
-For OS—with only 24 events—C-indices ranged more widely:
-InternVL reached 0.772 ($\mathcal{F}_{11}$), Gemini 0.736
-($\mathcal{F}_{11}$), Gemma 0.718 ($\mathcal{F}_8$), and Qwen 0.718
-($\mathcal{F}_8$).
-Log-rank tests were significant ($p < 0.05$) at $\mathcal{F}_8$ and
-$\mathcal{F}_9$ for EFS for all four LLMs.
+For EFS, best-level C-indices were all attained at $\mathcal{F}_8$:
+0.716 (Gemma), 0.687 (Gemini), 0.662 (Qwen), and 0.642 (InternVL).
+The inclusion of the D19/D46 MRD values at $\mathcal{F}_8$ was
+consistently optimal for EFS, confirming that residual disease burden
+encodes strong prognostic information accessible to LLMs without
+labelled training data.
+For OS—with only 24 events—C-indices also peaked at $\mathcal{F}_8$:
+InternVL reached 0.764, Gemini 0.725, and Gemma and Qwen both 0.718.
+Log-rank tests were significant ($p < 0.05$) at $\mathcal{F}_8$
+for EFS for all four LLMs.
 
 \textbf{External Site~1 validation.}
 LLM zero-shot performance generalised well to External Site~1 for
@@ -315,18 +317,18 @@ without any site-specific retraining.
 Bone marrow smear images were processed through a four-stage automated
 pipeline: SAM-based cell segmentation, morphological feature extraction
 ($\sim$37 features per cell), BiomedCLIP zero-shot cell-type clustering
-($k=7$), and structured text report generation.
-Comparing $\mathcal{F}_{4}$ (raw images) with $\mathcal{F}_{4.1}$
-(blast-only morphology text report), the text-report approach yielded
-higher Relapse AUROC for all four models (+0.017~Gemini, +0.035~Gemma,
-+0.022~InternVL, +0.036~Qwen).
-Final Risk AUROC remained comparable or slightly improved, and the
-all-cell-type report ($\mathcal{F}_{4.2}$) improved Final Risk for
-Gemma (0.854 vs 0.840 for raw images).
-These results demonstrate that domain-specific cell-level
-characterisation provides predictive signal complementary to global
-image appearance, and that converting images to structured text
-enables LLMs to extract clinically relevant morphological information.
+($k=7$ with Hungarian assignment), and per-patient aggregation into a
+quantitative morphology profile (Methods, Section~\ref{sec:morph}).
+Morphology enters the feature timeline at Day~1 ($\mathcal{F}_4$),
+earlier than molecular and MRD data: the structured morphology profile
+is provided to the LLMs as the $\mathcal{F}_4$ input in Phase~1 and, in
+aggregated form, augments the tabular Phase~2 models.
+The latter gives the clearest benefit for early treatment-response
+prediction: adding the morphology features at $\mathcal{F}_4$ raised
+D19MRD to DT~AUROC~0.743 / RF~AUROC~0.807
+(Section~\ref{sec:phase2}), showing that quantitative cell-level
+characterisation carries prognostic signal available already at
+diagnosis.
 
 %%--------------------------------------------------------------%%
 \subsection{Phase~2: Temporal validation and classification+survival
@@ -348,8 +350,9 @@ Final Risk DT AUROC rose from 0.810 at $\mathcal{F}_1$ to
 Including MRD at $\mathcal{F}_8$ further raised DT AUROC to
 \textbf{0.949} (RF:~0.998), the highest classification result across
 all conditions.
-D19MRD achieved DT AUROC~0.743 and RF AUROC~0.807 at $\mathcal{F}_{4.1}$
-(morphology-augmented); D46MRD reached DT~0.671 and RF~0.636 at
+D19MRD achieved DT AUROC~0.743 and RF AUROC~0.807 at $\mathcal{F}_{4}$,
+where the quantitative cell-morphology features from the pipeline
+augment the tabular model; D46MRD reached DT~0.671 and RF~0.636 at
 $\mathcal{F}_5$.
 Relapse prediction remained difficult for Phase~2 as for Phase~1
 (best DT AUROC~0.529, RF~0.630), mirroring the broader literature
@@ -377,9 +380,9 @@ is unstable due to very few positive cases ($n_\text{pos}=1$, marked
 $\dagger$ in Table~\ref{tab:summary}).
 Relapse RF AUROC was 0.528, consistent with the difficulty observed
 internally.
-For survival, RSF EFS C-index was 0.608 (not significant on Ext-1),
-while OS C-index reached 0.762 with log-rank $p=0.031$
-($\mathcal{F}_{12.1}$; morphology-augmented).
+For survival, RSF at $\mathcal{F}_8$ reached EFS C-index~0.608 and
+OS C-index~0.643 on Ext-1, neither attaining significance ($p=0.14$ and
+$p=0.54$), reflecting the small external cohort and low event counts.
 
 %%--------------------------------------------------------------%%
 \subsection{Cosine RAG belief revision}
@@ -551,7 +554,7 @@ forest provide multi-method evidence that residual disease burden at
 Day~46 is the strongest prognostic signal accessible before relapse.
 
 \textbf{LLM zero-shot as a competitive baseline.}
-Phase~1 Final Risk AUROCs of 0.868--0.900 without labelled training
+Phase~1 Final Risk AUROCs of 0.848--0.891 without labelled training
 data are competitive with Phase~2 DT at $\mathcal{F}_7$ (0.912) and
 only modestly below the Phase~2 DT peak (0.949 at $\mathcal{F}_8$).
 This indicates that clinical knowledge encoded during LLM pretraining
@@ -636,9 +639,8 @@ Ethics approval was obtained from [ETHICS NUMBER]; all data were
 de-identified prior to analysis.
 Each patient record includes structured clinical data (demographics,
 haematological indices, immunophenotype, 51-marker flow cytometry panel,
-cytogenetics, MRD values), bone marrow aspirate microscopy images
-(Giemsa-stained, $\sim$20 fields per patient), and diagnostic
-pathology reports.
+cytogenetics, MRD values) and bone marrow aspirate microscopy images
+(Giemsa-stained, $\sim$20 fields per patient).
 
 External Site~1 comprised 41 patients from Lianyungang First People's
 Hospital diagnosed after 2019; ethics approval: [ETHICS NUMBER Ext-1].
@@ -648,17 +650,17 @@ No external data were used in any model training.
 \subsection{Temporally-structured feature hierarchy}\label{sec:features}
 
 Feature sets form a strictly nested sequence
-$\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_{12}$,
+$\mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}_{8}$,
 where each level contains exactly the features available at the
 corresponding clinical timepoint.
 Boundaries: $\mathcal{F}_1$~(Day~0): WBC count and age;
 $\mathcal{F}_2$~(Day~1): adds blast percentage;
 $\mathcal{F}_3$~(Day~1): adds immunophenotype and 51 flow cytometry markers;
+$\mathcal{F}_4$~(Day~1): adds the bone marrow morphology profile (pipeline);
+$\mathcal{F}_5$~(Day~1): adds non-risk clinical factors;
 $\mathcal{F}_6$~(Day~5): adds CNS status, Day~5 blast, and Initial Risk;
 $\mathcal{F}_7$~(Day~7--10): adds Fusion gene, Karyotype, FISH;
 $\mathcal{F}_8$~(Day~46): adds D19MRD and D46MRD.
-Image-based variants ($\mathcal{F}_4$, $\mathcal{F}_{4.1}$, $\mathcal{F}_{10}$,
-$\mathcal{F}_{12.1}$) incorporate bone marrow morphology.
 All six prediction targets are evaluated on the same feature hierarchy.
 
 For Phase~2, categorical features were one-hot encoded and numerical
@@ -691,9 +693,11 @@ clustering mode with $k=7$ prototype classes (blast, granulocyte,
 megakaryocyte, monocyte, plasma cell, red cell, other), with Hungarian
 algorithm assignment.
 
-\textbf{Stage~4: Report generation.}
-Per-patient statistics were aggregated and serialised into a structured
-natural-language report supplied to LLM prompts.
+\textbf{Stage~4: Per-patient aggregation.}
+Cell-level features were aggregated into per-patient morphology
+statistics (cell-type proportions and summary descriptors) that augment
+the tabular Phase~2 models; the same profile is serialised as the
+$\mathcal{F}_4$ input to the LLMs.
 
 \subsection{Phase~1: LLM zero-shot inference}\label{sec:llm_inference}
 
@@ -873,7 +877,7 @@ The authors declare no competing interests.
 \begin{table}[ht]
 \caption{Feature set design aligned with the clinical data-acquisition
 timeline. All six prediction targets are evaluated at every feature
-level; $\dagger$~at $\mathcal{F}_8$/$\mathcal{F}_9$, D19MRD and
+level; $\dagger$~at $\mathcal{F}_8$, D19MRD and
 D46MRD are used as \emph{input features}, so only Final Risk and
 Relapse are predicted. EFS/OS are evaluated at all levels using
 the same feature vector as classification tasks.}
@@ -887,15 +891,11 @@ the same feature vector as classification tasks.}
 $\mathcal{F}_1$     & Day 0     & WBC count, Age & 4 \\
 $\mathcal{F}_2$     & Day 1     & + Blast\% & 4 \\
 $\mathcal{F}_3$     & Day 1     & + Immunophenotype + 51 flow cytometry markers & 4 \\
-$\mathcal{F}_{4}$   & Day 1     & Same as $\mathcal{F}_3$ + bone marrow images & 4 \\
-$\mathcal{F}_{4.1}$ & Day 1     & Same as $\mathcal{F}_3$ + blast morphology report & 4 \\
+$\mathcal{F}_{4}$   & Day 1     & $\mathcal{F}_3$ + bone marrow morphology profile (SAM/BiomedCLIP pipeline) & 4 \\
 $\mathcal{F}_5$     & Day 1     & $\mathcal{F}_3$ + non-risk clinical factors & 4 \\
 $\mathcal{F}_6$     & Day 5     & $\mathcal{F}_3$ + CNS status + Day~5 blast\% + Initial Risk & 4 \\
 $\mathcal{F}_7$     & Day 7--10 & $\mathcal{F}_6$ + Fusion gene + Karyotype + FISH & 4 \\
 $\mathcal{F}_8$     & Day 46    & $\mathcal{F}_7$ + D19MRD + D46MRD (as inputs) & 2$^\dagger$ \\
-$\mathcal{F}_9$     & Day 46    & D19MRD + D46MRD only & 2$^\dagger$ \\
-$\mathcal{F}_{10}$  & Day 7--10 & $\mathcal{F}_7$ + diagnostic pathology report & 4 \\
-$\mathcal{F}_{12.1}$& Day 7--10 & $\mathcal{F}_7$ + blast morphology report & 4 \\
 \bottomrule
 \multicolumn{4}{l}{Survival targets (EFS, OS) evaluated at all levels using the same feature vector.}
 \end{tabular}
@@ -928,20 +928,63 @@ Ext-2: pending.}
   & DT & RF/RSF & DT & RF/RSF \\
 \midrule
 \multicolumn{11}{l}{\textit{Classification tasks (AUROC)}} \\
-Final Risk & Int. & 0.868 & 0.900 & 0.869 & 0.899 & & 0.949 & 0.998 & — & — \\
-           & Ext-1 & 0.925 & 0.894 & 0.810 & 0.850 & & — & — & 0.968 & 0.991 \\
-D19MRD     & Int. & 0.679 & 0.683 & 0.616 & 0.635 & & 0.743 & 0.807 & — & — \\
-           & Ext-1 & 0.550 & 0.465 & 0.521 & 0.604 & & — & — & 0.628 & 0.635 \\
-D46MRD     & Int. & 0.661 & 0.589 & 0.575 & 0.564 & & 0.671 & 0.636 & — & — \\
+Final Risk & Int. & 0.849 & 0.891 & 0.848 & 0.882 & & 0.949 & 0.998 & — & — \\
+           & Ext-1 & 0.925 & 0.894 & 0.750 & 0.850 & & — & — & 0.968 & 0.991 \\
+D19MRD     & Int. & 0.651 & 0.659 & 0.567 & 0.605 & & 0.743 & 0.807 & — & — \\
+           & Ext-1 & 0.550 & 0.465 & 0.515 & 0.550 & & — & — & 0.628 & 0.635 \\
+D46MRD     & Int. & 0.610 & 0.577 & 0.542 & 0.552 & & 0.671 & 0.636 & — & — \\
            & Ext-1 & \multicolumn{4}{c}{$\leq$0.554\,$^\dagger$}  & & — & — & 0.975$^\dagger$ & 1.000$^\dagger$ \\
-Relapse    & Int. & 0.658 & 0.586 & 0.643 & 0.580 & & 0.529 & 0.630 & — & — \\
-           & Ext-1 & 0.717 & 0.656 & 0.699 & 0.630 & & — & — & 0.583 & 0.528 \\
+Relapse    & Int. & 0.599 & 0.586 & 0.643 & 0.573 & & 0.529 & 0.630 & — & — \\
+           & Ext-1 & 0.717 & 0.656 & 0.699 & 0.609 & & — & — & 0.583 & 0.528 \\
 \midrule
 \multicolumn{11}{l}{\textit{Survival tasks (C-index)}} \\
-EFS        & Int. & 0.705 & 0.716 & 0.682 & 0.694 & & — & 0.746 & — & — \\
+EFS        & Int. & 0.687 & 0.716 & 0.642 & 0.662 & & — & 0.746 & — & — \\
            & Ext-1 & 0.715 & 0.669 & 0.709 & 0.645 & & — & — & — & 0.608 \\
-OS         & Int. & 0.736 & 0.718 & 0.772 & 0.718 & & — & 0.629 & — & — \\
-           & Ext-1 & 0.810 & 0.821 & 0.859 & 0.806 & & — & — & — & 0.762 \\
+OS         & Int. & 0.725 & 0.718 & 0.764 & 0.718 & & — & 0.629 & — & — \\
+           & Ext-1 & 0.810 & 0.821 & 0.859 & 0.806 & & — & — & — & 0.643 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{\textbf{Phase~1 LLM zero-shot performance across all eight feature levels and six prediction targets (internal cohort, $n=301$).} Each cell is the macro-averaged AUROC (classification targets) or Harrell's concordance index (survival targets) for one LLM at one feature level; \textbf{bold} marks the best model at that level. Classification AUROC is computed from parsed categorical predictions (balanced-accuracy form). \textemdash{}~indicates a target not evaluated at that level: D19/D46MRD are used as \emph{input} features at $\mathcal{F}_8$ (see Table~\ref{tab:expdesign}).}
+\label{tab:phase1_full}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l cccc @{\hskip 1.6em} l cccc}
+\toprule
+ & \multicolumn{4}{c}{\textbf{Model}} & & \multicolumn{4}{c}{\textbf{Model}} \\
+\cmidrule(lr){2-5}\cmidrule(lr){7-10}
+\textbf{Lv.} & Gem. & Gma. & Int. & Qw. & \textbf{Lv.} & Gem. & Gma. & Int. & Qw. \\
+\midrule
+\multicolumn{5}{l}{\textit{Final Risk (AUROC)}} & \multicolumn{5}{l}{\textit{Relapse (AUROC)}} \\
+$\mathcal{F}_1$ & 0.788 & 0.785 & 0.729 & \textbf{0.792} & $\mathcal{F}_1$ & 0.514 & \textbf{0.572} & 0.566 & 0.530 \\
+$\mathcal{F}_2$ & 0.782 & \textbf{0.796} & 0.539 & 0.789 & $\mathcal{F}_2$ & 0.557 & \textbf{0.564} & 0.519 & 0.526 \\
+$\mathcal{F}_3$ & 0.812 & \textbf{0.842} & 0.583 & 0.831 & $\mathcal{F}_3$ & \textbf{0.577} & 0.572 & 0.503 & 0.503 \\
+$\mathcal{F}_4$ & 0.776 & \textbf{0.844} & 0.571 & 0.818 & $\mathcal{F}_4$ & \textbf{0.584} & 0.568 & 0.518 & 0.573 \\
+$\mathcal{F}_5$ & 0.826 & 0.835 & 0.591 & \textbf{0.837} & $\mathcal{F}_5$ & \textbf{0.575} & 0.555 & 0.500 & 0.552 \\
+$\mathcal{F}_6$ & 0.791 & \textbf{0.854} & 0.823 & 0.845 & $\mathcal{F}_6$ & \textbf{0.596} & 0.558 & 0.554 & 0.504 \\
+$\mathcal{F}_7$ & 0.834 & \textbf{0.891} & 0.848 & 0.882 & $\mathcal{F}_7$ & 0.599 & 0.552 & \textbf{0.643} & 0.546 \\
+$\mathcal{F}_8$ & 0.849 & 0.788 & 0.716 & \textbf{0.856} & $\mathcal{F}_8$ & 0.567 & \textbf{0.586} & 0.540 & 0.557 \\
+\multicolumn{5}{l}{\textit{D19 MRD (AUROC)}} & \multicolumn{5}{l}{\textit{EFS (C-index)}} \\
+$\mathcal{F}_1$ & \textbf{0.571} & 0.543 & 0.564 & 0.531 & $\mathcal{F}_1$ & 0.577 & \textbf{0.591} & 0.584 & 0.573 \\
+$\mathcal{F}_2$ & 0.543 & \textbf{0.555} & 0.479 & 0.521 & $\mathcal{F}_2$ & \textbf{0.607} & 0.598 & 0.522 & 0.561 \\
+$\mathcal{F}_3$ & \textbf{0.631} & 0.599 & 0.484 & 0.557 & $\mathcal{F}_3$ & 0.587 & \textbf{0.614} & 0.545 & 0.537 \\
+$\mathcal{F}_4$ & 0.556 & \textbf{0.659} & 0.492 & 0.432 & $\mathcal{F}_4$ & 0.597 & \textbf{0.619} & 0.532 & 0.533 \\
+$\mathcal{F}_5$ & 0.583 & \textbf{0.597} & 0.488 & 0.520 & $\mathcal{F}_5$ & 0.598 & \textbf{0.614} & 0.526 & 0.561 \\
+$\mathcal{F}_6$ & 0.603 & \textbf{0.620} & 0.567 & 0.605 & $\mathcal{F}_6$ & \textbf{0.624} & 0.583 & 0.604 & 0.542 \\
+$\mathcal{F}_7$ & 0.651 & \textbf{0.652} & 0.548 & 0.581 & $\mathcal{F}_7$ & \textbf{0.643} & 0.630 & 0.621 & 0.581 \\
+$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash & $\mathcal{F}_8$ & 0.687 & \textbf{0.716} & 0.642 & 0.662 \\
+\multicolumn{5}{l}{\textit{D46 MRD (AUROC)}} & \multicolumn{5}{l}{\textit{OS (C-index)}} \\
+$\mathcal{F}_1$ & 0.505 & 0.486 & \textbf{0.542} & 0.501 & $\mathcal{F}_1$ & \textbf{0.689} & 0.648 & 0.652 & 0.661 \\
+$\mathcal{F}_2$ & 0.492 & 0.475 & \textbf{0.501} & 0.495 & $\mathcal{F}_2$ & 0.647 & \textbf{0.702} & 0.550 & 0.634 \\
+$\mathcal{F}_3$ & 0.502 & \textbf{0.509} & 0.503 & 0.500 & $\mathcal{F}_3$ & \textbf{0.682} & 0.678 & 0.537 & 0.634 \\
+$\mathcal{F}_4$ & \textbf{0.528} & 0.508 & 0.509 & 0.508 & $\mathcal{F}_4$ & 0.667 & \textbf{0.681} & 0.524 & 0.616 \\
+$\mathcal{F}_5$ & 0.505 & \textbf{0.539} & 0.505 & 0.533 & $\mathcal{F}_5$ & 0.687 & \textbf{0.691} & 0.497 & 0.660 \\
+$\mathcal{F}_6$ & 0.549 & \textbf{0.577} & 0.518 & 0.552 & $\mathcal{F}_6$ & 0.701 & 0.704 & \textbf{0.734} & 0.619 \\
+$\mathcal{F}_7$ & \textbf{0.610} & 0.539 & 0.523 & 0.510 & $\mathcal{F}_7$ & 0.667 & 0.693 & \textbf{0.755} & 0.687 \\
+$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash & $\mathcal{F}_8$ & 0.725 & 0.718 & \textbf{0.764} & 0.718 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -954,7 +997,7 @@ OS         & Int. & 0.736 & 0.718 & 0.772 & 0.718 & & — & 0.629 & — & — \\
 \caption{\textbf{Overview of the temporally-structured multimodal
 prediction framework.}
 \textbf{a,}~The three parallel timelines: feature acquisition
-(Day~0--46+, $\mathcal{F}_1$–$\mathcal{F}_{12}$), prediction targets
+(Day~0--46, $\mathcal{F}_1$–$\mathcal{F}_{8}$), prediction targets
 (six tasks: Final Risk, D19MRD, D46MRD, Relapse, EFS, OS), and the
 dynamic case database (patient enrolment year 2015--2019, temporal
 splits).
@@ -977,8 +1020,8 @@ targets.}
 \textbf{d,}~D46MRD AUROC. \textbf{e,}~EFS C-index.
 \textbf{f,}~OS C-index.
 Vertical dashed lines indicate clinical timepoints: Day~1 (flow
-cytometry), Day~5 (early response), Day~7--10 (cytogenetics), Day~46
-(MRD, $\mathcal{F}_8$/$\mathcal{F}_9$).
+cytometry and bone marrow morphology), Day~5 (early response), Day~7--10
+(cytogenetics), Day~46 (MRD, $\mathcal{F}_8$).
 Open symbols: internal cohort. Filled symbols: External Site~1.}
 \label{fig:ablation}
 \end{figure}
@@ -988,12 +1031,13 @@ Open symbols: internal cohort. Filled symbols: External Site~1.}
 contribution.}
 \textbf{a,}~Pipeline schematic: SAM cell segmentation
 $\rightarrow$ morphological feature extraction $\rightarrow$
-BiomedCLIP cell-type clustering $\rightarrow$ structured text report.
-\textbf{b,}~Comparison of Relapse AUROC across three image-handling
-strategies: raw images ($\mathcal{F}_4$), blast-only text report
-($\mathcal{F}_{4.1}$), and all-cell-type text report
-($\mathcal{F}_{4.2}$) for four LLMs.
-\textbf{c,}~Same comparison for Final Risk AUROC.}
+BiomedCLIP cell-type clustering $\rightarrow$ per-patient morphology
+profile.
+\textbf{b,}~Representative segmented cells with BiomedCLIP cell-type
+assignments.
+\textbf{c,}~Predictive contribution of the morphology features in
+Phase~2: D19MRD DT/RF AUROC at $\mathcal{F}_3$ (no morphology) versus
+$\mathcal{F}_4$ (with morphology features).}
 \label{fig:morph}
 \end{figure}
 
