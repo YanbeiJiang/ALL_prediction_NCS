@@ -360,37 +360,78 @@ For survival, Site~2 (21 EFS events, 6 deaths) gave LLM EFS C-indices
 of 0.65--0.74 and OS 0.75--0.83; Site~1 estimates rest on very few
 events (3 EFS, 1 death) and are indicative only.
 
-\begin{table}[t]
-\caption{\textbf{Phase~1 LLM zero-shot performance on the two external
-sites} (best feature level $\mathcal{F}_1$--$\mathcal{F}_8$; four LLMs).
-Ext-1: Lianyungang ($n=20$); Ext-2: Fudan ($n=21$, relapse-enriched).
-Classification metric: AUROC; $*$~= accuracy where the cohort is
-single-class. Survival metric: Harrell's C-index. The cohorts are small
-and several cells rest on very few positives or events (e.g. Ext-1 OS:
-1 death) and are indicative only.}
+\begin{table}[p]
+\caption{\textbf{Phase~1 LLM zero-shot on the two external sites, all
+feature levels} (Gm/Gma/Iv/Qw = Gemini/Gemma/InternVL/Qwen).
+Classification: AUROC ($*$~= accuracy, single-class); survival (EFS,OS):
+C-index. \textbf{Bold}: best level per column. \textemdash: not
+evaluable. Ext-1 (Lianyungang, $n$=20) / Ext-2 (Fudan, $n$=21) small;
+indicative only.}
 \label{tab:phase1_ext}
 \centering
-\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}ll cccc@{}}
+\scriptsize
+\renewcommand{\arraystretch}{0.6}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}l cccc cccc@{}}
 \toprule
-\textbf{Task} & \textbf{Site} & Gemini & Gemma & InternVL & Qwen \\
+ & \multicolumn{4}{c}{\textbf{Ext-1 (Lianyungang)}} & \multicolumn{4}{c}{\textbf{Ext-2 (Fudan)}} \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}
+\textbf{Lv.} & Gm & Gma & Iv & Qw & Gm & Gma & Iv & Qw \\
 \midrule
-\multicolumn{6}{l}{\textit{Classification (AUROC; $*$ = accuracy, single class)}} \\
-Final Risk & Ext-1 & 0.900 & 0.900 & 0.800 & 0.875 \\
-           & Ext-2 & 0.933 & 0.883 & 0.800 & 0.867 \\
-D19MRD     & Ext-1 & 0.750$^*$ & 0.750$^*$ & 0.750$^*$ & 0.875$^*$ \\
-           & Ext-2 & 0.515 & 0.449 & 0.500 & 0.537 \\
-D46MRD     & Ext-1 & 0.357 & 0.357 & 0.571 & 0.500 \\
-           & Ext-2 & 0.714$^*$ & 0.619$^*$ & 0.571$^*$ & 0.762$^*$ \\
-Relapse    & Ext-1 & 0.750 & 0.750 & 0.750 & 0.750 \\
-           & Ext-2 & 0.429$^*$ & 0.524$^*$ & 1.000$^*$ & 0.191$^*$ \\
-\midrule
-\multicolumn{6}{l}{\textit{Survival (C-index)}} \\
-EFS & Ext-1 & 0.691 & 0.798 & 0.750 & 0.762 \\
-    & Ext-2 & 0.741 & 0.712 & 0.677 & 0.653 \\
-OS  & Ext-1 & 1.000 & 1.000 & 0.972 & 0.972 \\
-    & Ext-2 & 0.829 & 0.776 & 0.767 & 0.752 \\
+\multicolumn{9}{l}{\textit{Final Risk (AUROC; $^*$=acc)}} \\
+$\mathcal{F}_1$ & 0.633 & 0.800 & 0.700 & 0.800 & 0.783 & 0.783 & 0.700 & 0.783 \\
+$\mathcal{F}_2$ & 0.800 & 0.800 & 0.500 & 0.800 & 0.783 & 0.817 & 0.433 & 0.783 \\
+$\mathcal{F}_3$ & 0.800 & \textbf{0.900} & 0.500 & 0.800 & 0.650 & 0.783 & 0.550 & 0.783 \\
+$\mathcal{F}_4$ & 0.875 & 0.875 & 0.500 & \textbf{0.875} & 0.617 & 0.783 & 0.633 & 0.817 \\
+$\mathcal{F}_5$ & 0.800 & 0.900 & 0.667 & 0.800 & 0.850 & 0.783 & 0.717 & 0.783 \\
+$\mathcal{F}_6$ & 0.800 & 0.900 & 0.400 & 0.800 & 0.567 & \textbf{0.883} & 0.600 & 0.700 \\
+$\mathcal{F}_7$ & 0.800 & 0.800 & \textbf{0.800} & 0.800 & 0.650 & 0.850 & 0.683 & 0.817 \\
+$\mathcal{F}_8$ & \textbf{0.900} & 0.800 & 0.600 & 0.800 & \textbf{0.933} & 0.767 & \textbf{0.800} & \textbf{0.867} \\
+\multicolumn{9}{l}{\textit{D19 MRD (AUROC; $^*$=acc)}} \\
+$\mathcal{F}_1$ & \textbf{0.750$^*$} & \textbf{0.750$^*$} & \textbf{0.750$^*$} & 0.625$^*$ & 0.390 & 0.390 & 0.426 & 0.412 \\
+$\mathcal{F}_2$ & 0.750$^*$ & 0.750$^*$ & 0.000$^*$ & 0.750$^*$ & 0.485 & 0.360 & \textbf{0.500} & 0.515 \\
+$\mathcal{F}_3$ & 0.750$^*$ & 0.750$^*$ & 0.000$^*$ & 0.625$^*$ & 0.390 & 0.360 & 0.500 & 0.353 \\
+$\mathcal{F}_4$ & 0.571$^*$ & 0.429$^*$ & 0.000$^*$ & 0.714$^*$ & 0.331 & 0.331 & 0.500 & 0.324 \\
+$\mathcal{F}_5$ & 0.750$^*$ & 0.750$^*$ & 0.000$^*$ & 0.750$^*$ & \textbf{0.515} & 0.360 & 0.500 & 0.419 \\
+$\mathcal{F}_6$ & 0.750$^*$ & 0.750$^*$ & 0.000$^*$ & 0.625$^*$ & 0.390 & \textbf{0.449} & 0.404 & 0.449 \\
+$\mathcal{F}_7$ & 0.750$^*$ & 0.750$^*$ & 0.375$^*$ & \textbf{0.875$^*$} & 0.390 & 0.360 & 0.493 & \textbf{0.537} \\
+$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
+\multicolumn{9}{l}{\textit{D46 MRD (AUROC; $^*$=acc)}} \\
+$\mathcal{F}_1$ & \textbf{0.357} & \textbf{0.357} & 0.357 & 0.286 & \textbf{0.714$^*$} & 0.571$^*$ & \textbf{0.571$^*$} & 0.667$^*$ \\
+$\mathcal{F}_2$ & 0.357 & 0.357 & 0.500 & \textbf{0.500} & 0.571$^*$ & 0.524$^*$ & 0.000$^*$ & 0.571$^*$ \\
+$\mathcal{F}_3$ & 0.357 & 0.286 & 0.500 & 0.357 & 0.571$^*$ & \textbf{0.619$^*$} & 0.000$^*$ & 0.714$^*$ \\
+$\mathcal{F}_4$ & 0.333 & 0.167 & 0.500 & 0.167 & 0.429$^*$ & 0.524$^*$ & 0.048$^*$ & 0.650$^*$ \\
+$\mathcal{F}_5$ & 0.357 & 0.286 & 0.500 & 0.357 & 0.524$^*$ & 0.619$^*$ & 0.000$^*$ & \textbf{0.762$^*$} \\
+$\mathcal{F}_6$ & 0.357 & 0.357 & \textbf{0.571} & 0.286 & 0.571$^*$ & 0.619$^*$ & 0.095$^*$ & 0.762$^*$ \\
+$\mathcal{F}_7$ & 0.357 & 0.357 & 0.143 & 0.357 & 0.619$^*$ & 0.571$^*$ & 0.190$^*$ & 0.667$^*$ \\
+$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
+\multicolumn{9}{l}{\textit{Relapse (AUROC; $^*$=acc)}} \\
+$\mathcal{F}_1$ & \textbf{0.750} & 0.667 & 0.667 & 0.667 & 0.143$^*$ & 0.429$^*$ & 0.571$^*$ & 0.095$^*$ \\
+$\mathcal{F}_2$ & 0.667 & 0.667 & 0.500 & 0.667 & 0.143$^*$ & 0.381$^*$ & \textbf{1.000$^*$} & 0.095$^*$ \\
+$\mathcal{F}_3$ & 0.750 & 0.583 & 0.583 & \textbf{0.750} & 0.333$^*$ & 0.429$^*$ & 0.952$^*$ & 0.048$^*$ \\
+$\mathcal{F}_4$ & 0.550 & 0.550 & 0.500 & 0.750 & 0.286$^*$ & \textbf{0.524$^*$} & 1.000$^*$ & \textbf{0.190$^*$} \\
+$\mathcal{F}_5$ & 0.750 & 0.583 & \textbf{0.750} & 0.750 & 0.190$^*$ & 0.429$^*$ & 0.857$^*$ & 0.095$^*$ \\
+$\mathcal{F}_6$ & 0.750 & 0.667 & 0.500 & 0.750 & \textbf{0.429$^*$} & 0.381$^*$ & 0.762$^*$ & 0.143$^*$ \\
+$\mathcal{F}_7$ & 0.667 & 0.667 & 0.417 & 0.750 & 0.429$^*$ & 0.476$^*$ & 0.762$^*$ & 0.190$^*$ \\
+$\mathcal{F}_8$ & 0.500 & \textbf{0.750} & 0.500 & 0.750 & 0.000$^*$ & 0.000$^*$ & 0.000$^*$ & 0.000$^*$ \\
+\multicolumn{9}{l}{\textit{EFS (C-index)}} \\
+$\mathcal{F}_1$ & 0.536 & 0.595 & 0.488 & 0.583 & 0.697 & 0.704 & \textbf{0.677} & \textbf{0.653} \\
+$\mathcal{F}_2$ & \textbf{0.690} & 0.500 & 0.548 & 0.619 & \textbf{0.741} & \textbf{0.712} & 0.483 & 0.645 \\
+$\mathcal{F}_3$ & 0.560 & 0.560 & 0.619 & 0.655 & 0.660 & 0.653 & 0.539 & 0.643 \\
+$\mathcal{F}_4$ & 0.643 & 0.536 & 0.595 & 0.619 & 0.667 & 0.667 & 0.581 & 0.640 \\
+$\mathcal{F}_5$ & 0.560 & 0.560 & 0.619 & 0.655 & 0.667 & 0.653 & 0.539 & 0.643 \\
+$\mathcal{F}_6$ & 0.464 & 0.583 & 0.571 & 0.500 & 0.606 & 0.643 & 0.596 & 0.539 \\
+$\mathcal{F}_7$ & 0.560 & 0.750 & \textbf{0.750} & 0.667 & 0.665 & 0.581 & 0.633 & 0.603 \\
+$\mathcal{F}_8$ & 0.667 & \textbf{0.798} & 0.619 & \textbf{0.762} & 0.712 & 0.670 & 0.670 & 0.567 \\
+\multicolumn{9}{l}{\textit{OS (C-index)}} \\
+$\mathcal{F}_1$ & 0.889 & 0.972 & 0.944 & 0.944 & 0.795 & 0.757 & 0.724 & 0.662 \\
+$\mathcal{F}_2$ & \textbf{1.000} & 0.944 & 0.889 & 0.944 & 0.757 & 0.733 & 0.567 & 0.671 \\
+$\mathcal{F}_3$ & 0.972 & \textbf{1.000} & \textbf{0.972} & 0.500 & 0.710 & \textbf{0.776} & 0.605 & 0.538 \\
+$\mathcal{F}_4$ & 0.972 & 1.000 & 0.972 & 0.500 & 0.652 & 0.771 & 0.605 & 0.614 \\
+$\mathcal{F}_5$ & 0.972 & 1.000 & 0.972 & 0.500 & 0.743 & 0.776 & 0.605 & 0.538 \\
+$\mathcal{F}_6$ & 0.944 & 1.000 & 0.972 & 0.833 & 0.671 & 0.757 & 0.710 & 0.557 \\
+$\mathcal{F}_7$ & 0.889 & 0.722 & 0.972 & 0.944 & 0.819 & 0.562 & 0.700 & \textbf{0.752} \\
+$\mathcal{F}_8$ & 1.000 & 0.889 & 0.972 & \textbf{0.972} & \textbf{0.829} & 0.571 & \textbf{0.767} & 0.567 \\
 \bottomrule
 \end{tabular}
 \end{table}
