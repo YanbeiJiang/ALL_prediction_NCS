@@ -497,9 +497,10 @@ the low event rate (8.0\%) and limited statistical power.
 \begin{table}[t]
 \caption{\textbf{Method comparison on the internal cohort, per temporal
 split.} Rows are methods: LLM zero-shot (Gemini, best feature level,
-evaluated on each split's test set); decision tree (DT) and random
-forest (RF; random survival forest, RSF, for EFS/OS), our Phase~2
-models. Classification: AUROC; survival (EFS, OS): C-index. \textbf{Bold}
+evaluated on each split's test set); decision tree (DT, a survival tree
+for EFS/OS) and random forest (RF, a random survival forest RSF for
+EFS/OS), our Phase~2 models. Classification: AUROC; survival (EFS, OS):
+C-index. \textbf{Bold}
 marks the best method in each split. Test sets by enrolment year:
 Split~1 (2017--19, $n$=201), Split~2 (2018--19, $n$=114), Split~3 (2019,
 $n$=17). \textemdash{}: no OS events in the 2019 test set. Full
@@ -531,9 +532,11 @@ DT & 0.559 & 0.529 & 0.500 \\
 RF & 0.591 & \textbf{0.630} & 0.500 \\
 \multicolumn{4}{l}{\textit{EFS (C-index)}} \\
 LLM (Gemini) & 0.661 & 0.674 & \textbf{0.772} \\
+DT & 0.674 & 0.718 & 0.691 \\
 RSF & \textbf{0.684} & \textbf{0.746} & 0.706 \\
 \multicolumn{4}{l}{\textit{OS (C-index)}} \\
 LLM (Gemini) & 0.682 & \textbf{0.665} & \textemdash \\
+DT & 0.562 & 0.562 & \textemdash \\
 RSF & \textbf{0.688} & 0.628 & \textemdash \\
 \bottomrule
 \end{tabular}
@@ -543,7 +546,7 @@ RSF & \textbf{0.688} & 0.628 & \textemdash \\
 \caption{\textbf{Phase~2 internal results across all feature levels and
 the three temporal splits} (full detail behind the summary in
 Table~\ref{tab:phase2_int}). Classification: DT / RF AUROC; survival
-(EFS, OS): RSF C-index (spanning the DT/RF columns). \textbf{Bold} marks
+(EFS, OS): survival-tree (DT) / RSF C-index. \textbf{Bold} marks
 the best feature level in each column. Splits by enrolment year: S1
 train~$\leq$16/test~17--19; S2 $\leq$17/18--19; S3 $\leq$18/19.
 \textemdash{}: not evaluable (D19/D46MRD are inputs at $\mathcal{F}_8$;
@@ -595,24 +598,24 @@ $\mathcal{F}_5$ & 0.540 & 0.564 & 0.411 & 0.471 & 0.286 & 0.036 \\
 $\mathcal{F}_6$ & 0.527 & 0.517 & 0.411 & 0.624 & 0.286 & 0.286 \\
 $\mathcal{F}_7$ & 0.528 & 0.547 & 0.411 & \textbf{0.630} & 0.488 & \textbf{0.500} \\
 $\mathcal{F}_8$ & 0.529 & \textbf{0.591} & 0.411 & 0.597 & 0.488 & 0.429 \\
-\multicolumn{7}{l}{\textit{EFS (RSF C-index)}} \\
-$\mathcal{F}_1$ & \multicolumn{2}{c}{0.532} & \multicolumn{2}{c}{0.610} & \multicolumn{2}{c}{\textbf{0.706}} \\
-$\mathcal{F}_2$ & \multicolumn{2}{c}{0.516} & \multicolumn{2}{c}{0.597} & \multicolumn{2}{c}{0.559} \\
-$\mathcal{F}_3$ & \multicolumn{2}{c}{0.542} & \multicolumn{2}{c}{0.552} & \multicolumn{2}{c}{0.500} \\
-$\mathcal{F}_4$ & \multicolumn{2}{c}{0.530} & \multicolumn{2}{c}{0.516} & \multicolumn{2}{c}{0.397} \\
-$\mathcal{F}_5$ & \multicolumn{2}{c}{0.520} & \multicolumn{2}{c}{0.533} & \multicolumn{2}{c}{0.485} \\
-$\mathcal{F}_6$ & \multicolumn{2}{c}{0.511} & \multicolumn{2}{c}{0.572} & \multicolumn{2}{c}{0.588} \\
-$\mathcal{F}_7$ & \multicolumn{2}{c}{0.560} & \multicolumn{2}{c}{0.592} & \multicolumn{2}{c}{0.662} \\
-$\mathcal{F}_8$ & \multicolumn{2}{c}{\textbf{0.684}} & \multicolumn{2}{c}{\textbf{0.746}} & \multicolumn{2}{c}{0.691} \\
-\multicolumn{7}{l}{\textit{OS (RSF C-index)}} \\
-$\mathcal{F}_1$ & \multicolumn{2}{c}{\textbf{0.688}} & \multicolumn{2}{c}{0.497} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_2$ & \multicolumn{2}{c}{0.651} & \multicolumn{2}{c}{0.540} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_3$ & \multicolumn{2}{c}{0.556} & \multicolumn{2}{c}{0.515} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_4$ & \multicolumn{2}{c}{0.536} & \multicolumn{2}{c}{0.415} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_5$ & \multicolumn{2}{c}{0.590} & \multicolumn{2}{c}{0.529} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_6$ & \multicolumn{2}{c}{0.586} & \multicolumn{2}{c}{0.622} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_7$ & \multicolumn{2}{c}{0.621} & \multicolumn{2}{c}{0.620} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_8$ & \multicolumn{2}{c}{0.607} & \multicolumn{2}{c}{\textbf{0.628}} & \multicolumn{2}{c}{\textemdash} \\
+\multicolumn{7}{l}{\textit{EFS (DT / RSF C-index)}} \\
+$\mathcal{F}_1$ & 0.468 & 0.532 & 0.443 & 0.610 & \textbf{0.691} & \textbf{0.706} \\
+$\mathcal{F}_2$ & 0.482 & 0.516 & 0.501 & 0.597 & 0.529 & 0.559 \\
+$\mathcal{F}_3$ & 0.527 & 0.542 & 0.477 & 0.552 & 0.390 & 0.500 \\
+$\mathcal{F}_4$ & 0.557 & 0.530 & 0.547 & 0.516 & 0.507 & 0.397 \\
+$\mathcal{F}_5$ & 0.546 & 0.520 & 0.482 & 0.533 & 0.426 & 0.485 \\
+$\mathcal{F}_6$ & 0.494 & 0.511 & 0.490 & 0.572 & 0.390 & 0.588 \\
+$\mathcal{F}_7$ & 0.497 & 0.560 & 0.485 & 0.592 & 0.390 & 0.662 \\
+$\mathcal{F}_8$ & \textbf{0.674} & \textbf{0.684} & \textbf{0.718} & \textbf{0.746} & 0.640 & 0.691 \\
+\multicolumn{7}{l}{\textit{OS (DT / RSF C-index)}} \\
+$\mathcal{F}_1$ & 0.541 & \textbf{0.688} & 0.531 & 0.497 & \textemdash & \textemdash \\
+$\mathcal{F}_2$ & 0.467 & 0.651 & 0.541 & 0.540 & \textemdash & \textemdash \\
+$\mathcal{F}_3$ & 0.512 & 0.556 & 0.440 & 0.515 & \textemdash & \textemdash \\
+$\mathcal{F}_4$ & 0.505 & 0.536 & 0.402 & 0.415 & \textemdash & \textemdash \\
+$\mathcal{F}_5$ & 0.498 & 0.590 & 0.472 & 0.529 & \textemdash & \textemdash \\
+$\mathcal{F}_6$ & 0.492 & 0.586 & 0.445 & 0.622 & \textemdash & \textemdash \\
+$\mathcal{F}_7$ & \textbf{0.562} & 0.621 & \textbf{0.562} & 0.620 & \textemdash & \textemdash \\
+$\mathcal{F}_8$ & 0.562 & 0.607 & 0.505 & \textbf{0.628} & \textemdash & \textemdash \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -634,8 +637,8 @@ For survival, the RSF transferred to Site~2 (EFS C-index~0.586 over
 \caption{\textbf{Phase~2 out-of-distribution results on the two external
 sites, across all feature levels} (train~=~all 301 internal patients).
 Classification: DT / RF AUROC; $*$~= accuracy where the cohort is
-single-class. Survival (EFS, OS): RSF C-index (spanning the DT/RF
-columns). \textbf{Bold} marks the best feature level in each column.
+single-class. Survival (EFS, OS): survival-tree (DT) / RSF C-index.
+\textbf{Bold} marks the best feature level in each column.
 \textemdash{}: not evaluable (D19/D46MRD are inputs at $\mathcal{F}_8$;
 Ext-1 OS has 1 death). Ext-1: Lianyungang ($n=20$); Ext-2: Fudan
 ($n=21$). Cohorts are small; indicative only.}
@@ -686,24 +689,24 @@ $\mathcal{F}_5$ & 0.667 & 0.556 & 0.000$^*$ & 0.000$^*$ \\
 $\mathcal{F}_6$ & 0.472 & 0.778 & 0.524$^*$ & 0.000$^*$ \\
 $\mathcal{F}_7$ & 0.528 & 0.639 & 0.476$^*$ & 0.000$^*$ \\
 $\mathcal{F}_8$ & 0.583 & 0.750 & 0.476$^*$ & 0.000$^*$ \\
-\multicolumn{5}{l}{\textit{EFS (RSF C-index)}} \\
-$\mathcal{F}_1$ & \multicolumn{2}{c}{0.762} & \multicolumn{2}{c}{0.562} \\
-$\mathcal{F}_2$ & \multicolumn{2}{c}{0.738} & \multicolumn{2}{c}{\textbf{0.586}} \\
-$\mathcal{F}_3$ & \multicolumn{2}{c}{0.833} & \multicolumn{2}{c}{0.493} \\
-$\mathcal{F}_4$ & \multicolumn{2}{c}{0.667} & \multicolumn{2}{c}{0.517} \\
-$\mathcal{F}_5$ & \multicolumn{2}{c}{0.643} & \multicolumn{2}{c}{0.542} \\
-$\mathcal{F}_6$ & \multicolumn{2}{c}{0.691} & \multicolumn{2}{c}{0.473} \\
-$\mathcal{F}_7$ & \multicolumn{2}{c}{0.714} & \multicolumn{2}{c}{0.453} \\
-$\mathcal{F}_8$ & \multicolumn{2}{c}{\textbf{0.905}} & \multicolumn{2}{c}{0.571} \\
-\multicolumn{5}{l}{\textit{OS (RSF C-index)}} \\
-$\mathcal{F}_1$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.686} \\
-$\mathcal{F}_2$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.610} \\
-$\mathcal{F}_3$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.562} \\
-$\mathcal{F}_4$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{\textbf{0.705}} \\
-$\mathcal{F}_5$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.619} \\
-$\mathcal{F}_6$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.600} \\
-$\mathcal{F}_7$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.571} \\
-$\mathcal{F}_8$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.657} \\
+\multicolumn{5}{l}{\textit{EFS (DT / RSF C-index)}} \\
+$\mathcal{F}_1$ & 0.667 & 0.762 & 0.483 & 0.562 \\
+$\mathcal{F}_2$ & 0.667 & 0.738 & 0.517 & \textbf{0.586} \\
+$\mathcal{F}_3$ & 0.512 & 0.833 & 0.475 & 0.493 \\
+$\mathcal{F}_4$ & 0.667 & 0.667 & 0.559 & 0.517 \\
+$\mathcal{F}_5$ & 0.560 & 0.643 & \textbf{0.571} & 0.542 \\
+$\mathcal{F}_6$ & 0.488 & 0.691 & 0.438 & 0.473 \\
+$\mathcal{F}_7$ & 0.488 & 0.714 & 0.438 & 0.453 \\
+$\mathcal{F}_8$ & \textbf{0.821} & \textbf{0.905} & 0.510 & 0.571 \\
+\multicolumn{5}{l}{\textit{OS (DT / RSF C-index)}} \\
+$\mathcal{F}_1$ & \textemdash & \textemdash & \textbf{0.705} & 0.686 \\
+$\mathcal{F}_2$ & \textemdash & \textemdash & 0.676 & 0.610 \\
+$\mathcal{F}_3$ & \textemdash & \textemdash & 0.681 & 0.562 \\
+$\mathcal{F}_4$ & \textemdash & \textemdash & 0.681 & \textbf{0.705} \\
+$\mathcal{F}_5$ & \textemdash & \textemdash & 0.681 & 0.619 \\
+$\mathcal{F}_6$ & \textemdash & \textemdash & 0.657 & 0.600 \\
+$\mathcal{F}_7$ & \textemdash & \textemdash & 0.657 & 0.571 \\
+$\mathcal{F}_8$ & \textemdash & \textemdash & 0.690 & 0.657 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -712,7 +715,7 @@ $\mathcal{F}_8$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.657} \\
 \caption{\textbf{Method comparison on the two external sites}
 (out-of-distribution; no temporal split). Rows are methods: LLM
 zero-shot (Gemini, best feature level, evaluated per site); decision tree
-(DT) and random forest (RF; random survival forest, RSF, for EFS/OS),
+(DT, a survival tree for EFS/OS) and random forest (RF, RSF for EFS/OS),
 trained on all 301 internal patients. Classification: AUROC ($*$~=
 accuracy, single-class cohort); survival (EFS, OS): C-index.
 \textbf{Bold} marks the best method at each site. \textemdash{}: Ext-1 OS
@@ -744,9 +747,11 @@ DT & 0.708 & \textbf{0.762$^*$} \\
 RF & \textbf{0.861} & 0.048$^*$ \\
 \multicolumn{3}{l}{\textit{EFS (C-index)}} \\
 LLM (Gemini) & 0.690 & \textbf{0.741} \\
+DT & 0.821 & 0.571 \\
 RSF & \textbf{0.905} & 0.586 \\
 \multicolumn{3}{l}{\textit{OS (C-index)}} \\
 LLM (Gemini) & \textbf{1.000} & \textbf{0.829} \\
+DT & \textemdash & 0.705 \\
 RSF & \textemdash & 0.705 \\
 \bottomrule
 \end{tabular}
@@ -1116,7 +1121,9 @@ Primary metric: AUROC; secondary: F1-macro and balanced accuracy.
 
 A random survival forest (RSF;~\cite{[CITE:Ishwaran2008]};
 $n_\text{estimators}=100$, \texttt{random\_state}=42) was trained on
-the same temporal splits as the classification experiments.
+the same temporal splits as the classification experiments; a single
+survival decision tree (survival-tree analogue of the classification DT)
+was trained under the same protocol as its tree-based counterpart.
 EFS was defined as time from diagnosis to first of: relapse, induction
 failure, or death; OS was time to death.
 Censoring was at last follow-up.
