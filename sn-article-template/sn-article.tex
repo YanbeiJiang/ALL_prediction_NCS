@@ -714,6 +714,8 @@ $\mathcal{F}_5$~(Day~1): adds non-risk clinical factors;
 $\mathcal{F}_6$~(Day~5): adds CNS status, Day~5 blast, and Initial Risk;
 $\mathcal{F}_7$~(Day~7--10): adds Fusion gene, Karyotype, FISH;
 $\mathcal{F}_8$~(Day~46): adds D19MRD and D46MRD.
+The complete variable list for every level is given in
+Table~\ref{tab:featurelist}.
 All six prediction targets are evaluated on the same feature hierarchy.
 
 For Phase~2, categorical features were one-hot encoded and numerical
@@ -951,6 +953,33 @@ $\mathcal{F}_7$     & Day 7--10 & $\mathcal{F}_6$ + Fusion gene + Karyotype + FI
 $\mathcal{F}_8$     & Day 46    & $\mathcal{F}_7$ + D19MRD + D46MRD (as inputs) & 2$^\dagger$ \\
 \bottomrule
 \multicolumn{4}{l}{Survival targets (EFS, OS) evaluated at all levels using the same feature vector.}
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\caption{\textbf{Complete variable specification for each feature level}
+(Supplementary Table). Each level adds the listed variables to its base
+set; $\mathcal{F}_4$ and $\mathcal{F}_5$ branch from $\mathcal{F}_3$,
+while the main clinical chain is
+$\mathcal{F}_1\!\subseteq\!\mathcal{F}_2\!\subseteq\!\mathcal{F}_3\!
+\subseteq\!\mathcal{F}_6\!\subseteq\!\mathcal{F}_7\!\subseteq\!\mathcal{F}_8$.}
+\label{tab:featurelist}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l p{0.80\linewidth}@{}}
+\toprule
+\textbf{Level} & \textbf{Variables added (base set)} \\
+\midrule
+$\mathcal{F}_1$ & WBC count; Age \\
+$\mathcal{F}_2$ & $+$ Blast\% \\
+$\mathcal{F}_3$ & $+$ Immunophenotype (B/T lineage); 42 CD markers (CD1a, CD2, CD3, cCD3, CD4, CD5, CD7, CD8, CD9, CD10, CD11b, CD11c, CD13, CD14, CD15, CD19, CD20, CD22, cCD22, CD24, CD33, CD34, CD38, CD41, CD44, CD45, CD58, CD61, CD64, CD65, CD66c, CD71, CD73, cCD79a, CD86, CD90, CD97, CD99, CD117, CD123, CD133, CD200); 9 additional markers (GPA, cMPO, NG2, TdT, c$\mu$, sIgM, TCR$\alpha\beta$, TCR$\gamma\delta$, HLA-DR) \\
+$\mathcal{F}_4$ & (base $\mathcal{F}_3$) $+$ bone marrow morphology profile: per-patient blast-cell descriptors from the SAM/BiomedCLIP pipeline (area, perimeter, circularity, eccentricity, aspect ratio, nucleus-to-cytoplasm ratio, GLCM texture, chromatin fineness, nucleoli count/size, vacuole \%, hand-mirror \%) and cell-type proportions; Phase~2 uses the six SHAP-ranked descriptors \\
+$\mathcal{F}_5$ & (base $\mathcal{F}_3$) $+$ non-risk clinical factors: chief-complaint category, pregnancy number, birth order, term/preterm status, delivery mode, birth weight, feeding type, admission weight, liver span, spleen span, haemoglobin, platelet count \\
+$\mathcal{F}_6$ & (base $\mathcal{F}_3$) $+$ CNS status (CNSL); Day-5 peripheral blast\%; Initial Risk \\
+$\mathcal{F}_7$ & (base $\mathcal{F}_6$) $+$ Fusion gene; Karyotype; FISH \\
+$\mathcal{F}_8$ & (base $\mathcal{F}_7$) $+$ D19MRD; D46MRD (as input features) \\
+\bottomrule
 \end{tabular}
 \end{table}
 
