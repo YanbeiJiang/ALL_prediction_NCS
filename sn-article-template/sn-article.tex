@@ -708,6 +708,50 @@ $\mathcal{F}_8$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.657} \\
 \end{tabular}
 \end{table}
 
+\begin{table}[t]
+\caption{\textbf{Method comparison on the two external sites}
+(out-of-distribution; no temporal split). Rows are methods: LLM
+zero-shot (Gemini, best feature level, evaluated per site); decision tree
+(DT) and random forest (RF; random survival forest, RSF, for EFS/OS),
+trained on all 301 internal patients. Classification: AUROC ($*$~=
+accuracy, single-class cohort); survival (EFS, OS): C-index.
+\textbf{Bold} marks the best method at each site. \textemdash{}: Ext-1 OS
+has 1 death (RSF omitted). Ext-1: Lianyungang ($n$=20); Ext-2: Fudan
+($n$=21). Full per-feature-level detail in Table~\ref{tab:phase2_ext}.}
+\label{tab:phase2_ext_summary}
+\centering
+\small
+\setlength{\tabcolsep}{7pt}
+\begin{tabular}{@{}l cc@{}}
+\toprule
+\textbf{Method} & \textbf{Ext-1 (Lianyungang)} & \textbf{Ext-2 (Fudan)} \\
+\midrule
+\multicolumn{3}{l}{\textit{Final Risk (AUROC)}} \\
+LLM (Gemini) & 0.900 & 0.933 \\
+DT & 0.939 & \textbf{1.000} \\
+RF & \textbf{0.965} & \textbf{1.000} \\
+\multicolumn{3}{l}{\textit{D19 MRD (AUROC)}} \\
+LLM (Gemini) & 0.750$^*$ & 0.515 \\
+DT & 0.550$^*$ & 0.706 \\
+RF & \textbf{1.000$^*$} & \textbf{0.750} \\
+\multicolumn{3}{l}{\textit{D46 MRD (AUROC)}} \\
+LLM (Gemini) & 0.357 & 0.714$^*$ \\
+DT & 0.974 & 0.714$^*$ \\
+RF & \textbf{1.000} & \textbf{1.000$^*$} \\
+\multicolumn{3}{l}{\textit{Relapse (AUROC)}} \\
+LLM (Gemini) & 0.750 & 0.429$^*$ \\
+DT & 0.708 & \textbf{0.762$^*$} \\
+RF & \textbf{0.861} & 0.048$^*$ \\
+\multicolumn{3}{l}{\textit{EFS (C-index)}} \\
+LLM (Gemini) & 0.690 & \textbf{0.741} \\
+RSF & \textbf{0.905} & 0.586 \\
+\multicolumn{3}{l}{\textit{OS (C-index)}} \\
+LLM (Gemini) & \textbf{1.000} & \textbf{0.829} \\
+RSF & \textemdash & 0.705 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 %%--------------------------------------------------------------%%
 \subsection{Cosine RAG belief revision}
 \label{sec:rag}
