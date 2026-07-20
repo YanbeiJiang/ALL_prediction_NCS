@@ -495,26 +495,46 @@ For OS, RSF C-index was 0.629 ($p=0.489$; not significant), reflecting
 the low event rate (8.0\%) and limited statistical power.
 
 \begin{table}[t]
-\caption{\textbf{Method comparison on the internal cohort} (best result
-per target). Rows are methods: LLM zero-shot (Gemini, best feature level;
-no training, evaluated on the full 301-patient cohort); decision tree
-(DT) and random forest (RF), our Phase~2 models at temporal Split~2
-($n_\text{test}=114$), best feature level. Classification metric: AUROC;
-survival (EFS, OS): Harrell's C-index (the RF row uses a random survival
-forest). \textbf{Bold} marks the best method for each target; the full
-per-level, per-split results are in Table~\ref{tab:phase2_int_full}.}
+\caption{\textbf{Method comparison on the internal cohort, per temporal
+split.} Rows are methods: LLM zero-shot (Gemini, best feature level,
+evaluated on each split's test set); decision tree (DT) and random
+forest (RF; random survival forest, RSF, for EFS/OS), our Phase~2
+models. Classification: AUROC; survival (EFS, OS): C-index. \textbf{Bold}
+marks the best method in each split. Test sets by enrolment year:
+Split~1 (2017--19, $n$=201), Split~2 (2018--19, $n$=114), Split~3 (2019,
+$n$=17). \textemdash{}: no OS events in the 2019 test set. Full
+per-feature-level detail in Table~\ref{tab:phase2_int_full}.}
 \label{tab:phase2_int}
 \centering
 \small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}l cccc cc@{}}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}l ccc@{}}
 \toprule
-\textbf{Method} & \textbf{Final Risk} & \textbf{D19MRD} & \textbf{D46MRD} & \textbf{Relapse} & \textbf{EFS} & \textbf{OS} \\
- & \multicolumn{4}{c}{\footnotesize AUROC} & \multicolumn{2}{c}{\footnotesize C-index} \\
+\textbf{Method} & \textbf{Split~1} & \textbf{Split~2} & \textbf{Split~3} \\
+ & \footnotesize $n$=201 & \footnotesize $n$=114 & \footnotesize $n$=17 \\
 \midrule
-LLM zero-shot (Gemini) & 0.849 & 0.651 & 0.610 & 0.599 & 0.687 & \textbf{0.725} \\
-Decision tree (DT) & 0.949 & 0.743 & \textbf{0.671} & 0.529 & \textemdash & \textemdash \\
-Random forest (RF\,/\,RSF) & \textbf{0.998} & \textbf{0.853} & 0.636 & \textbf{0.630} & \textbf{0.746} & 0.628 \\
+\multicolumn{4}{l}{\textit{Final Risk (AUROC)}} \\
+LLM (Gemini) & 0.860 & 0.856 & \textbf{1.000} \\
+DT & 0.893 & 0.949 & 0.979 \\
+RF & \textbf{0.996} & \textbf{0.998} & \textbf{1.000} \\
+\multicolumn{4}{l}{\textit{D19 MRD (AUROC)}} \\
+LLM (Gemini) & 0.651 & 0.745 & 0.560 \\
+DT & 0.555 & 0.743 & \textbf{0.893} \\
+RF & \textbf{0.696} & \textbf{0.853} & 0.833 \\
+\multicolumn{4}{l}{\textit{D46 MRD (AUROC)}} \\
+LLM (Gemini) & \textbf{0.614} & 0.632 & 0.560 \\
+DT & 0.545 & \textbf{0.671} & 0.464 \\
+RF & 0.597 & 0.636 & \textbf{0.655} \\
+\multicolumn{4}{l}{\textit{Relapse (AUROC)}} \\
+LLM (Gemini) & \textbf{0.593} & 0.589 & \textbf{0.786} \\
+DT & 0.559 & 0.529 & 0.500 \\
+RF & 0.591 & \textbf{0.630} & 0.500 \\
+\multicolumn{4}{l}{\textit{EFS (C-index)}} \\
+LLM (Gemini) & 0.661 & 0.674 & \textbf{0.772} \\
+RSF & \textbf{0.684} & \textbf{0.746} & 0.706 \\
+\multicolumn{4}{l}{\textit{OS (C-index)}} \\
+LLM (Gemini) & 0.682 & \textbf{0.665} & \textemdash \\
+RSF & \textbf{0.688} & 0.628 & \textemdash \\
 \bottomrule
 \end{tabular}
 \end{table}
