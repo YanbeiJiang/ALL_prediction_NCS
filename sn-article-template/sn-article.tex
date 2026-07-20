@@ -257,9 +257,9 @@ Morphology features & 287 (95.3\%) & 19 & 21 \\
 %%--------------------------------------------------------------%%
 
 We evaluated four LLMs in a zero-shot setting across all eight feature
-levels and all six prediction targets (Table~\ref{tab:summary} summarises
-the best level per model; Table~\ref{tab:phase1_full} reports the complete
-per-feature-level results).
+levels and all six prediction targets; Table~\ref{tab:phase1_full}
+reports the complete internal per-feature-level results and
+Table~\ref{tab:phase1_ext} the two external sites.
 Models included Gemini-3.1-Flash-Lite (Google AI API) and three
 open-weight models deployed locally via vLLM: Gemma-4-31B-it,
 InternVL3.5-30B-A3B, and Qwen3.6-35B-A3B.
@@ -350,7 +350,7 @@ for EFS for all four LLMs.
 Final Risk—the only target with both classes at both sites—transferred
 well: LLM zero-shot AUROC was 0.80--0.90 at Site~1 (Lianyungang) and
 0.80--0.93 at Site~2 (Fudan), close to the internal range and obtained
-without any site-specific retraining (Table~\ref{tab:summary}).
+without any site-specific retraining (Table~\ref{tab:phase1_ext}).
 The other classification targets are limited by the small,
 class-imbalanced external cohorts: at each site one or more targets
 collapse to a single class (Relapse is all-positive at Site~2, D19MRD
@@ -359,6 +359,41 @@ AUROC.
 For survival, Site~2 (21 EFS events, 6 deaths) gave LLM EFS C-indices
 of 0.65--0.74 and OS 0.75--0.83; Site~1 estimates rest on very few
 events (3 EFS, 1 death) and are indicative only.
+
+\begin{table}[t]
+\caption{\textbf{Phase~1 LLM zero-shot performance on the two external
+sites} (best feature level $\mathcal{F}_1$--$\mathcal{F}_8$; four LLMs).
+Ext-1: Lianyungang ($n=20$); Ext-2: Fudan ($n=21$, relapse-enriched).
+Classification metric: AUROC; $*$~= accuracy where the cohort is
+single-class. Survival metric: Harrell's C-index. The cohorts are small
+and several cells rest on very few positives or events (e.g. Ext-1 OS:
+1 death) and are indicative only.}
+\label{tab:phase1_ext}
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}ll cccc@{}}
+\toprule
+\textbf{Task} & \textbf{Site} & Gemini & Gemma & InternVL & Qwen \\
+\midrule
+\multicolumn{6}{l}{\textit{Classification (AUROC; $*$ = accuracy, single class)}} \\
+Final Risk & Ext-1 & 0.900 & 0.900 & 0.800 & 0.875 \\
+           & Ext-2 & 0.933 & 0.883 & 0.800 & 0.867 \\
+D19MRD     & Ext-1 & 0.750$^*$ & 0.750$^*$ & 0.750$^*$ & 0.875$^*$ \\
+           & Ext-2 & 0.515 & 0.449 & 0.500 & 0.537 \\
+D46MRD     & Ext-1 & 0.357 & 0.357 & 0.571 & 0.500 \\
+           & Ext-2 & 0.714$^*$ & 0.619$^*$ & 0.571$^*$ & 0.762$^*$ \\
+Relapse    & Ext-1 & 0.750 & 0.750 & 0.750 & 0.750 \\
+           & Ext-2 & 0.429$^*$ & 0.524$^*$ & 1.000$^*$ & 0.191$^*$ \\
+\midrule
+\multicolumn{6}{l}{\textit{Survival (C-index)}} \\
+EFS & Ext-1 & 0.691 & 0.798 & 0.750 & 0.762 \\
+    & Ext-2 & 0.741 & 0.712 & 0.677 & 0.653 \\
+OS  & Ext-1 & 1.000 & 1.000 & 0.972 & 0.972 \\
+    & Ext-2 & 0.829 & 0.776 & 0.767 & 0.752 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 %%--------------------------------------------------------------%%
 \subsection{Bone marrow morphology pipeline}
@@ -392,7 +427,8 @@ Phase~2 evaluates DT and RF models on three temporal splits
 $\mathcal{T}_2=2017$: $n_\text{train}=186$, $n_\text{test}=114$;
 $\mathcal{T}_3=2018$: $n_\text{train}=283$, $n_\text{test}=17$)
 and a random survival forest (RSF) on the same splits for the EFS
-and OS targets (Table~\ref{tab:summary}).
+and OS targets (internal results in Table~\ref{tab:phase2_int},
+external in Table~\ref{tab:phase2_ext}).
 
 \textbf{Classification on the internal cohort (Split~2).}
 Final Risk DT AUROC rose from 0.810 at $\mathcal{F}_1$ to
@@ -417,6 +453,34 @@ without any training data.
 For OS, RSF C-index was 0.629 ($p=0.489$; not significant), reflecting
 the low event rate (8.0\%) and limited statistical power.
 
+\begin{table}[t]
+\caption{\textbf{Phase~2 internal results across the three temporal
+splits.} Classification: decision tree / random forest AUROC at the best
+feature level per task (Feat.\ column). Survival: random survival forest
+(RSF) C-index. Split~1: train 2015--16 / test 2017--19; Split~2: train
+2015--17 / test 2018--19; Split~3: train 2015--18 / test 2019.
+--~= not evaluable (no OS events in the 17-patient 2019 test set).}
+\label{tab:phase2_int}
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}ll ccc@{}}
+\toprule
+\textbf{Task} & \textbf{Feat.} & \textbf{Split~1} & \textbf{Split~2} & \textbf{Split~3} \\
+\midrule
+\multicolumn{5}{l}{\textit{Classification (DT / RF AUROC)}} \\
+Final Risk & $\mathcal{F}_8$ & 0.891 / 0.996 & 0.949 / 0.998 & 0.979 / 1.000 \\
+D19MRD     & $\mathcal{F}_4$ & 0.555 / 0.696 & 0.743 / 0.807 & 0.821 / 0.774 \\
+D46MRD     & $\mathcal{F}_5$ & 0.531 / 0.528 & 0.671 / 0.636 & 0.369 / 0.417 \\
+Relapse    & $\mathcal{F}_7$ & 0.528 / 0.547 & 0.411 / 0.630 & 0.488 / 0.500 \\
+\midrule
+\multicolumn{5}{l}{\textit{Survival (RSF C-index)}} \\
+EFS & $\mathcal{F}_8$ & 0.684 & 0.746 & 0.691 \\
+OS  & $\mathcal{F}_8$ & 0.607 & 0.629 & — \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \textbf{External validation (two sites, OOD).}
 With all 301 internal patients as training, RF and DT retained strong
 Final Risk discrimination at both sites (RF~AUROC 0.965 / DT 0.914 at
@@ -425,10 +489,44 @@ institutions.
 Consistent with Phase~1, the remaining per-site classification targets
 are constrained by class imbalance: several reduce to a single class
 (reported as accuracy) or rest on one to two positives, so their AUROCs
-are not interpretable (Table~\ref{tab:summary}).
+are not interpretable (Table~\ref{tab:phase2_ext}).
 For survival, the RSF transferred to Site~2 (EFS C-index~0.586 over
 21 events; OS~0.705 over 6 deaths); the Site~1 RSF is omitted for OS
 (1 death) and rests on only 3 events for EFS.
+
+\begin{table}[t]
+\caption{\textbf{Phase~2 out-of-distribution results on the two external
+sites} (train~=~all 301 internal patients). Classification: decision
+tree / random forest AUROC; $*$~= accuracy where the cohort is
+single-class. Survival: RSF C-index. --~= not evaluable (Ext-1 OS: 1
+death). Cohorts are small; several cells rest on very few positives or
+events and are indicative only.}
+\label{tab:phase2_ext}
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}ll cc@{}}
+\toprule
+\textbf{Task} & \textbf{Site} & \textbf{DT} & \textbf{RF / RSF} \\
+\midrule
+\multicolumn{4}{l}{\textit{Classification (AUROC; $*$ = accuracy, single class)}} \\
+Final Risk & Ext-1 & 0.914 & 0.965 \\
+           & Ext-2 & 1.000 & 1.000 \\
+D19MRD     & Ext-1 & 0.400$^*$ & 1.000$^*$ \\
+           & Ext-2 & 0.581 & 0.750 \\
+D46MRD     & Ext-1 & 0.184 & 1.000 \\
+           & Ext-2 & 0.667$^*$ & 1.000$^*$ \\
+Relapse    & Ext-1 & 0.431 & 0.861 \\
+           & Ext-2 & 0.143$^*$ & 0.048$^*$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Survival (RSF C-index)}} \\
+EFS & Ext-1 & — & 0.905 \\
+    & Ext-2 & — & 0.586 \\
+OS  & Ext-1 & — & — \\
+    & Ext-2 & — & 0.705 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 %%--------------------------------------------------------------%%
 \subsection{Cosine RAG belief revision}
@@ -982,59 +1080,6 @@ $\mathcal{F}_8$ & (base $\mathcal{F}_7$) $+$ D19MRD; D46MRD (as input features) 
 \bottomrule
 \end{tabular}
 \end{table}
-
-\begin{table}[ht]
-\caption{Summary of best results across six prediction targets, four
-LLMs (Phase~1, best feature level), and Phase~2 models (DT/RF for
-classification; RSF for EFS/OS).
-Internal: Huaxi Hospital ($n=301$; Phase~2 temporal Split~2).
-Ext-1: Lianyungang First People's Hospital ($n=20$); Ext-2: Children's
-Hospital of Fudan University, Shanghai ($n=21$), a relapse-enriched
-cohort (all 21 relapsed).
-Classification metric: AUROC; $*$~= accuracy, reported where the
-external cohort has a single class and AUROC is undefined.
-Survival metric: Harrell's C-index.
-Because the external cohorts are small, several cells rest on very few
-positives or events (e.g. Ext-1 Relapse: 2 positives; Ext-1 OS: 1 death,
-RSF omitted) and should be read as indicative only.}
-\label{tab:summary}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}ll cccc c cc@{}}
-\toprule
-& & \multicolumn{4}{c}{\textbf{Phase~1 LLM (best level)}}
-  & & \multicolumn{2}{c}{\textbf{Phase~2}} \\
-\cmidrule(lr){3-6} \cmidrule(lr){8-9}
-\textbf{Task} & \textbf{Cohort}
-  & Gemini & Gemma & InternVL & Qwen & & DT & RF/RSF \\
-\midrule
-\multicolumn{9}{l}{\textit{Classification tasks (AUROC; $*$ = accuracy, single-class cohort)}} \\
-Final Risk & Int.   & 0.849 & 0.891 & 0.848 & 0.882 & & 0.949 & 0.998 \\
-           & Ext-1  & 0.900 & 0.900 & 0.800 & 0.875 & & 0.914 & 0.965 \\
-           & Ext-2  & 0.933 & 0.883 & 0.800 & 0.867 & & 1.000 & 1.000 \\
-D19MRD     & Int.   & 0.651 & 0.659 & 0.567 & 0.605 & & 0.743 & 0.807 \\
-           & Ext-1  & 0.750$^*$ & 0.750$^*$ & 0.750$^*$ & 0.875$^*$ & & 0.400$^*$ & 1.000$^*$ \\
-           & Ext-2  & 0.515 & 0.449 & 0.500 & 0.537 & & 0.581 & 0.750 \\
-D46MRD     & Int.   & 0.610 & 0.577 & 0.542 & 0.552 & & 0.671 & 0.636 \\
-           & Ext-1  & 0.357 & 0.357 & 0.571 & 0.500 & & 0.184 & 1.000 \\
-           & Ext-2  & 0.714$^*$ & 0.619$^*$ & 0.571$^*$ & 0.762$^*$ & & 0.667$^*$ & 1.000$^*$ \\
-Relapse    & Int.   & 0.599 & 0.586 & 0.643 & 0.573 & & 0.529 & 0.630 \\
-           & Ext-1  & 0.750 & 0.750 & 0.750 & 0.750 & & 0.431 & 0.861 \\
-           & Ext-2  & 0.429$^*$ & 0.524$^*$ & 1.000$^*$ & 0.191$^*$ & & 0.143$^*$ & 0.048$^*$ \\
-\midrule
-\multicolumn{9}{l}{\textit{Survival tasks (C-index)}} \\
-EFS & Int.   & 0.687 & 0.716 & 0.642 & 0.662 & & — & 0.746 \\
-    & Ext-1  & 0.691 & 0.798 & 0.750 & 0.762 & & — & 0.905 \\
-    & Ext-2  & 0.741 & 0.712 & 0.677 & 0.653 & & — & 0.586 \\
-OS  & Int.   & 0.725 & 0.718 & 0.764 & 0.718 & & — & 0.629 \\
-    & Ext-1  & 1.000 & 1.000 & 0.972 & 0.972 & & — & — \\
-    & Ext-2  & 0.829 & 0.776 & 0.767 & 0.752 & & — & 0.705 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-
 
 %%==============================================================%%
 %% Figure captions
