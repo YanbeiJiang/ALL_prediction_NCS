@@ -263,6 +263,49 @@ label; we report AUROC.
 For survival targets (5--6), the model output a continuous risk score
 (0--1) evaluated by concordance index (C-index).
 
+\begin{table}[!t]
+\caption{\textbf{Phase~1 LLM zero-shot performance across all eight feature levels and six prediction targets (internal cohort, $n=301$).} Each cell is the macro-averaged AUROC (classification targets) or Harrell's concordance index (survival targets) for one LLM at one feature level; \textbf{bold} marks the best model at that level. Classification AUROC is computed from parsed categorical predictions (balanced-accuracy form). \textemdash{}~indicates a target not evaluated at that level: D19/D46MRD are used as \emph{input} features at $\mathcal{F}_8$ (see Table~\ref{tab:expdesign}).}
+\label{tab:phase1_full}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l cccc @{\hskip 1.6em} l cccc}
+\toprule
+ & \multicolumn{4}{c}{\textbf{Model}} & & \multicolumn{4}{c}{\textbf{Model}} \\
+\cmidrule(lr){2-5}\cmidrule(lr){7-10}
+\textbf{Lv.} & Gem. & Gma. & Int. & Qw. & \textbf{Lv.} & Gem. & Gma. & Int. & Qw. \\
+\midrule
+\multicolumn{5}{l}{\textit{Final Risk (AUROC)}} & \multicolumn{5}{l}{\textit{Relapse (AUROC)}} \\
+$\mathcal{F}_1$ & 0.788 & 0.785 & 0.729 & \textbf{0.792} & $\mathcal{F}_1$ & 0.514 & \textbf{0.572} & 0.566 & 0.530 \\
+$\mathcal{F}_2$ & 0.782 & \textbf{0.796} & 0.539 & 0.789 & $\mathcal{F}_2$ & 0.557 & \textbf{0.564} & 0.519 & 0.526 \\
+$\mathcal{F}_3$ & 0.812 & \textbf{0.842} & 0.583 & 0.831 & $\mathcal{F}_3$ & \textbf{0.577} & 0.572 & 0.503 & 0.503 \\
+$\mathcal{F}_4$ & 0.776 & \textbf{0.844} & 0.571 & 0.818 & $\mathcal{F}_4$ & \textbf{0.584} & 0.568 & 0.518 & 0.573 \\
+$\mathcal{F}_5$ & 0.826 & 0.835 & 0.591 & \textbf{0.837} & $\mathcal{F}_5$ & \textbf{0.575} & 0.555 & 0.500 & 0.552 \\
+$\mathcal{F}_6$ & 0.791 & \textbf{0.854} & 0.823 & 0.845 & $\mathcal{F}_6$ & \textbf{0.596} & 0.558 & 0.554 & 0.504 \\
+$\mathcal{F}_7$ & 0.834 & \textbf{0.891} & 0.848 & 0.882 & $\mathcal{F}_7$ & 0.599 & 0.552 & \textbf{0.643} & 0.546 \\
+$\mathcal{F}_8$ & 0.849 & 0.788 & 0.716 & \textbf{0.856} & $\mathcal{F}_8$ & 0.567 & \textbf{0.586} & 0.540 & 0.557 \\
+\multicolumn{5}{l}{\textit{D19 MRD (AUROC)}} & \multicolumn{5}{l}{\textit{EFS (C-index)}} \\
+$\mathcal{F}_1$ & \textbf{0.571} & 0.543 & 0.564 & 0.531 & $\mathcal{F}_1$ & 0.577 & \textbf{0.591} & 0.584 & 0.573 \\
+$\mathcal{F}_2$ & 0.543 & \textbf{0.555} & 0.479 & 0.521 & $\mathcal{F}_2$ & \textbf{0.607} & 0.598 & 0.522 & 0.561 \\
+$\mathcal{F}_3$ & \textbf{0.631} & 0.599 & 0.484 & 0.557 & $\mathcal{F}_3$ & 0.587 & \textbf{0.614} & 0.545 & 0.537 \\
+$\mathcal{F}_4$ & 0.556 & \textbf{0.659} & 0.492 & 0.432 & $\mathcal{F}_4$ & 0.597 & \textbf{0.619} & 0.532 & 0.533 \\
+$\mathcal{F}_5$ & 0.583 & \textbf{0.597} & 0.488 & 0.520 & $\mathcal{F}_5$ & 0.598 & \textbf{0.614} & 0.526 & 0.561 \\
+$\mathcal{F}_6$ & 0.603 & \textbf{0.620} & 0.567 & 0.605 & $\mathcal{F}_6$ & \textbf{0.624} & 0.583 & 0.604 & 0.542 \\
+$\mathcal{F}_7$ & 0.651 & \textbf{0.652} & 0.548 & 0.581 & $\mathcal{F}_7$ & \textbf{0.643} & 0.630 & 0.621 & 0.581 \\
+$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash & $\mathcal{F}_8$ & 0.687 & \textbf{0.716} & 0.642 & 0.662 \\
+\multicolumn{5}{l}{\textit{D46 MRD (AUROC)}} & \multicolumn{5}{l}{\textit{OS (C-index)}} \\
+$\mathcal{F}_1$ & 0.505 & 0.486 & \textbf{0.542} & 0.501 & $\mathcal{F}_1$ & \textbf{0.689} & 0.648 & 0.652 & 0.661 \\
+$\mathcal{F}_2$ & 0.492 & 0.475 & \textbf{0.501} & 0.495 & $\mathcal{F}_2$ & 0.647 & \textbf{0.702} & 0.550 & 0.634 \\
+$\mathcal{F}_3$ & 0.502 & \textbf{0.509} & 0.503 & 0.500 & $\mathcal{F}_3$ & \textbf{0.682} & 0.678 & 0.537 & 0.634 \\
+$\mathcal{F}_4$ & \textbf{0.528} & 0.508 & 0.509 & 0.508 & $\mathcal{F}_4$ & 0.667 & \textbf{0.681} & 0.524 & 0.616 \\
+$\mathcal{F}_5$ & 0.505 & \textbf{0.539} & 0.505 & 0.533 & $\mathcal{F}_5$ & 0.687 & \textbf{0.691} & 0.497 & 0.660 \\
+$\mathcal{F}_6$ & 0.549 & \textbf{0.577} & 0.518 & 0.552 & $\mathcal{F}_6$ & 0.701 & 0.704 & \textbf{0.734} & 0.619 \\
+$\mathcal{F}_7$ & \textbf{0.610} & 0.539 & 0.523 & 0.510 & $\mathcal{F}_7$ & 0.667 & 0.693 & \textbf{0.755} & 0.687 \\
+$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash & $\mathcal{F}_8$ & 0.725 & 0.718 & \textbf{0.764} & 0.718 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \textbf{Classification performance on the internal cohort.}
 Final Risk was the easiest target for all models.
 At Day~0 features ($\mathcal{F}_1$: WBC and age), Gemini and Gemma
@@ -946,48 +989,7 @@ OS         & Int. & 0.725 & 0.718 & 0.764 & 0.718 & & — & 0.629 & — & — \\
 \end{tabular}
 \end{table}
 
-\begin{table}[t]
-\caption{\textbf{Phase~1 LLM zero-shot performance across all eight feature levels and six prediction targets (internal cohort, $n=301$).} Each cell is the macro-averaged AUROC (classification targets) or Harrell's concordance index (survival targets) for one LLM at one feature level; \textbf{bold} marks the best model at that level. Classification AUROC is computed from parsed categorical predictions (balanced-accuracy form). \textemdash{}~indicates a target not evaluated at that level: D19/D46MRD are used as \emph{input} features at $\mathcal{F}_8$ (see Table~\ref{tab:expdesign}).}
-\label{tab:phase1_full}
-\centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{l cccc @{\hskip 1.6em} l cccc}
-\toprule
- & \multicolumn{4}{c}{\textbf{Model}} & & \multicolumn{4}{c}{\textbf{Model}} \\
-\cmidrule(lr){2-5}\cmidrule(lr){7-10}
-\textbf{Lv.} & Gem. & Gma. & Int. & Qw. & \textbf{Lv.} & Gem. & Gma. & Int. & Qw. \\
-\midrule
-\multicolumn{5}{l}{\textit{Final Risk (AUROC)}} & \multicolumn{5}{l}{\textit{Relapse (AUROC)}} \\
-$\mathcal{F}_1$ & 0.788 & 0.785 & 0.729 & \textbf{0.792} & $\mathcal{F}_1$ & 0.514 & \textbf{0.572} & 0.566 & 0.530 \\
-$\mathcal{F}_2$ & 0.782 & \textbf{0.796} & 0.539 & 0.789 & $\mathcal{F}_2$ & 0.557 & \textbf{0.564} & 0.519 & 0.526 \\
-$\mathcal{F}_3$ & 0.812 & \textbf{0.842} & 0.583 & 0.831 & $\mathcal{F}_3$ & \textbf{0.577} & 0.572 & 0.503 & 0.503 \\
-$\mathcal{F}_4$ & 0.776 & \textbf{0.844} & 0.571 & 0.818 & $\mathcal{F}_4$ & \textbf{0.584} & 0.568 & 0.518 & 0.573 \\
-$\mathcal{F}_5$ & 0.826 & 0.835 & 0.591 & \textbf{0.837} & $\mathcal{F}_5$ & \textbf{0.575} & 0.555 & 0.500 & 0.552 \\
-$\mathcal{F}_6$ & 0.791 & \textbf{0.854} & 0.823 & 0.845 & $\mathcal{F}_6$ & \textbf{0.596} & 0.558 & 0.554 & 0.504 \\
-$\mathcal{F}_7$ & 0.834 & \textbf{0.891} & 0.848 & 0.882 & $\mathcal{F}_7$ & 0.599 & 0.552 & \textbf{0.643} & 0.546 \\
-$\mathcal{F}_8$ & 0.849 & 0.788 & 0.716 & \textbf{0.856} & $\mathcal{F}_8$ & 0.567 & \textbf{0.586} & 0.540 & 0.557 \\
-\multicolumn{5}{l}{\textit{D19 MRD (AUROC)}} & \multicolumn{5}{l}{\textit{EFS (C-index)}} \\
-$\mathcal{F}_1$ & \textbf{0.571} & 0.543 & 0.564 & 0.531 & $\mathcal{F}_1$ & 0.577 & \textbf{0.591} & 0.584 & 0.573 \\
-$\mathcal{F}_2$ & 0.543 & \textbf{0.555} & 0.479 & 0.521 & $\mathcal{F}_2$ & \textbf{0.607} & 0.598 & 0.522 & 0.561 \\
-$\mathcal{F}_3$ & \textbf{0.631} & 0.599 & 0.484 & 0.557 & $\mathcal{F}_3$ & 0.587 & \textbf{0.614} & 0.545 & 0.537 \\
-$\mathcal{F}_4$ & 0.556 & \textbf{0.659} & 0.492 & 0.432 & $\mathcal{F}_4$ & 0.597 & \textbf{0.619} & 0.532 & 0.533 \\
-$\mathcal{F}_5$ & 0.583 & \textbf{0.597} & 0.488 & 0.520 & $\mathcal{F}_5$ & 0.598 & \textbf{0.614} & 0.526 & 0.561 \\
-$\mathcal{F}_6$ & 0.603 & \textbf{0.620} & 0.567 & 0.605 & $\mathcal{F}_6$ & \textbf{0.624} & 0.583 & 0.604 & 0.542 \\
-$\mathcal{F}_7$ & 0.651 & \textbf{0.652} & 0.548 & 0.581 & $\mathcal{F}_7$ & \textbf{0.643} & 0.630 & 0.621 & 0.581 \\
-$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash & $\mathcal{F}_8$ & 0.687 & \textbf{0.716} & 0.642 & 0.662 \\
-\multicolumn{5}{l}{\textit{D46 MRD (AUROC)}} & \multicolumn{5}{l}{\textit{OS (C-index)}} \\
-$\mathcal{F}_1$ & 0.505 & 0.486 & \textbf{0.542} & 0.501 & $\mathcal{F}_1$ & \textbf{0.689} & 0.648 & 0.652 & 0.661 \\
-$\mathcal{F}_2$ & 0.492 & 0.475 & \textbf{0.501} & 0.495 & $\mathcal{F}_2$ & 0.647 & \textbf{0.702} & 0.550 & 0.634 \\
-$\mathcal{F}_3$ & 0.502 & \textbf{0.509} & 0.503 & 0.500 & $\mathcal{F}_3$ & \textbf{0.682} & 0.678 & 0.537 & 0.634 \\
-$\mathcal{F}_4$ & \textbf{0.528} & 0.508 & 0.509 & 0.508 & $\mathcal{F}_4$ & 0.667 & \textbf{0.681} & 0.524 & 0.616 \\
-$\mathcal{F}_5$ & 0.505 & \textbf{0.539} & 0.505 & 0.533 & $\mathcal{F}_5$ & 0.687 & \textbf{0.691} & 0.497 & 0.660 \\
-$\mathcal{F}_6$ & 0.549 & \textbf{0.577} & 0.518 & 0.552 & $\mathcal{F}_6$ & 0.701 & 0.704 & \textbf{0.734} & 0.619 \\
-$\mathcal{F}_7$ & \textbf{0.610} & 0.539 & 0.523 & 0.510 & $\mathcal{F}_7$ & 0.667 & 0.693 & \textbf{0.755} & 0.687 \\
-$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash & $\mathcal{F}_8$ & 0.725 & 0.718 & \textbf{0.764} & 0.718 \\
-\bottomrule
-\end{tabular}
-\end{table}
+
 
 %%==============================================================%%
 %% Figure captions
