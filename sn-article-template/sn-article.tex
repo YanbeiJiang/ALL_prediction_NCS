@@ -494,79 +494,26 @@ without any training data.
 For OS, RSF C-index was 0.629 ($p=0.489$; not significant), reflecting
 the low event rate (8.0\%) and limited statistical power.
 
-\begin{table}[p]
-\caption{\textbf{Phase~2 internal results across all feature levels and
-the three temporal splits.} Classification: DT / RF AUROC; survival
-(EFS, OS): RSF C-index (spanning the DT/RF columns). \textbf{Bold} marks
-the best feature level in each column. Splits by enrolment year: S1
-train~$\leq$16/test~17--19; S2 $\leq$17/18--19; S3 $\leq$18/19.
-\textemdash{}: not evaluable (D19/D46MRD are inputs at $\mathcal{F}_8$;
-no OS events in the 2019 test set).}
+\begin{table}[t]
+\caption{\textbf{Method comparison on the internal cohort} (best result
+per target). Rows are methods: LLM zero-shot (Gemini, best feature level;
+no training, evaluated on the full 301-patient cohort); decision tree
+(DT) and random forest (RF), our Phase~2 models at temporal Split~2
+($n_\text{test}=114$), best feature level. Classification metric: AUROC;
+survival (EFS, OS): Harrell's C-index (the RF row uses a random survival
+forest). \textbf{Bold} marks the best method for each target.}
 \label{tab:phase2_int}
 \centering
-\footnotesize
-\renewcommand{\arraystretch}{0.88}
+\small
 \setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}l cc cc cc@{}}
+\begin{tabular}{@{}l cccc cc@{}}
 \toprule
- & \multicolumn{2}{c}{\textbf{Split~1}} & \multicolumn{2}{c}{\textbf{Split~2}} & \multicolumn{2}{c}{\textbf{Split~3}} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
-\textbf{Lv.} & DT & RF & DT & RF & DT & RF \\
+\textbf{Method} & \textbf{Final Risk} & \textbf{D19MRD} & \textbf{D46MRD} & \textbf{Relapse} & \textbf{EFS} & \textbf{OS} \\
+ & \multicolumn{4}{c}{\footnotesize AUROC} & \multicolumn{2}{c}{\footnotesize C-index} \\
 \midrule
-\multicolumn{7}{l}{\textit{Final Risk (DT / RF AUROC)}} \\
-$\mathcal{F}_1$ & 0.759 & 0.842 & 0.810 & 0.871 & 0.799 & 0.806 \\
-$\mathcal{F}_2$ & 0.759 & 0.820 & 0.810 & 0.830 & 0.778 & 0.847 \\
-$\mathcal{F}_3$ & 0.711 & 0.849 & 0.782 & 0.872 & 0.771 & 0.743 \\
-$\mathcal{F}_4$ & 0.731 & 0.878 & 0.784 & 0.875 & 0.771 & 0.750 \\
-$\mathcal{F}_5$ & 0.711 & 0.852 & 0.757 & 0.847 & 0.771 & 0.799 \\
-$\mathcal{F}_6$ & \textbf{0.893} & 0.897 & 0.909 & 0.943 & 0.736 & 0.847 \\
-$\mathcal{F}_7$ & 0.893 & 0.922 & 0.911 & 0.951 & 0.736 & 0.882 \\
-$\mathcal{F}_8$ & 0.891 & \textbf{0.996} & \textbf{0.949} & \textbf{0.998} & \textbf{0.979} & \textbf{1.000} \\
-\multicolumn{7}{l}{\textit{D19 MRD (DT / RF AUROC)}} \\
-$\mathcal{F}_1$ & 0.538 & 0.512 & 0.483 & 0.425 & 0.393 & 0.643 \\
-$\mathcal{F}_2$ & 0.497 & 0.487 & 0.495 & 0.495 & 0.464 & 0.667 \\
-$\mathcal{F}_3$ & \textbf{0.555} & 0.629 & 0.687 & 0.767 & \textbf{0.893} & \textbf{0.833} \\
-$\mathcal{F}_4$ & 0.555 & \textbf{0.696} & \textbf{0.743} & 0.807 & 0.821 & 0.774 \\
-$\mathcal{F}_5$ & 0.555 & 0.641 & 0.725 & \textbf{0.853} & 0.893 & 0.786 \\
-$\mathcal{F}_6$ & 0.555 & 0.668 & 0.687 & 0.764 & 0.750 & 0.738 \\
-$\mathcal{F}_7$ & 0.555 & 0.643 & 0.687 & 0.840 & 0.845 & 0.833 \\
-$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
-\multicolumn{7}{l}{\textit{D46 MRD (DT / RF AUROC)}} \\
-$\mathcal{F}_1$ & 0.364 & 0.534 & 0.405 & 0.516 & \textbf{0.464} & 0.619 \\
-$\mathcal{F}_2$ & 0.519 & 0.396 & 0.405 & 0.533 & 0.321 & \textbf{0.655} \\
-$\mathcal{F}_3$ & \textbf{0.545} & 0.564 & 0.519 & 0.605 & 0.369 & 0.309 \\
-$\mathcal{F}_4$ & 0.477 & 0.580 & 0.514 & 0.525 & 0.417 & 0.524 \\
-$\mathcal{F}_5$ & 0.531 & 0.528 & \textbf{0.671} & \textbf{0.636} & 0.369 & 0.417 \\
-$\mathcal{F}_6$ & 0.545 & 0.555 & 0.548 & 0.550 & 0.369 & 0.167 \\
-$\mathcal{F}_7$ & 0.545 & \textbf{0.597} & 0.548 & 0.613 & 0.369 & 0.464 \\
-$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
-\multicolumn{7}{l}{\textit{Relapse (DT / RF AUROC)}} \\
-$\mathcal{F}_1$ & 0.480 & 0.439 & \textbf{0.529} & 0.465 & 0.274 & 0.476 \\
-$\mathcal{F}_2$ & 0.550 & 0.546 & 0.483 & 0.526 & \textbf{0.500} & 0.357 \\
-$\mathcal{F}_3$ & 0.528 & 0.483 & 0.411 & 0.485 & 0.286 & 0.274 \\
-$\mathcal{F}_4$ & \textbf{0.559} & 0.516 & 0.411 & 0.561 & 0.333 & 0.202 \\
-$\mathcal{F}_5$ & 0.540 & 0.564 & 0.411 & 0.471 & 0.286 & 0.036 \\
-$\mathcal{F}_6$ & 0.527 & 0.517 & 0.411 & 0.624 & 0.286 & 0.286 \\
-$\mathcal{F}_7$ & 0.528 & 0.547 & 0.411 & \textbf{0.630} & 0.488 & \textbf{0.500} \\
-$\mathcal{F}_8$ & 0.529 & \textbf{0.591} & 0.411 & 0.597 & 0.488 & 0.429 \\
-\multicolumn{7}{l}{\textit{EFS (RSF C-index)}} \\
-$\mathcal{F}_1$ & \multicolumn{2}{c}{0.532} & \multicolumn{2}{c}{0.610} & \multicolumn{2}{c}{\textbf{0.706}} \\
-$\mathcal{F}_2$ & \multicolumn{2}{c}{0.516} & \multicolumn{2}{c}{0.597} & \multicolumn{2}{c}{0.559} \\
-$\mathcal{F}_3$ & \multicolumn{2}{c}{0.542} & \multicolumn{2}{c}{0.552} & \multicolumn{2}{c}{0.500} \\
-$\mathcal{F}_4$ & \multicolumn{2}{c}{0.530} & \multicolumn{2}{c}{0.516} & \multicolumn{2}{c}{0.397} \\
-$\mathcal{F}_5$ & \multicolumn{2}{c}{0.520} & \multicolumn{2}{c}{0.533} & \multicolumn{2}{c}{0.485} \\
-$\mathcal{F}_6$ & \multicolumn{2}{c}{0.511} & \multicolumn{2}{c}{0.572} & \multicolumn{2}{c}{0.588} \\
-$\mathcal{F}_7$ & \multicolumn{2}{c}{0.560} & \multicolumn{2}{c}{0.592} & \multicolumn{2}{c}{0.662} \\
-$\mathcal{F}_8$ & \multicolumn{2}{c}{\textbf{0.684}} & \multicolumn{2}{c}{\textbf{0.746}} & \multicolumn{2}{c}{0.691} \\
-\multicolumn{7}{l}{\textit{OS (RSF C-index)}} \\
-$\mathcal{F}_1$ & \multicolumn{2}{c}{\textbf{0.688}} & \multicolumn{2}{c}{0.497} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_2$ & \multicolumn{2}{c}{0.651} & \multicolumn{2}{c}{0.540} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_3$ & \multicolumn{2}{c}{0.556} & \multicolumn{2}{c}{0.515} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_4$ & \multicolumn{2}{c}{0.536} & \multicolumn{2}{c}{0.415} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_5$ & \multicolumn{2}{c}{0.590} & \multicolumn{2}{c}{0.529} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_6$ & \multicolumn{2}{c}{0.586} & \multicolumn{2}{c}{0.622} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_7$ & \multicolumn{2}{c}{0.621} & \multicolumn{2}{c}{0.620} & \multicolumn{2}{c}{\textemdash} \\
-$\mathcal{F}_8$ & \multicolumn{2}{c}{0.607} & \multicolumn{2}{c}{\textbf{0.628}} & \multicolumn{2}{c}{\textemdash} \\
+LLM zero-shot (Gemini) & 0.849 & 0.651 & 0.610 & 0.599 & 0.687 & \textbf{0.725} \\
+Decision tree (DT) & 0.949 & 0.743 & \textbf{0.671} & 0.529 & \textemdash & \textemdash \\
+Random forest (RF\,/\,RSF) & \textbf{0.998} & \textbf{0.853} & 0.636 & \textbf{0.630} & \textbf{0.746} & 0.628 \\
 \bottomrule
 \end{tabular}
 \end{table}
