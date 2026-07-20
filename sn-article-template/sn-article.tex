@@ -532,9 +532,9 @@ $\mathcal{F}_8$ & \multicolumn{2}{c}{0.607} & \multicolumn{2}{c}{\textbf{0.628}}
 
 \textbf{External validation (two sites, OOD).}
 With all 301 internal patients as training, RF and DT retained strong
-Final Risk discrimination at both sites (RF~AUROC 0.965 / DT 0.914 at
-Site~1; 1.000 / 1.000 at Site~2), confirming transfer to independent
-institutions.
+Final Risk discrimination at both sites (best RF~AUROC 0.965 at Site~1
+and 1.000 at Site~2; Table~\ref{tab:phase2_ext}), confirming transfer to
+independent institutions.
 Consistent with Phase~1, the remaining per-site classification targets
 are constrained by class imbalance: several reduce to a single class
 (reported as accuracy) or rest on one to two positives, so their AUROCs
@@ -543,36 +543,80 @@ For survival, the RSF transferred to Site~2 (EFS C-index~0.586 over
 21 events; OS~0.705 over 6 deaths); the Site~1 RSF is omitted for OS
 (1 death) and rests on only 3 events for EFS.
 
-\begin{table}[t]
+\begin{table}[p]
 \caption{\textbf{Phase~2 out-of-distribution results on the two external
-sites} (train~=~all 301 internal patients). Classification: decision
-tree / random forest AUROC; $*$~= accuracy where the cohort is
-single-class. Survival: RSF C-index. --~= not evaluable (Ext-1 OS: 1
-death). Cohorts are small; several cells rest on very few positives or
-events and are indicative only.}
+sites, across all feature levels} (train~=~all 301 internal patients).
+Classification: DT / RF AUROC; $*$~= accuracy where the cohort is
+single-class. Survival (EFS, OS): RSF C-index (spanning the DT/RF
+columns). \textbf{Bold} marks the best feature level in each column.
+\textemdash{}: not evaluable (D19/D46MRD are inputs at $\mathcal{F}_8$;
+Ext-1 OS has 1 death). Ext-1: Lianyungang ($n=20$); Ext-2: Fudan
+($n=21$). Cohorts are small; indicative only.}
 \label{tab:phase2_ext}
 \centering
-\small
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{@{}ll cc@{}}
+\footnotesize
+\renewcommand{\arraystretch}{0.84}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}l cc cc@{}}
 \toprule
-\textbf{Task} & \textbf{Site} & \textbf{DT} & \textbf{RF / RSF} \\
+ & \multicolumn{2}{c}{\textbf{Ext-1 (Lianyungang)}} & \multicolumn{2}{c}{\textbf{Ext-2 (Fudan)}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{Lv.} & DT & RF & DT & RF \\
 \midrule
-\multicolumn{4}{l}{\textit{Classification (AUROC; $*$ = accuracy, single class)}} \\
-Final Risk & Ext-1 & 0.914 & 0.965 \\
-           & Ext-2 & 1.000 & 1.000 \\
-D19MRD     & Ext-1 & 0.400$^*$ & 1.000$^*$ \\
-           & Ext-2 & 0.581 & 0.750 \\
-D46MRD     & Ext-1 & 0.184 & 1.000 \\
-           & Ext-2 & 0.667$^*$ & 1.000$^*$ \\
-Relapse    & Ext-1 & 0.431 & 0.861 \\
-           & Ext-2 & 0.143$^*$ & 0.048$^*$ \\
-\midrule
-\multicolumn{4}{l}{\textit{Survival (RSF C-index)}} \\
-EFS & Ext-1 & — & 0.905 \\
-    & Ext-2 & — & 0.586 \\
-OS  & Ext-1 & — & — \\
-    & Ext-2 & — & 0.705 \\
+\multicolumn{5}{l}{\textit{Final Risk (DT / RF)}} \\
+$\mathcal{F}_1$ & 0.778 & 0.909 & 0.783 & 0.867 \\
+$\mathcal{F}_2$ & 0.788 & 0.848 & 0.817 & 0.878 \\
+$\mathcal{F}_3$ & 0.697 & 0.884 & 0.794 & 0.844 \\
+$\mathcal{F}_4$ & 0.697 & 0.778 & 0.794 & 0.833 \\
+$\mathcal{F}_5$ & 0.702 & 0.798 & 0.806 & 0.806 \\
+$\mathcal{F}_6$ & \textbf{0.939} & 0.949 & 0.900 & 0.933 \\
+$\mathcal{F}_7$ & 0.939 & 0.914 & 0.900 & 0.961 \\
+$\mathcal{F}_8$ & 0.914 & \textbf{0.965} & \textbf{1.000} & \textbf{1.000} \\
+\multicolumn{5}{l}{\textit{D19 MRD (DT / RF)}} \\
+$\mathcal{F}_1$ & 0.400$^*$ & \textbf{1.000$^*$} & \textbf{0.706} & 0.632 \\
+$\mathcal{F}_2$ & 0.400$^*$ & 1.000$^*$ & 0.581 & \textbf{0.750} \\
+$\mathcal{F}_3$ & \textbf{0.550$^*$} & 1.000$^*$ & 0.463 & 0.419 \\
+$\mathcal{F}_4$ & 0.350$^*$ & 1.000$^*$ & 0.382 & 0.449 \\
+$\mathcal{F}_5$ & 0.550$^*$ & 1.000$^*$ & 0.463 & 0.456 \\
+$\mathcal{F}_6$ & 0.350$^*$ & 1.000$^*$ & 0.522 & 0.426 \\
+$\mathcal{F}_7$ & 0.350$^*$ & 1.000$^*$ & 0.522 & 0.654 \\
+$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash \\
+\multicolumn{5}{l}{\textit{D46 MRD (DT / RF)}} \\
+$\mathcal{F}_1$ & \textbf{0.974} & 0.842 & 0.667$^*$ & \textbf{1.000$^*$} \\
+$\mathcal{F}_2$ & 0.974 & 0.947 & 0.524$^*$ & 1.000$^*$ \\
+$\mathcal{F}_3$ & 0.184 & 0.947 & \textbf{0.714$^*$} & 1.000$^*$ \\
+$\mathcal{F}_4$ & 0.553 & 0.895 & 0.524$^*$ & 1.000$^*$ \\
+$\mathcal{F}_5$ & 0.553 & 0.553 & 0.333$^*$ & 1.000$^*$ \\
+$\mathcal{F}_6$ & 0.184 & 0.947 & 0.714$^*$ & 1.000$^*$ \\
+$\mathcal{F}_7$ & 0.184 & \textbf{1.000} & 0.714$^*$ & 1.000$^*$ \\
+$\mathcal{F}_8$ & \textemdash & \textemdash & \textemdash & \textemdash \\
+\multicolumn{5}{l}{\textit{Relapse (DT / RF)}} \\
+$\mathcal{F}_1$ & \textbf{0.708} & 0.847 & 0.667$^*$ & 0.000$^*$ \\
+$\mathcal{F}_2$ & 0.431 & \textbf{0.861} & 0.143$^*$ & \textbf{0.048$^*$} \\
+$\mathcal{F}_3$ & 0.472 & 0.556 & 0.524$^*$ & 0.000$^*$ \\
+$\mathcal{F}_4$ & 0.444 & 0.806 & \textbf{0.762$^*$} & 0.000$^*$ \\
+$\mathcal{F}_5$ & 0.667 & 0.556 & 0.000$^*$ & 0.000$^*$ \\
+$\mathcal{F}_6$ & 0.472 & 0.778 & 0.524$^*$ & 0.000$^*$ \\
+$\mathcal{F}_7$ & 0.528 & 0.639 & 0.476$^*$ & 0.000$^*$ \\
+$\mathcal{F}_8$ & 0.583 & 0.750 & 0.476$^*$ & 0.000$^*$ \\
+\multicolumn{5}{l}{\textit{EFS (RSF C-index)}} \\
+$\mathcal{F}_1$ & \multicolumn{2}{c}{0.762} & \multicolumn{2}{c}{0.562} \\
+$\mathcal{F}_2$ & \multicolumn{2}{c}{0.738} & \multicolumn{2}{c}{\textbf{0.586}} \\
+$\mathcal{F}_3$ & \multicolumn{2}{c}{0.833} & \multicolumn{2}{c}{0.493} \\
+$\mathcal{F}_4$ & \multicolumn{2}{c}{0.667} & \multicolumn{2}{c}{0.517} \\
+$\mathcal{F}_5$ & \multicolumn{2}{c}{0.643} & \multicolumn{2}{c}{0.542} \\
+$\mathcal{F}_6$ & \multicolumn{2}{c}{0.691} & \multicolumn{2}{c}{0.473} \\
+$\mathcal{F}_7$ & \multicolumn{2}{c}{0.714} & \multicolumn{2}{c}{0.453} \\
+$\mathcal{F}_8$ & \multicolumn{2}{c}{\textbf{0.905}} & \multicolumn{2}{c}{0.571} \\
+\multicolumn{5}{l}{\textit{OS (RSF C-index)}} \\
+$\mathcal{F}_1$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.686} \\
+$\mathcal{F}_2$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.610} \\
+$\mathcal{F}_3$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.562} \\
+$\mathcal{F}_4$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{\textbf{0.705}} \\
+$\mathcal{F}_5$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.619} \\
+$\mathcal{F}_6$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.600} \\
+$\mathcal{F}_7$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.571} \\
+$\mathcal{F}_8$ & \multicolumn{2}{c}{\textemdash} & \multicolumn{2}{c}{0.657} \\
 \bottomrule
 \end{tabular}
 \end{table}
