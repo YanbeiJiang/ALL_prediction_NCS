@@ -65,9 +65,10 @@ and concordance index~0.746 for EFS.
 A cosine similarity retrieval-augmented generation (RAG) belief
 revision improves D46MRD AUROC from 0.655 to 0.881 ($+0.226$) in
 the largest training regime.
-External validation at an independent site confirms robust Final Risk
-performance (RF AUROC~0.991) and LLM OS concordance indices
-of 0.806--0.859 without retraining.
+External validation at two independent sites confirms robust Final Risk
+transfer (LLM zero-shot AUROC 0.80--0.93; Phase~2 RF up to 1.000)
+without retraining, although the small external cohorts limit the
+remaining targets.
 This framework demonstrates that temporally stratified multimodal
 learning, aligned with clinical workflows, enables consistent
 multi-target prediction that generalises to independent cohorts.
@@ -188,14 +189,17 @@ EFS events (relapse, induction failure, or death; 75 of 301, 24.9\%)
 and OS events (death; 24 of 301, 8.0\%) together extend the prediction
 targets to six.
 
-Two external validation cohorts were recruited from independent
-institutions.
+Two external validation cohorts from independent institutions were
+supplied as a single merged file, which we split by the recorded
+hospital of origin.
 External Site~1 (Lianyungang First People's Hospital) contributed
-41 patients diagnosed after 2019, of whom 29 had complete labels for
-the four classification tasks (Table~\ref{tab:cohort}).
-External Site~2 ([EXTERNAL HOSPITAL 2 NAME]) data collection is
-in progress; a placeholder row is included in Table~\ref{tab:cohort}
-and the corresponding result cells are left empty.
+20 patients diagnosed in 2019--2023; External Site~2 (Children's
+Hospital of Fudan University, Shanghai) contributed 21 patients
+(2017--2021) (Table~\ref{tab:cohort}).
+The Site~2 cohort is relapse-enriched—all 21 patients relapsed—so at
+each site one or more targets reduce to a single class or a handful of
+events; these are reported with accuracy (classification) or flagged as
+indicative (survival) rather than dropped.
 For external validation, all 301 internal patients were used as the
 training set and no external data were used in training.
 
@@ -211,8 +215,10 @@ EFS, OS) use Harrell's C-index and time-dependent IPCW AUC.
 
 \begin{table}[ht]
 \caption{Cohort characteristics and prediction target distributions.
-$\dagger$~patients with complete labels for all four classification targets.
-Ext-2: data collection in progress.}
+Ext-1: Lianyungang First People's Hospital; Ext-2: Children's Hospital
+of Fudan University (Shanghai). $\dagger$~patients with complete labels
+for all four classification targets. Note that the Ext-2 cohort is
+relapse-enriched: all 21 patients experienced relapse.}
 \label{tab:cohort}
 \centering
 \small
@@ -220,27 +226,27 @@ Ext-2: data collection in progress.}
 \toprule
 \textbf{Characteristic}
   & \textbf{Internal} ($n=301$)
-  & \textbf{Ext-1} ($n=41$)
-  & \textbf{Ext-2} (TBD) \\
+  & \textbf{Ext-1} ($n=20$)
+  & \textbf{Ext-2} ($n=21$) \\
 \midrule
-Enrolment years & 2015--2019 & $>$2019 & — \\
-B-ALL & 163 (54.2\%) & [X] & — \\
-Patients with complete labels$^\dagger$ & 301 & 29 & — \\
+Enrolment years & 2015--2019 & 2019--2023 & 2017--2021 \\
+B-ALL & 163 (54.2\%) & 20 (100\%) & 18 (85.7\%) \\
+Patients with complete labels$^\dagger$ & 301 & 8 & 21 \\
 \midrule
 \multicolumn{4}{l}{\textit{Classification targets}} \\
-Final Risk: LR & 159 (52.8\%) & [X] & — \\
-Final Risk: IR/HR & 142 (47.2\%) & [X] & — \\
-Relapse: Yes & 44 (14.6\%) & [X] & — \\
-D19MRD $\geq 1\%$ & [X] ([X]\%) & [X] & — \\
-D46MRD $\geq 0.01\%$ & [X] ([X]\%) & $\leq$2 & — \\
+Final Risk: LR & 159 (52.8\%) & 11 (55.0\%) & 6 (28.6\%) \\
+Final Risk: IR/HR & 142 (47.2\%) & 9 (45.0\%) & 15 (71.4\%) \\
+Relapse: Yes & 44 (14.6\%) & 2 (10.0\%) & 21 (100\%) \\
+D19MRD $\geq 1\%$ & [X] ([X]\%) & 0 & 4 \\
+D46MRD $\geq 0.01\%$ & [X] ([X]\%) & 1 & 0 \\
 \midrule
 \multicolumn{4}{l}{\textit{Survival endpoints}} \\
-EFS events & 75 (24.9\%) & [X] & — \\
-OS events & 24 (8.0\%) & [X] & — \\
+EFS events & 75 (24.9\%) & 3 (15.0\%) & 21 (100\%) \\
+OS events & 24 (8.0\%) & 1 (5.0\%) & 6 (28.6\%) \\
 \midrule
 \multicolumn{4}{l}{\textit{Multimodal data}} \\
-Bone marrow images & [X] (XX\%) & 41 & — \\
-Morphology features & 287 (95.3\%) & 19 & — \\
+Bone marrow images & [X] (XX\%) & 20 & 21 \\
+Morphology features & 287 (95.3\%) & 19 & 21 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -340,17 +346,19 @@ InternVL reached 0.764, Gemini 0.725, and Gemma and Qwen both 0.718.
 Log-rank tests were significant ($p < 0.05$) at $\mathcal{F}_8$
 for EFS for all four LLMs.
 
-\textbf{External Site~1 validation.}
-LLM zero-shot performance generalised well to External Site~1 for
-Final Risk (AUROC~0.810--0.925) and Relapse (AUROC~0.630--0.717),
-with Gemini achieving the highest Final Risk AUROC (0.925,
-$\mathcal{F}_8$) and InternVL achieving the highest OS C-index
-(0.859, $\mathcal{F}_8$).
-D46MRD AUROCs were unstable due to very few positive cases at the
-external site ($n_\text{pos} \leq 2$, results marked $\dagger$).
-Survival prediction transferred robustly: EFS C-indices of
-0.645--0.715 and OS C-indices of 0.806--0.859 represent generalisation
-without any site-specific retraining.
+\textbf{External validation (two sites).}
+Final Risk—the only target with both classes at both sites—transferred
+well: LLM zero-shot AUROC was 0.80--0.90 at Site~1 (Lianyungang) and
+0.80--0.93 at Site~2 (Fudan), close to the internal range and obtained
+without any site-specific retraining (Table~\ref{tab:summary}).
+The other classification targets are limited by the small,
+class-imbalanced external cohorts: at each site one or more targets
+collapse to a single class (Relapse is all-positive at Site~2, D19MRD
+all-negative at Site~1), for which we report accuracy rather than
+AUROC.
+For survival, Site~2 (21 EFS events, 6 deaths) gave LLM EFS C-indices
+of 0.65--0.74 and OS 0.75--0.83; Site~1 estimates rest on very few
+events (3 EFS, 1 death) and are indicative only.
 
 %%--------------------------------------------------------------%%
 \subsection{Bone marrow morphology pipeline}
@@ -409,23 +417,18 @@ without any training data.
 For OS, RSF C-index was 0.629 ($p=0.489$; not significant), reflecting
 the low event rate (8.0\%) and limited statistical power.
 
-\textbf{External Site~1 (OOD) evaluation.}
-Using all 301 internal patients as training and 41 external patients
-as the test set, RF replicated its high Final Risk performance
-(AUROC~0.991 at $\mathcal{F}_8$) and DT achieved 0.968, confirming
-that models trained on the internal temporal splits generalise to
-patients from an independent institution enrolled after the training
-period.
-D19MRD RF AUROC was 0.635 (external) vs 0.807 (internal Split~2),
-suggesting modest feature-distribution shift.
-D46MRD RF AUROC was 1.000 on External Site~1; however, this result
-is unstable due to very few positive cases ($n_\text{pos}=1$, marked
-$\dagger$ in Table~\ref{tab:summary}).
-Relapse RF AUROC was 0.528, consistent with the difficulty observed
-internally.
-For survival, RSF at $\mathcal{F}_8$ reached EFS C-index~0.608 and
-OS C-index~0.643 on Ext-1, neither attaining significance ($p=0.14$ and
-$p=0.54$), reflecting the small external cohort and low event counts.
+\textbf{External validation (two sites, OOD).}
+With all 301 internal patients as training, RF and DT retained strong
+Final Risk discrimination at both sites (RF~AUROC 0.965 / DT 0.914 at
+Site~1; 1.000 / 1.000 at Site~2), confirming transfer to independent
+institutions.
+Consistent with Phase~1, the remaining per-site classification targets
+are constrained by class imbalance: several reduce to a single class
+(reported as accuracy) or rest on one to two positives, so their AUROCs
+are not interpretable (Table~\ref{tab:summary}).
+For survival, the RSF transferred to Site~2 (EFS C-index~0.586 over
+21 events; OS~0.705 over 6 deaths); the Site~1 RSF is omitted for OS
+(1 death) and rests on only 3 events for EFS.
 
 %%--------------------------------------------------------------%%
 \subsection{Cosine RAG belief revision}
@@ -457,8 +460,8 @@ $0.630 \to 0.588$, $\Delta=-0.042$): because relapse prediction is
 intrinsically noisy, retrieved neighbours have mixed outcomes, and
 RAG evidence acts as a noise source rather than a corrective signal.
 
-\textbf{External Site~1.}
-On external patients, belief revision improved Final Risk
+\textbf{External (pooled across sites).}
+On the pooled external cohort, belief revision improved Final Risk
 ($0.991 \to 1.000$, $+0.009$).
 D19MRD AUROCs degraded ($-0.064$) because the external set has very
 few D19MRD-positive patients ($n_\text{pos}=4$), making retrieved
@@ -620,8 +623,11 @@ The very low positive rate for D46MRD at the external site ($n=1$)
 precluded belief revision and produced unstable AUC estimates,
 highlighting the need for larger external cohorts with balanced
 outcome distributions.
-External Site~2 data, once collected, will provide a more comprehensive
-test of cross-site robustness.
+Both external sites are small (20 and 21 patients) and the Site~2
+referral cohort is relapse-enriched (all relapsed), so several per-site
+targets are single-class or event-sparse; larger, prospectively
+balanced external cohorts remain necessary for a definitive test of
+cross-site robustness.
 
 \textbf{Integrating six targets in a unified framework.}
 Treating EFS and OS as targets~5--6 of the same feature hierarchy—rather
@@ -685,9 +691,13 @@ haematological indices, immunophenotype, 51-marker flow cytometry panel,
 cytogenetics, MRD values) and bone marrow aspirate microscopy images
 (Giemsa-stained, $\sim$20 fields per patient).
 
-External Site~1 comprised 41 patients from Lianyungang First People's
-Hospital diagnosed after 2019; ethics approval: [ETHICS NUMBER Ext-1].
-External Site~2 data collection is in progress ([ETHICS NUMBER Ext-2]).
+The external validation data were supplied as a single merged file
+spanning two independent institutions, distinguished by the recorded
+hospital field: External Site~1 (Lianyungang First People's Hospital;
+20 patients, 2019--2023) and External Site~2 (Children's Hospital of
+Fudan University, Shanghai; 21 patients, 2017--2021, a relapse-enriched
+referral cohort in which all patients relapsed); ethics approval:
+[ETHICS NUMBERS Ext-1, Ext-2]. We evaluate the two sites separately.
 No external data were used in any model training.
 
 \subsection{Temporally-structured feature hierarchy}\label{sec:features}
@@ -934,7 +944,7 @@ the same feature vector as classification tasks.}
 $\mathcal{F}_1$     & Day 0     & WBC count, Age & 4 \\
 $\mathcal{F}_2$     & Day 1     & + Blast\% & 4 \\
 $\mathcal{F}_3$     & Day 1     & + Immunophenotype + 51 flow cytometry markers & 4 \\
-$\mathcal{F}_{4}$   & Day 1     & $\mathcal{F}_3$ + bone marrow morphology profile (SAM/BiomedCLIP pipeline) & 4 \\
+$\mathcal{F}_{4}$   & Day 1     & $\mathcal{F}_3$ + bone marrow morphology profile & 4 \\
 $\mathcal{F}_5$     & Day 1     & $\mathcal{F}_3$ + non-risk clinical factors & 4 \\
 $\mathcal{F}_6$     & Day 5     & $\mathcal{F}_3$ + CNS status + Day~5 blast\% + Initial Risk & 4 \\
 $\mathcal{F}_7$     & Day 7--10 & $\mathcal{F}_6$ + Fusion gene + Karyotype + FISH & 4 \\
@@ -946,45 +956,51 @@ $\mathcal{F}_8$     & Day 46    & $\mathcal{F}_7$ + D19MRD + D46MRD (as inputs) 
 
 \begin{table}[ht]
 \caption{Summary of best results across six prediction targets, four
-LLMs (Phase~1), and Phase~2 models (DT/RF for classification;
-RSF for EFS/OS).
-Internal: best-feature-level result; all four models shown.
-External~1: OOD results using all 301 internal patients as training.
-Classification metric: AUROC. Survival metric: C-index.
-$\dagger$~fewer than 3 positives in external cohort; AUC/C-index
-unstable.
-Phase~2 internal: Split~2 ($n_\text{train}=186$, $n_\text{test}=114$).
-Ext-2: pending.}
+LLMs (Phase~1, best feature level), and Phase~2 models (DT/RF for
+classification; RSF for EFS/OS).
+Internal: Huaxi Hospital ($n=301$; Phase~2 temporal Split~2).
+Ext-1: Lianyungang First People's Hospital ($n=20$); Ext-2: Children's
+Hospital of Fudan University, Shanghai ($n=21$), a relapse-enriched
+cohort (all 21 relapsed).
+Classification metric: AUROC; $*$~= accuracy, reported where the
+external cohort has a single class and AUROC is undefined.
+Survival metric: Harrell's C-index.
+Because the external cohorts are small, several cells rest on very few
+positives or events (e.g. Ext-1 Relapse: 2 positives; Ext-1 OS: 1 death,
+RSF omitted) and should be read as indicative only.}
 \label{tab:summary}
 \centering
 \footnotesize
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{llccccc|cc|cc}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}ll cccc c cc@{}}
 \toprule
-& & \multicolumn{4}{c}{\textbf{Phase~1 LLM (best feature level)}}
-  & & \multicolumn{2}{c|}{\textbf{Phase~2 (Int.)}}
-  & \multicolumn{2}{c}{\textbf{Phase~2 (Ext-1)}} \\
-\cmidrule(lr){3-6} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
-\textbf{Task} & \textbf{Metric}
-  & Gemini & Gemma & InternVL & Qwen
-  & \textit{(Ext-1)}
-  & DT & RF/RSF & DT & RF/RSF \\
+& & \multicolumn{4}{c}{\textbf{Phase~1 LLM (best level)}}
+  & & \multicolumn{2}{c}{\textbf{Phase~2}} \\
+\cmidrule(lr){3-6} \cmidrule(lr){8-9}
+\textbf{Task} & \textbf{Cohort}
+  & Gemini & Gemma & InternVL & Qwen & & DT & RF/RSF \\
 \midrule
-\multicolumn{11}{l}{\textit{Classification tasks (AUROC)}} \\
-Final Risk & Int. & 0.849 & 0.891 & 0.848 & 0.882 & & 0.949 & 0.998 & — & — \\
-           & Ext-1 & 0.925 & 0.894 & 0.750 & 0.850 & & — & — & 0.968 & 0.991 \\
-D19MRD     & Int. & 0.651 & 0.659 & 0.567 & 0.605 & & 0.743 & 0.807 & — & — \\
-           & Ext-1 & 0.550 & 0.465 & 0.515 & 0.550 & & — & — & 0.628 & 0.635 \\
-D46MRD     & Int. & 0.610 & 0.577 & 0.542 & 0.552 & & 0.671 & 0.636 & — & — \\
-           & Ext-1 & \multicolumn{4}{c}{$\leq$0.554\,$^\dagger$}  & & — & — & 0.975$^\dagger$ & 1.000$^\dagger$ \\
-Relapse    & Int. & 0.599 & 0.586 & 0.643 & 0.573 & & 0.529 & 0.630 & — & — \\
-           & Ext-1 & 0.717 & 0.656 & 0.699 & 0.609 & & — & — & 0.583 & 0.528 \\
+\multicolumn{9}{l}{\textit{Classification tasks (AUROC; $*$ = accuracy, single-class cohort)}} \\
+Final Risk & Int.   & 0.849 & 0.891 & 0.848 & 0.882 & & 0.949 & 0.998 \\
+           & Ext-1  & 0.900 & 0.900 & 0.800 & 0.875 & & 0.914 & 0.965 \\
+           & Ext-2  & 0.933 & 0.883 & 0.800 & 0.867 & & 1.000 & 1.000 \\
+D19MRD     & Int.   & 0.651 & 0.659 & 0.567 & 0.605 & & 0.743 & 0.807 \\
+           & Ext-1  & 0.750$^*$ & 0.750$^*$ & 0.750$^*$ & 0.875$^*$ & & 0.400$^*$ & 1.000$^*$ \\
+           & Ext-2  & 0.515 & 0.449 & 0.500 & 0.537 & & 0.581 & 0.750 \\
+D46MRD     & Int.   & 0.610 & 0.577 & 0.542 & 0.552 & & 0.671 & 0.636 \\
+           & Ext-1  & 0.357 & 0.357 & 0.571 & 0.500 & & 0.184 & 1.000 \\
+           & Ext-2  & 0.714$^*$ & 0.619$^*$ & 0.571$^*$ & 0.762$^*$ & & 0.667$^*$ & 1.000$^*$ \\
+Relapse    & Int.   & 0.599 & 0.586 & 0.643 & 0.573 & & 0.529 & 0.630 \\
+           & Ext-1  & 0.750 & 0.750 & 0.750 & 0.750 & & 0.431 & 0.861 \\
+           & Ext-2  & 0.429$^*$ & 0.524$^*$ & 1.000$^*$ & 0.191$^*$ & & 0.143$^*$ & 0.048$^*$ \\
 \midrule
-\multicolumn{11}{l}{\textit{Survival tasks (C-index)}} \\
-EFS        & Int. & 0.687 & 0.716 & 0.642 & 0.662 & & — & 0.746 & — & — \\
-           & Ext-1 & 0.715 & 0.669 & 0.709 & 0.645 & & — & — & — & 0.608 \\
-OS         & Int. & 0.725 & 0.718 & 0.764 & 0.718 & & — & 0.629 & — & — \\
-           & Ext-1 & 0.810 & 0.821 & 0.859 & 0.806 & & — & — & — & 0.643 \\
+\multicolumn{9}{l}{\textit{Survival tasks (C-index)}} \\
+EFS & Int.   & 0.687 & 0.716 & 0.642 & 0.662 & & — & 0.746 \\
+    & Ext-1  & 0.691 & 0.798 & 0.750 & 0.762 & & — & 0.905 \\
+    & Ext-2  & 0.741 & 0.712 & 0.677 & 0.653 & & — & 0.586 \\
+OS  & Int.   & 0.725 & 0.718 & 0.764 & 0.718 & & — & 0.629 \\
+    & Ext-1  & 1.000 & 1.000 & 0.972 & 0.972 & & — & — \\
+    & Ext-2  & 0.829 & 0.776 & 0.767 & 0.752 & & — & 0.705 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1010,7 +1026,7 @@ training.
 cases generates predictions and decision paths; RAG retrieves the
 $K=5$ most similar cases; LLM synthesises a clinical narrative.
 \textbf{d,}~Evaluation scope: internal temporal splits (three splits) and
-external OOD validation (two independent sites; Site~2 pending).}
+external OOD validation (two independent sites).}
 \label{fig:overview}
 \end{figure}
 
