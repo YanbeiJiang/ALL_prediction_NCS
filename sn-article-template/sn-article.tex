@@ -70,10 +70,13 @@ and concordance index~0.746 for EFS.
 A cosine similarity retrieval-augmented generation (RAG) belief
 revision improves D46MRD AUROC from 0.655 to 0.881 ($+0.226$) in
 the largest training regime.
-External validation at two independent sites confirms robust Final Risk
-transfer (LLM zero-shot AUROC 0.80--0.93; Phase~2 RF up to 1.000)
-without retraining, although the small external cohorts limit the
-remaining targets.
+External validation on a merged 41-patient cohort pooled from two
+hospitals confirms robust Final Risk transfer (LLM zero-shot AUROC up
+to 0.925; Phase~2 RF up to 0.991) without retraining; pooling also
+makes Relapse and D19MRD two-class and AUROC-evaluable, although the
+cohort remains small and, because one source hospital is a
+relapse-enriched referral series, external relapse metrics are
+exploratory.
 This framework demonstrates that temporally stratified multimodal
 learning, aligned with clinical workflows, enables consistent
 multi-target prediction that generalises to independent cohorts.
@@ -199,17 +202,19 @@ EFS events (relapse, induction failure, or death; 75 of 301, 24.9\%)
 and OS events (death; 24 of 301, 8.0\%) together extend the prediction
 targets to six.
 
-Two external validation cohorts from independent institutions were
-supplied as a single merged file, which we split by the recorded
-hospital of origin.
-External Site~1 (Lianyungang First People's Hospital) contributed
-20 patients diagnosed in 2019--2023; External Site~2 (Children's
-Hospital of Fudan University, Shanghai) contributed 21 patients
-(2017--2021) (Table~\ref{tab:cohort}).
-The Site~2 cohort is relapse-enriched—all 21 patients relapsed—so at
-each site one or more targets reduce to a single class or a handful of
-events; these are reported with accuracy (classification) or flagged as
-indicative (survival) rather than dropped.
+External validation used a single pooled cohort of 41 patients
+collected at two hospitals: Lianyungang First People's Hospital
+(20 patients, diagnosed 2019--2023) and Children's Hospital of Fudan
+University, Shanghai (21 patients, 2017--2021) (Table~\ref{tab:cohort}).
+The Fudan sub-cohort is a relapse-enriched referral series (all 21
+patients relapsed), so the pooled external relapse rate (23 of 41,
+56.1\%) sits far above that of an unselected ALL population; external
+relapse metrics are therefore exploratory (see Limitations).
+Pooling the two hospitals resolves the single-class collapse a
+per-site split would otherwise cause for several targets: D19MRD and
+Relapse become two-class and AUROC-evaluable across the full cohort,
+while D46MRD still has only one positive patient after pooling and is
+reported as accuracy.
 For external validation, all 301 internal patients were used as the
 training set and no external data were used in training.
 
@@ -226,42 +231,41 @@ EFS, OS) use Harrell's C-index and time-dependent IPCW AUC.
 
 \begin{table}[ht]
 \caption{Cohort characteristics and prediction target distributions.
-Ext-1: Lianyungang First People's Hospital; Ext-2: Children's Hospital
-of Fudan University (Shanghai). $\dagger$~patients with complete labels
-for all four classification targets. Note that the Ext-2 cohort is
-relapse-enriched: all 21 patients experienced relapse.
+The External cohort pools patients from two independent hospitals
+(see Methods for site details).
+$\dagger$~patients with complete labels
+for all four classification targets.
 $\ddagger$~patients whose automated pipeline output contains at least
 one blast cell; only these enter the imaging analysis
 (Section~\ref{sec:imgmorph}).}
 \label{tab:cohort}
 \centering
 \small
-\begin{tabular}{lccc}
+\begin{tabular}{lcc}
 \toprule
 \textbf{Characteristic}
   & \textbf{Internal} ($n=301$)
-  & \textbf{Ext-1} ($n=20$)
-  & \textbf{Ext-2} ($n=21$) \\
+  & \textbf{External} ($n=41$) \\
 \midrule
-Enrolment years & 2015--2019 & 2019--2023 & 2017--2021 \\
-B-ALL & 163 (54.2\%) & 20 (100\%) & 18 (85.7\%) \\
-Patients with complete labels$^\dagger$ & 301 & 8 & 21 \\
+Enrolment years & 2015--2019 & 2017--2023 \\
+B-ALL & 163 (54.2\%) & 38 (92.7\%) \\
+Patients with complete labels$^\dagger$ & 301 & 29 \\
 \midrule
-\multicolumn{4}{l}{\textit{Classification targets}} \\
-Final Risk: LR & 159 (52.8\%) & 11 (55.0\%) & 6 (28.6\%) \\
-Final Risk: IR/HR & 142 (47.2\%) & 9 (45.0\%) & 15 (71.4\%) \\
-Relapse: Yes & 44 (14.6\%) & 2 (10.0\%) & 21 (100\%) \\
-D19MRD $\geq 1\%$ & [X] ([X]\%) & 0 & 4 \\
-D46MRD $\geq 0.01\%$ & [X] ([X]\%) & 1 & 0 \\
+\multicolumn{3}{l}{\textit{Classification targets}} \\
+Final Risk: LR & 159 (52.8\%) & 17 (41.5\%) \\
+Final Risk: IR/HR & 142 (47.2\%) & 24 (58.5\%) \\
+Relapse: Yes & 44 (14.6\%) & 23 (56.1\%) \\
+D19MRD $\geq 1\%$ & [X] ([X]\%) & 4 \\
+D46MRD $\geq 0.01\%$ & [X] ([X]\%) & 1 \\
 \midrule
-\multicolumn{4}{l}{\textit{Survival endpoints}} \\
-EFS events & 75 (24.9\%) & 3 (15.0\%) & 21 (100\%) \\
-OS events & 24 (8.0\%) & 1 (5.0\%) & 6 (28.6\%) \\
+\multicolumn{3}{l}{\textit{Survival endpoints}} \\
+EFS events & 75 (24.9\%) & 24 (58.5\%) \\
+OS events & 24 (8.0\%) & 7 (17.1\%) \\
 \midrule
-\multicolumn{4}{l}{\textit{Multimodal data}} \\
-Bone marrow images & [X] (XX\%) & 20 & 21 \\
-Morphology features & 287 (95.3\%) & 19 & 21 \\
-\;\,non-empty blast profile$^\ddagger$ & 221 (73.4\%) & 8 & 5 \\
+\multicolumn{3}{l}{\textit{Multimodal data}} \\
+Bone marrow images & [X] (XX\%) & 41 \\
+Morphology features & 287 (95.3\%) & 40 \\
+\;\,non-empty blast profile$^\ddagger$ & 221 (73.4\%) & 13 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -274,7 +278,7 @@ Morphology features & 287 (95.3\%) & 19 & 21 \\
 We evaluated four LLMs in a zero-shot setting across all seven
 clinical feature levels and all six prediction targets; Table~\ref{tab:phase1_full}
 reports the complete internal per-feature-level results and
-Table~\ref{tab:phase1_ext} the two external sites.
+Table~\ref{tab:phase1_ext} the merged external cohort.
 Models included Gemini-3.1-Flash-Lite (Google AI API) and three
 open-weight models deployed locally via vLLM: Gemma-4-31B-it,
 InternVL3.5-30B-A3B, and Qwen3.6-35B-A3B.
@@ -358,86 +362,91 @@ InternVL reached 0.764, Gemini 0.725, and Gemma and Qwen both 0.718.
 Log-rank tests were significant ($p < 0.05$) at $\mathcal{F}_7$
 for EFS for all four LLMs.
 
-\textbf{External validation (two sites).}
-Final Risk—the only target with both classes at both sites—transferred
-well: LLM zero-shot AUROC was 0.80--0.90 at Site~1 (Lianyungang) and
-0.80--0.93 at Site~2 (Fudan), close to the internal range and obtained
-without any site-specific retraining (Table~\ref{tab:phase1_ext}).
-The other classification targets are limited by the small,
-class-imbalanced external cohorts: at each site one or more targets
-collapse to a single class (Relapse is all-positive at Site~2, D19MRD
-all-negative at Site~1), for which we report accuracy rather than
-AUROC.
-For survival, Site~2 (21 EFS events, 6 deaths) gave LLM EFS C-indices
-of 0.65--0.74 and OS 0.75--0.83; Site~1 estimates rest on very few
-events (3 EFS, 1 death) and are indicative only.
+\textbf{External validation (merged cohort).}
+Final Risk transferred well on the pooled 41-patient external cohort:
+LLM zero-shot AUROC ranged 0.450--0.925 across models and feature
+levels, peaking at $\mathcal{F}_7$ (0.750--0.925 across the four
+LLMs), close to the internal range and obtained without any
+cohort-specific retraining (Table~\ref{tab:phase1_ext}).
+Pooling the two source hospitals resolves the single-class collapse
+that a per-site split would otherwise produce for Relapse and D19MRD:
+both targets are now two-class across the full external cohort and
+AUROC-evaluable (Relapse 0.482--0.717; D19MRD close to chance,
+0.340--0.550); only D46MRD still has a single positive patient after
+pooling (1 of 29 labelled patients) and is reported with accuracy
+(0.035--0.724) rather than AUROC.
+For survival, the pooled cohort (24 EFS events, 7 deaths) gave LLM EFS
+C-indices of 0.542--0.715 and OS 0.548--0.859.
 
 \begin{table}[p]
-\caption{\textbf{Phase~1 LLM zero-shot on the two external sites, all
-feature levels} (Gm/Gma/Iv/Qw = Gemini/Gemma/InternVL/Qwen).
-Classification: AUROC ($*$~= accuracy, single-class); survival (EFS,OS):
-C-index. \textbf{Bold}: best level per column. \textemdash: not
-evaluable. Ext-1 (Lianyungang, $n$=20) / Ext-2 (Fudan, $n$=21) small;
+\caption{\textbf{Phase~1 LLM zero-shot on the pooled external cohort,
+all feature levels} (Gm/Gma/Iv/Qw = Gemini/Gemma/InternVL/Qwen).
+The two source hospitals are pooled into a
+single external cohort ($n$=41 for survival; classification targets
+use the $n$=29 subset with available labels). Classification: AUROC
+($^*$~= accuracy; D46MRD has only one positive class after pooling,
+so accuracy is reported instead). Survival (EFS, OS): C-index.
+\textbf{Bold}: best feature level per column within each task block
+(ties all bolded). \textemdash: not evaluable ($\mathcal{F}_7$ not
+defined for D19/D46 MRD). External pooled cohort; exploratory,
 indicative only.}
 \label{tab:phase1_ext}
 \centering
-\scriptsize
-\renewcommand{\arraystretch}{0.6}
-\setlength{\tabcolsep}{3.5pt}
-\begin{tabular}{@{}l cccc cccc@{}}
+\footnotesize
+\renewcommand{\arraystretch}{0.8}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}l cccc@{}}
 \toprule
- & \multicolumn{4}{c}{\textbf{Ext-1 (Lianyungang)}} & \multicolumn{4}{c}{\textbf{Ext-2 (Fudan)}} \\
-\cmidrule(lr){2-5}\cmidrule(lr){6-9}
-\textbf{Lv.} & Gm & Gma & Iv & Qw & Gm & Gma & Iv & Qw \\
+\textbf{Lv.} & Gm & Gma & Iv & Qw \\
 \midrule
-\multicolumn{9}{l}{\textit{Final Risk (AUROC; $^*$=acc)}} \\
-$\mathcal{F}_1$ & 0.633 & 0.800 & 0.700 & \textbf{0.800} & 0.783 & 0.783 & 0.700 & 0.783 \\
-$\mathcal{F}_2$ & 0.800 & 0.800 & 0.500 & 0.800 & 0.783 & 0.817 & 0.433 & 0.783 \\
-$\mathcal{F}_3$ & 0.800 & \textbf{0.900} & 0.500 & 0.800 & 0.650 & 0.783 & 0.550 & 0.783 \\
-$\mathcal{F}_4$ & 0.800 & 0.900 & 0.667 & 0.800 & 0.850 & 0.783 & 0.717 & 0.783 \\
-$\mathcal{F}_5$ & 0.800 & 0.900 & 0.400 & 0.800 & 0.567 & \textbf{0.883} & 0.600 & 0.700 \\
-$\mathcal{F}_6$ & 0.800 & 0.800 & \textbf{0.800} & 0.800 & 0.650 & 0.850 & 0.683 & 0.817 \\
-$\mathcal{F}_7$ & \textbf{0.900} & 0.800 & 0.600 & 0.800 & \textbf{0.933} & 0.767 & \textbf{0.800} & \textbf{0.867} \\
-\multicolumn{9}{l}{\textit{D19 MRD (AUROC; $^*$=acc)}} \\
-$\mathcal{F}_1$ & \textbf{0.750$^*$} & \textbf{0.750$^*$} & \textbf{0.750$^*$} & 0.625$^*$ & 0.390 & 0.390 & 0.426 & 0.412 \\
-$\mathcal{F}_2$ & 0.750$^*$ & 0.750$^*$ & 0.000$^*$ & 0.750$^*$ & 0.485 & 0.360 & \textbf{0.500} & 0.515 \\
-$\mathcal{F}_3$ & 0.750$^*$ & 0.750$^*$ & 0.000$^*$ & 0.625$^*$ & 0.390 & 0.360 & 0.500 & 0.353 \\
-$\mathcal{F}_4$ & 0.750$^*$ & 0.750$^*$ & 0.000$^*$ & 0.750$^*$ & \textbf{0.515} & 0.360 & 0.500 & 0.419 \\
-$\mathcal{F}_5$ & 0.750$^*$ & 0.750$^*$ & 0.000$^*$ & 0.625$^*$ & 0.390 & \textbf{0.449} & 0.404 & 0.449 \\
-$\mathcal{F}_6$ & 0.750$^*$ & 0.750$^*$ & 0.375$^*$ & \textbf{0.875$^*$} & 0.390 & 0.360 & 0.493 & \textbf{0.537} \\
-$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
-\multicolumn{9}{l}{\textit{D46 MRD (AUROC; $^*$=acc)}} \\
-$\mathcal{F}_1$ & \textbf{0.357} & \textbf{0.357} & 0.357 & 0.286 & \textbf{0.714$^*$} & 0.571$^*$ & \textbf{0.571$^*$} & 0.667$^*$ \\
-$\mathcal{F}_2$ & 0.357 & 0.357 & 0.500 & \textbf{0.500} & 0.571$^*$ & 0.524$^*$ & 0.000$^*$ & 0.571$^*$ \\
-$\mathcal{F}_3$ & 0.357 & 0.286 & 0.500 & 0.357 & 0.571$^*$ & \textbf{0.619$^*$} & 0.000$^*$ & 0.714$^*$ \\
-$\mathcal{F}_4$ & 0.357 & 0.286 & 0.500 & 0.357 & 0.524$^*$ & 0.619$^*$ & 0.000$^*$ & \textbf{0.762$^*$} \\
-$\mathcal{F}_5$ & 0.357 & 0.357 & \textbf{0.571} & 0.286 & 0.571$^*$ & 0.619$^*$ & 0.095$^*$ & 0.762$^*$ \\
-$\mathcal{F}_6$ & 0.357 & 0.357 & 0.143 & 0.357 & 0.619$^*$ & 0.571$^*$ & 0.190$^*$ & 0.667$^*$ \\
-$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
-\multicolumn{9}{l}{\textit{Relapse (AUROC; $^*$=acc)}} \\
-$\mathcal{F}_1$ & \textbf{0.750} & 0.667 & 0.667 & 0.667 & 0.143$^*$ & 0.429$^*$ & 0.571$^*$ & 0.095$^*$ \\
-$\mathcal{F}_2$ & 0.667 & 0.667 & 0.500 & 0.667 & 0.143$^*$ & 0.381$^*$ & \textbf{1.000$^*$} & 0.095$^*$ \\
-$\mathcal{F}_3$ & 0.750 & 0.583 & 0.583 & \textbf{0.750} & 0.333$^*$ & 0.429$^*$ & 0.952$^*$ & 0.048$^*$ \\
-$\mathcal{F}_4$ & 0.750 & 0.583 & \textbf{0.750} & 0.750 & 0.190$^*$ & 0.429$^*$ & 0.857$^*$ & 0.095$^*$ \\
-$\mathcal{F}_5$ & 0.750 & 0.667 & 0.500 & 0.750 & \textbf{0.429$^*$} & 0.381$^*$ & 0.762$^*$ & 0.143$^*$ \\
-$\mathcal{F}_6$ & 0.667 & 0.667 & 0.417 & 0.750 & 0.429$^*$ & \textbf{0.476$^*$} & 0.762$^*$ & \textbf{0.190$^*$} \\
-$\mathcal{F}_7$ & 0.500 & \textbf{0.750} & 0.500 & 0.750 & 0.000$^*$ & 0.000$^*$ & 0.000$^*$ & 0.000$^*$ \\
-\multicolumn{9}{l}{\textit{EFS (C-index)}} \\
-$\mathcal{F}_1$ & 0.536 & 0.595 & 0.488 & 0.583 & 0.697 & 0.704 & \textbf{0.677} & \textbf{0.653} \\
-$\mathcal{F}_2$ & \textbf{0.690} & 0.500 & 0.548 & 0.619 & \textbf{0.741} & \textbf{0.712} & 0.483 & 0.645 \\
-$\mathcal{F}_3$ & 0.560 & 0.560 & 0.619 & 0.655 & 0.660 & 0.653 & 0.539 & 0.643 \\
-$\mathcal{F}_4$ & 0.560 & 0.560 & 0.619 & 0.655 & 0.667 & 0.653 & 0.539 & 0.643 \\
-$\mathcal{F}_5$ & 0.464 & 0.583 & 0.571 & 0.500 & 0.606 & 0.643 & 0.596 & 0.539 \\
-$\mathcal{F}_6$ & 0.560 & 0.750 & \textbf{0.750} & 0.667 & 0.665 & 0.581 & 0.633 & 0.603 \\
-$\mathcal{F}_7$ & 0.667 & \textbf{0.798} & 0.619 & \textbf{0.762} & 0.712 & 0.670 & 0.670 & 0.567 \\
-\multicolumn{9}{l}{\textit{OS (C-index)}} \\
-$\mathcal{F}_1$ & 0.889 & 0.972 & 0.944 & 0.944 & 0.795 & 0.757 & 0.724 & 0.662 \\
-$\mathcal{F}_2$ & \textbf{1.000} & 0.944 & 0.889 & 0.944 & 0.757 & 0.733 & 0.567 & 0.671 \\
-$\mathcal{F}_3$ & 0.972 & \textbf{1.000} & \textbf{0.972} & 0.500 & 0.710 & \textbf{0.776} & 0.605 & 0.538 \\
-$\mathcal{F}_4$ & 0.972 & 1.000 & 0.972 & 0.500 & 0.743 & 0.776 & 0.605 & 0.538 \\
-$\mathcal{F}_5$ & 0.944 & 1.000 & 0.972 & 0.833 & 0.671 & 0.757 & 0.710 & 0.557 \\
-$\mathcal{F}_6$ & 0.889 & 0.722 & 0.972 & 0.944 & 0.819 & 0.562 & 0.700 & \textbf{0.752} \\
-$\mathcal{F}_7$ & 1.000 & 0.889 & 0.972 & \textbf{0.972} & \textbf{0.829} & 0.571 & \textbf{0.767} & 0.567 \\
+\multicolumn{5}{l}{\textit{Final Risk (AUROC)}} \\
+$\mathcal{F}_1$ & 0.739 & 0.794 & 0.714 & 0.794 \\
+$\mathcal{F}_2$ & 0.794 & 0.819 & 0.450 & 0.794 \\
+$\mathcal{F}_3$ & 0.708 & 0.819 & 0.531 & 0.794 \\
+$\mathcal{F}_4$ & 0.844 & 0.819 & 0.697 & 0.794 \\
+$\mathcal{F}_5$ & 0.653 & \textbf{0.894} & 0.536 & 0.739 \\
+$\mathcal{F}_6$ & 0.708 & 0.844 & 0.733 & 0.819 \\
+$\mathcal{F}_7$ & \textbf{0.925} & 0.775 & \textbf{0.750} & \textbf{0.850} \\
+\multicolumn{5}{l}{\textit{D19 MRD (AUROC)}} \\
+$\mathcal{F}_1$ & 0.425 & 0.425 & 0.490 & 0.380 \\
+$\mathcal{F}_2$ & 0.530 & 0.405 & 0.500 & \textbf{0.550} \\
+$\mathcal{F}_3$ & 0.425 & 0.405 & 0.500 & 0.340 \\
+$\mathcal{F}_4$ & \textbf{0.550} & 0.405 & 0.500 & 0.445 \\
+$\mathcal{F}_5$ & 0.425 & \textbf{0.465} & 0.395 & 0.445 \\
+$\mathcal{F}_6$ & 0.425 & 0.405 & \textbf{0.515} & 0.545 \\
+$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash \\
+\multicolumn{5}{l}{\textit{D46 MRD (accuracy; single positive)}} \\
+$\mathcal{F}_1$ & \textbf{0.690$^*$} & 0.586$^*$ & \textbf{0.586$^*$} & 0.621$^*$ \\
+$\mathcal{F}_2$ & 0.586$^*$ & 0.552$^*$ & 0.035$^*$ & 0.655$^*$ \\
+$\mathcal{F}_3$ & 0.586$^*$ & 0.586$^*$ & 0.035$^*$ & 0.690$^*$ \\
+$\mathcal{F}_4$ & 0.552$^*$ & 0.586$^*$ & 0.035$^*$ & \textbf{0.724$^*$} \\
+$\mathcal{F}_5$ & 0.586$^*$ & \textbf{0.621$^*$} & 0.138$^*$ & 0.690$^*$ \\
+$\mathcal{F}_6$ & 0.621$^*$ & 0.586$^*$ & 0.207$^*$ & 0.655$^*$ \\
+$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash \\
+\multicolumn{5}{l}{\textit{Relapse (AUROC)}} \\
+$\mathcal{F}_1$ & 0.587 & 0.634 & \textbf{0.699} & 0.482 \\
+$\mathcal{F}_2$ & 0.504 & 0.612 & 0.500 & 0.482 \\
+$\mathcal{F}_3$ & 0.674 & 0.551 & 0.562 & 0.544 \\
+$\mathcal{F}_4$ & 0.609 & 0.551 & 0.685 & 0.565 \\
+$\mathcal{F}_5$ & \textbf{0.717} & 0.612 & 0.620 & 0.587 \\
+$\mathcal{F}_6$ & 0.634 & \textbf{0.656} & 0.536 & \textbf{0.609} \\
+$\mathcal{F}_7$ & 0.500 & 0.522 & 0.500 & 0.522 \\
+\multicolumn{5}{l}{\textit{EFS (C-index)}} \\
+$\mathcal{F}_1$ & 0.657 & \textbf{0.669} & 0.627 & 0.634 \\
+$\mathcal{F}_2$ & \textbf{0.715} & 0.659 & 0.551 & \textbf{0.645} \\
+$\mathcal{F}_3$ & 0.635 & 0.590 & 0.615 & 0.638 \\
+$\mathcal{F}_4$ & 0.634 & 0.590 & 0.615 & 0.638 \\
+$\mathcal{F}_5$ & 0.617 & 0.656 & 0.639 & 0.542 \\
+$\mathcal{F}_6$ & 0.657 & 0.651 & \textbf{0.709} & 0.567 \\
+$\mathcal{F}_7$ & 0.656 & 0.664 & 0.702 & 0.591 \\
+\multicolumn{5}{l}{\textit{OS (C-index)}} \\
+$\mathcal{F}_1$ & 0.808 & \textbf{0.821} & 0.802 & 0.714 \\
+$\mathcal{F}_2$ & 0.804 & 0.792 & 0.633 & 0.744 \\
+$\mathcal{F}_3$ & 0.746 & 0.780 & 0.710 & 0.548 \\
+$\mathcal{F}_4$ & 0.760 & 0.780 & 0.710 & 0.548 \\
+$\mathcal{F}_5$ & 0.762 & 0.808 & 0.816 & 0.694 \\
+$\mathcal{F}_6$ & \textbf{0.810} & 0.603 & 0.814 & \textbf{0.806} \\
+$\mathcal{F}_7$ & 0.802 & 0.615 & \textbf{0.859} & 0.665 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -468,7 +477,7 @@ same patient subset as its imaging variants (patients with available
 morphology data).
 Table~\ref{tab:imgmorph_int} reports the internal cohort;
 Tables~\ref{tab:imgmorph_ext_cls} and~\ref{tab:imgmorph_ext_surv}
-report the two external sites.
+report the merged external cohort.
 
 With the comparison now complete at all five levels, the clearest and
 most consistent internal-cohort gain is for relapse prediction from
@@ -607,200 +616,197 @@ $\mathcal{F}_7$      & \textemdash & \textemdash & \textemdash & \textemdash & $
 
 \begin{table}[p]
 \caption{\textbf{Information gain from bone marrow imaging at every
-clinical feature level, external classification tasks (two sites).}
-Ext-1 = Lianyungang, Ext-2 = Fudan; Gm/Gma/Iv/Qw =
+clinical feature level, external classification tasks (merged external
+cohort).} Gm/Gma/Iv/Qw =
 Gemini/Gemma/InternVL/Qwen. For each base level $\mathcal{F}_k$
 ($k=3..7$ for Final Risk and Relapse, $k=3..6$ for D19/D46MRD): $+$img
 adds raw smear images, $+$morph the structured morphology profile,
-$+$both adds both. AUROC ($^*$~= accuracy, single-class site). Base
-rows are re-evaluated on the morphology-available patient subset, so
-they can differ slightly from Table~\ref{tab:phase1_ext}. \textbf{Bold}:
-best variant within each level block (per column; ties all bolded).
-Fair-comparison subsets are small (Ext-1 $n{=}3$, Ext-2 $n{=}5$ at
-$\mathcal{F}_3$); indicative only.}
+$+$both adds both. AUROC ($^*$~= accuracy, single-class task/level).
+Base rows are re-evaluated on the morphology-available patient subset,
+so they can differ slightly from Table~\ref{tab:phase1_ext}.
+\textbf{Bold}: best variant within each level block (per column; ties
+all bolded). The pooled external fair-comparison subset is small
+($n{=}8$; one model--level cell $n{=}7$ owing to a parse-filtered
+response); indicative only.}
 \label{tab:imgmorph_ext_cls}
 \centering
 \tiny
 \renewcommand{\arraystretch}{0.5}
-\setlength{\tabcolsep}{3.5pt}
+\setlength{\tabcolsep}{28pt}
 \setlength{\aboverulesep}{0.5pt}
 \setlength{\belowrulesep}{0.5pt}
-\begin{tabular}{@{}l cccc cccc@{}}
+\begin{tabular}{@{}l cccc@{}}
 \toprule
- & \multicolumn{4}{c}{\textbf{Ext-1 (Lianyungang)}} & \multicolumn{4}{c}{\textbf{Ext-2 (Fudan)}} \\
-\cmidrule(lr){2-5}\cmidrule(lr){6-9}
- & Gm & Gma & Iv & Qw & Gm & Gma & Iv & Qw \\
+ & Gm & Gma & Iv & Qw \\
 \midrule
-\multicolumn{9}{l}{\textit{Final Risk (AUROC; $^*$=accuracy)}} \\
-$\mathcal{F}_3$      & \textbf{1.000} & \textbf{1.000} & \textbf{0.500} & \textbf{1.000} & \textbf{0.583} & 0.583 & \textbf{0.750} & 0.583 \\
-\;\,$+$img           & \textbf{1.000} & \textbf{1.000} & \textbf{0.500} & \textbf{1.000} & \textbf{0.583} & 0.583 & 0.500 & 0.583 \\
-\;\,$+$morph         & \textbf{1.000} & \textbf{1.000} & \textbf{0.500} & \textbf{1.000} & 0.333 & 0.583 & \textbf{0.750} & \textbf{0.750} \\
-\;\,$+$both          & \textbf{1.000} & \textbf{1.000} & \textbf{0.500} & 0.250 & 0.500 & \textbf{0.750} & \textbf{0.750} & 0.583 \\
+\multicolumn{5}{l}{\textit{Final Risk (AUROC; $^*$=accuracy)}} \\
+$\mathcal{F}_3$      & \textbf{0.750} & 0.750 & \textbf{0.625} & 0.750 \\
+\;\,$+$img           & \textbf{0.750} & 0.750 & 0.500 & 0.750 \\
+\;\,$+$morph         & 0.625 & 0.750 & \textbf{0.625} & \textbf{0.875} \\
+\;\,$+$both          & \textbf{0.750} & \textbf{0.875} & \textbf{0.625} & 0.500 \\
 \addlinespace[0.3pt]
-$\mathcal{F}_4$      & \textbf{1.000} & \textbf{1.000} & \textbf{0.750} & \textbf{1.000} & \textbf{0.583} & \textbf{0.583} & \textbf{0.750} & \textbf{0.583} \\
-\;\,$+$img           & \textbf{1.000} & \textbf{1.000} & 0.500 & \textbf{1.000} & \textbf{0.583} & \textbf{0.583} & \textbf{0.750} & \textbf{0.583} \\
-\;\,$+$morph         & \textbf{1.000} & \textbf{1.000} & \textbf{0.750} & \textbf{1.000} & \textbf{0.583} & \textbf{0.583} & \textbf{0.750} & \textbf{0.583} \\
-\;\,$+$both          & \textbf{1.000} & \textbf{1.000} & \textbf{0.750} & 0.500 & 0.333 & \textbf{0.583} & 0.500 & \textbf{0.583} \\
+$\mathcal{F}_4$      & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} \\
+\;\,$+$img           & \textbf{0.750} & \textbf{0.750} & 0.625 & \textbf{0.750} \\
+\;\,$+$morph         & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} \\
+\;\,$+$both          & 0.625 & \textbf{0.750} & 0.625 & 0.625 \\
 \addlinespace[0.3pt]
-$\mathcal{F}_5$      & \textbf{1.000} & \textbf{1.000} & 0.500 & \textbf{1.000} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & 0.583 \\
-\;\,$+$img           & \textbf{1.000} & \textbf{1.000} & \textbf{0.750} & \textbf{1.000} & 0.583 & \textbf{0.750} & \textbf{0.750} & 0.583 \\
-\;\,$+$morph         & \textbf{1.000} & \textbf{1.000} & \textbf{0.750} & \textbf{1.000} & 0.583 & 0.500 & \textbf{0.750} & 0.750 \\
-\;\,$+$both          & \textbf{1.000} & \textbf{1.000} & \textbf{0.750} & \textbf{1.000} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & \textbf{0.833} \\
+$\mathcal{F}_5$      & \textbf{0.875} & \textbf{0.875} & 0.625 & 0.750 \\
+\;\,$+$img           & 0.750 & \textbf{0.875} & \textbf{0.750} & 0.750 \\
+\;\,$+$morph         & 0.750 & 0.750 & \textbf{0.750} & \textbf{0.875} \\
+\;\,$+$both          & \textbf{0.875} & \textbf{0.875} & \textbf{0.750} & \textbf{0.875} \\
 \addlinespace[0.3pt]
-$\mathcal{F}_6$      & \textbf{1.000} & \textbf{1.000} & \textbf{1.000} & \textbf{1.000} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} \\
-\;\,$+$img           & \textbf{1.000} & \textbf{1.000} & \textbf{1.000} & \textbf{1.000} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} \\
-\;\,$+$morph         & \textbf{1.000} & \textbf{1.000} & \textbf{1.000} & \textbf{1.000} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} \\
-\;\,$+$both          & \textbf{1.000} & \textbf{1.000} & \textbf{1.000} & \textbf{1.000} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} \\
+$\mathcal{F}_6$      & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} \\
+\;\,$+$img           & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} \\
+\;\,$+$morph         & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} \\
+\;\,$+$both          & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} \\
 \addlinespace[0.3pt]
-$\mathcal{F}_7$      & \textbf{1.000} & \textbf{0.500} & 0.500 & \textbf{0.500} & \textbf{1.000} & 0.833 & 0.833 & \textbf{1.000} \\
-\;\,$+$img           & \textbf{1.000} & \textbf{0.500} & 0.500 & \textbf{0.500} & \textbf{1.000} & \textbf{1.000} & \textbf{1.000} & 0.833 \\
-\;\,$+$morph         & \textbf{1.000} & \textbf{0.500} & \textbf{1.000} & \textbf{0.500} & \textbf{1.000} & 0.667 & 0.667 & \textbf{1.000} \\
-\;\,$+$both          & 0.500 & \textbf{0.500} & 0.500 & \textbf{0.500} & 0.833 & 0.833 & 0.667 & \textbf{1.000} \\
+$\mathcal{F}_7$      & \textbf{1.000} & 0.750 & 0.750 & \textbf{0.875} \\
+\;\,$+$img           & \textbf{1.000} & \textbf{0.875} & \textbf{0.875} & 0.750 \\
+\;\,$+$morph         & \textbf{1.000} & 0.625 & 0.750 & \textbf{0.875} \\
+\;\,$+$both          & 0.750 & 0.750 & 0.625 & \textbf{0.875} \\
 \midrule
-\multicolumn{9}{l}{\textit{D19 MRD (AUROC; $^*$=accuracy)}} \\
-$\mathcal{F}_3$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & 0.667$^*$ & \textbf{0.400$^*$} & \textbf{0.400$^*$} & 0.000$^*$ & \textbf{0.600$^*$} \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & 0.667$^*$ & \textbf{0.400$^*$} & 0.200$^*$ & 0.000$^*$ & 0.400$^*$ \\
-\;\,$+$morph         & 0.667$^*$ & 0.333$^*$ & \textbf{0.000$^*$} & \textbf{1.000$^*$} & 0.200$^*$ & 0.000$^*$ & 0.000$^*$ & 0.400$^*$ \\
-\;\,$+$both          & \textbf{1.000$^*$} & 0.000$^*$ & \textbf{0.000$^*$} & 0.667$^*$ & 0.000$^*$ & 0.000$^*$ & \textbf{0.200$^*$} & 0.200$^*$ \\
+\multicolumn{5}{l}{\textit{D19 MRD (AUROC; $^*$=accuracy)}} \\
+$\mathcal{F}_3$      & \textbf{0.625$^*$} & \textbf{0.625$^*$} & 0.000$^*$ & \textbf{0.625$^*$} \\
+\;\,$+$img           & \textbf{0.625$^*$} & 0.500$^*$ & 0.000$^*$ & 0.500$^*$ \\
+\;\,$+$morph         & 0.375$^*$ & 0.125$^*$ & 0.000$^*$ & \textbf{0.625$^*$} \\
+\;\,$+$both          & 0.375$^*$ & 0.000$^*$ & \textbf{0.125$^*$} & 0.375$^*$ \\
 \addlinespace[0.3pt]
-$\mathcal{F}_4$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & \textbf{1.000$^*$} & \textbf{0.400$^*$} & \textbf{0.400$^*$} & \textbf{0.000$^*$} & \textbf{0.400$^*$} \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & 0.333$^*$ & \textbf{0.400$^*$} & 0.200$^*$ & \textbf{0.000$^*$} & 0.200$^*$ \\
-\;\,$+$morph         & 0.667$^*$ & 0.333$^*$ & \textbf{0.000$^*$} & 0.667$^*$ & 0.200$^*$ & 0.000$^*$ & \textbf{0.000$^*$} & \textbf{0.400$^*$} \\
-\;\,$+$both          & 0.667$^*$ & 0.333$^*$ & \textbf{0.000$^*$} & 0.667$^*$ & 0.200$^*$ & 0.000$^*$ & \textbf{0.000$^*$} & 0.200$^*$ \\
+$\mathcal{F}_4$      & \textbf{0.625$^*$} & \textbf{0.625$^*$} & \textbf{0.000$^*$} & \textbf{0.625$^*$} \\
+\;\,$+$img           & \textbf{0.625$^*$} & 0.500$^*$ & \textbf{0.000$^*$} & 0.250$^*$ \\
+\;\,$+$morph         & 0.375$^*$ & 0.125$^*$ & \textbf{0.000$^*$} & 0.500$^*$ \\
+\;\,$+$both          & 0.375$^*$ & 0.125$^*$ & \textbf{0.000$^*$} & 0.375$^*$ \\
 \addlinespace[0.3pt]
-$\mathcal{F}_5$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & 0.667$^*$ & \textbf{0.800$^*$} & \textbf{0.600$^*$} & 0.000$^*$ & \textbf{0.800$^*$} \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & \textbf{1.000$^*$} & \textbf{0.800$^*$} & \textbf{0.600$^*$} & 0.000$^*$ & 0.600$^*$ \\
-\;\,$+$morph         & \textbf{1.000$^*$} & 0.333$^*$ & \textbf{0.000$^*$} & \textbf{1.000$^*$} & \textbf{0.800$^*$} & 0.400$^*$ & \textbf{0.400$^*$} & 0.600$^*$ \\
-\;\,$+$both          & 0.667$^*$ & 0.667$^*$ & \textbf{0.000$^*$} & 0.667$^*$ & \textbf{0.800$^*$} & 0.200$^*$ & 0.000$^*$ & \textbf{0.800$^*$} \\
+$\mathcal{F}_5$      & \textbf{0.875$^*$} & \textbf{0.750$^*$} & 0.000$^*$ & \textbf{0.750$^*$} \\
+\;\,$+$img           & \textbf{0.875$^*$} & \textbf{0.750$^*$} & 0.000$^*$ & \textbf{0.750$^*$} \\
+\;\,$+$morph         & \textbf{0.875$^*$} & 0.375$^*$ & \textbf{0.250$^*$} & \textbf{0.750$^*$} \\
+\;\,$+$both          & 0.750$^*$ & 0.375$^*$ & 0.000$^*$ & \textbf{0.750$^*$} \\
 \addlinespace[0.3pt]
-$\mathcal{F}_6$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & 0.333$^*$ & \textbf{1.000$^*$} & \textbf{0.600$^*$} & \textbf{0.200$^*$} & \textbf{0.400$^*$} & \textbf{1.000$^*$} \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.667$^*$} & \textbf{1.000$^*$} & \textbf{0.600$^*$} & \textbf{0.200$^*$} & \textbf{0.400$^*$} & 0.200$^*$ \\
-\;\,$+$morph         & 0.667$^*$ & 0.667$^*$ & 0.333$^*$ & \textbf{1.000$^*$} & \textbf{0.600$^*$} & \textbf{0.200$^*$} & 0.200$^*$ & 0.600$^*$ \\
-\;\,$+$both          & 0.667$^*$ & \textbf{1.000$^*$} & 0.333$^*$ & \textbf{1.000$^*$} & \textbf{0.600$^*$} & \textbf{0.200$^*$} & 0.200$^*$ & 0.800$^*$ \\
+$\mathcal{F}_6$      & \textbf{0.750$^*$} & \textbf{0.500$^*$} & 0.375$^*$ & \textbf{1.000$^*$} \\
+\;\,$+$img           & \textbf{0.750$^*$} & \textbf{0.500$^*$} & \textbf{0.500$^*$} & 0.500$^*$ \\
+\;\,$+$morph         & 0.625$^*$ & 0.375$^*$ & 0.250$^*$ & 0.750$^*$ \\
+\;\,$+$both          & 0.625$^*$ & \textbf{0.500$^*$} & 0.250$^*$ & 0.875$^*$ \\
 \midrule
-\multicolumn{9}{l}{\textit{D46 MRD (AUROC; $^*$=accuracy)}} \\
-$\mathcal{F}_3$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & 0.000$^*$ & \textbf{1.000$^*$} & \textbf{0.400$^*$} & \textbf{0.400$^*$} & 0.000$^*$ & \textbf{0.400$^*$} \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & 0.000$^*$ & \textbf{1.000$^*$} & \textbf{0.400$^*$} & 0.200$^*$ & \textbf{0.200$^*$} & 0.200$^*$ \\
-\;\,$+$morph         & \textbf{1.000$^*$} & 0.333$^*$ & 0.000$^*$ & 0.333$^*$ & 0.200$^*$ & 0.000$^*$ & 0.000$^*$ & 0.200$^*$ \\
-\;\,$+$both          & \textbf{1.000$^*$} & 0.333$^*$ & \textbf{0.333$^*$} & 0.667$^*$ & 0.200$^*$ & 0.000$^*$ & 0.000$^*$ & 0.200$^*$ \\
+\multicolumn{5}{l}{\textit{D46 MRD (accuracy; single positive)}} \\
+$\mathcal{F}_3$      & \textbf{0.625$^*$} & \textbf{0.625$^*$} & 0.000$^*$ & \textbf{0.625$^*$} \\
+\;\,$+$img           & \textbf{0.625$^*$} & 0.500$^*$ & \textbf{0.125$^*$} & 0.500$^*$ \\
+\;\,$+$morph         & 0.500$^*$ & 0.125$^*$ & 0.000$^*$ & 0.250$^*$ \\
+\;\,$+$both          & 0.500$^*$ & 0.125$^*$ & \textbf{0.125$^*$} & 0.375$^*$ \\
 \addlinespace[0.3pt]
-$\mathcal{F}_4$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & \textbf{1.000$^*$} & \textbf{0.400$^*$} & \textbf{0.400$^*$} & \textbf{0.000$^*$} & \textbf{0.600$^*$} \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & 0.667$^*$ & 0.200$^*$ & \textbf{0.400$^*$} & \textbf{0.000$^*$} & 0.400$^*$ \\
-\;\,$+$morph         & 0.667$^*$ & 0.667$^*$ & \textbf{0.000$^*$} & 0.667$^*$ & 0.200$^*$ & 0.000$^*$ & \textbf{0.000$^*$} & \textbf{0.600$^*$} \\
-\;\,$+$both          & 0.667$^*$ & 0.000$^*$ & \textbf{0.000$^*$} & 0.667$^*$ & \textbf{0.400$^*$} & 0.000$^*$ & \textbf{0.000$^*$} & 0.400$^*$ \\
+$\mathcal{F}_4$      & \textbf{0.625$^*$} & \textbf{0.625$^*$} & \textbf{0.000$^*$} & \textbf{0.750$^*$} \\
+\;\,$+$img           & 0.500$^*$ & \textbf{0.625$^*$} & \textbf{0.000$^*$} & 0.500$^*$ \\
+\;\,$+$morph         & 0.375$^*$ & 0.250$^*$ & \textbf{0.000$^*$} & 0.625$^*$ \\
+\;\,$+$both          & 0.500$^*$ & 0.000$^*$ & \textbf{0.000$^*$} & 0.500$^*$ \\
 \addlinespace[0.3pt]
-$\mathcal{F}_5$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.333$^*$} & 0.667$^*$ & \textbf{0.800$^*$} & \textbf{0.400$^*$} & 0.000$^*$ & \textbf{1.000$^*$} \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & 0.000$^*$ & 0.667$^*$ & 0.600$^*$ & \textbf{0.400$^*$} & \textbf{0.200$^*$} & 0.800$^*$ \\
-\;\,$+$morph         & \textbf{1.000$^*$} & 0.667$^*$ & 0.000$^*$ & 0.667$^*$ & \textbf{0.800$^*$} & 0.200$^*$ & 0.000$^*$ & 0.800$^*$ \\
-\;\,$+$both          & \textbf{1.000$^*$} & 0.333$^*$ & 0.000$^*$ & \textbf{1.000$^*$} & \textbf{0.800$^*$} & 0.000$^*$ & 0.000$^*$ & 0.600$^*$ \\
+$\mathcal{F}_5$      & \textbf{0.875$^*$} & \textbf{0.625$^*$} & \textbf{0.125$^*$} & \textbf{0.875$^*$} \\
+\;\,$+$img           & 0.750$^*$ & \textbf{0.625$^*$} & \textbf{0.125$^*$} & 0.750$^*$ \\
+\;\,$+$morph         & \textbf{0.875$^*$} & 0.375$^*$ & 0.000$^*$ & 0.750$^*$ \\
+\;\,$+$both          & \textbf{0.875$^*$} & 0.125$^*$ & 0.000$^*$ & 0.750$^*$ \\
 \addlinespace[0.3pt]
-$\mathcal{F}_6$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & 0.333$^*$ & \textbf{1.000$^*$} & \textbf{0.600$^*$} & \textbf{0.200$^*$} & \textbf{0.200$^*$} & \textbf{0.800$^*$} \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.667$^*$} & \textbf{1.000$^*$} & \textbf{0.600$^*$} & \textbf{0.200$^*$} & \textbf{0.200$^*$} & 0.600$^*$ \\
-\;\,$+$morph         & 0.667$^*$ & \textbf{1.000$^*$} & 0.333$^*$ & 0.667$^*$ & 0.400$^*$ & \textbf{0.200$^*$} & 0.000$^*$ & \textbf{0.800$^*$} \\
-\;\,$+$both          & 0.667$^*$ & 0.667$^*$ & 0.000$^*$ & \textbf{1.000$^*$} & \textbf{0.600$^*$} & \textbf{0.200$^*$} & 0.000$^*$ & 0.400$^*$ \\
+$\mathcal{F}_6$      & \textbf{0.750$^*$} & \textbf{0.500$^*$} & 0.250$^*$ & \textbf{0.875$^*$} \\
+\;\,$+$img           & \textbf{0.750$^*$} & \textbf{0.500$^*$} & \textbf{0.375$^*$} & 0.750$^*$ \\
+\;\,$+$morph         & 0.500$^*$ & \textbf{0.500$^*$} & 0.125$^*$ & 0.750$^*$ \\
+\;\,$+$both          & 0.625$^*$ & 0.375$^*$ & 0.000$^*$ & 0.625$^*$ \\
 \midrule
-\multicolumn{9}{l}{\textit{Relapse (AUROC; $^*$=accuracy)}} \\
-$\mathcal{F}_3$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.333$^*$} & \textbf{1.000$^*$} & 0.600$^*$ & 0.600$^*$ & \textbf{1.000$^*$} & 0.200$^*$ \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.333$^*$} & \textbf{1.000$^*$} & 0.600$^*$ & 0.600$^*$ & \textbf{1.000$^*$} & 0.400$^*$ \\
-\;\,$+$morph         & 0.667$^*$ & 0.667$^*$ & 0.000$^*$ & \textbf{1.000$^*$} & 0.600$^*$ & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.600$^*$} \\
-\;\,$+$both          & 0.667$^*$ & 0.667$^*$ & 0.000$^*$ & \textbf{1.000$^*$} & \textbf{0.800$^*$} & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.600$^*$} \\
+\multicolumn{5}{l}{\textit{Relapse (AUROC)}} \\
+$\mathcal{F}_3$      & \textbf{0.800} & 0.800 & \textbf{0.667} & 0.600 \\
+\;\,$+$img           & \textbf{0.800} & 0.800 & \textbf{0.667} & 0.700 \\
+\;\,$+$morph         & 0.633 & \textbf{0.833} & 0.500 & \textbf{0.800} \\
+\;\,$+$both          & 0.733 & \textbf{0.833} & 0.500 & \textbf{0.800} \\
 \addlinespace[0.3pt]
-$\mathcal{F}_4$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.333$^*$} & \textbf{1.000$^*$} & 0.200$^*$ & 0.600$^*$ & 0.800$^*$ & 0.000$^*$ \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & 0.000$^*$ & \textbf{1.000$^*$} & \textbf{0.600$^*$} & 0.400$^*$ & \textbf{1.000$^*$} & 0.250$^*$ \\
-\;\,$+$morph         & \textbf{1.000$^*$} & 0.667$^*$ & 0.000$^*$ & 0.667$^*$ & \textbf{0.600$^*$} & \textbf{0.800$^*$} & \textbf{1.000$^*$} & \textbf{0.750$^*$} \\
-\;\,$+$both          & 0.667$^*$ & 0.667$^*$ & 0.000$^*$ & 0.667$^*$ & \textbf{0.600$^*$} & \textbf{0.800$^*$} & \textbf{1.000$^*$} & 0.500$^*$ \\
+$\mathcal{F}_4$      & 0.600 & \textbf{0.800} & \textbf{0.567} & 0.500 \\
+\;\,$+$img           & \textbf{0.800} & 0.700 & 0.500 & 0.625 \\
+\;\,$+$morph         & \textbf{0.800} & 0.733 & 0.500 & \textbf{0.708} \\
+\;\,$+$both          & 0.633 & 0.733 & 0.500 & 0.583 \\
 \addlinespace[0.3pt]
-$\mathcal{F}_5$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & 0.333$^*$ & \textbf{1.000$^*$} & \textbf{0.200$^*$} & 0.600$^*$ & 0.800$^*$ & \textbf{0.200$^*$} \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.667$^*$} & \textbf{1.000$^*$} & \textbf{0.200$^*$} & 0.200$^*$ & 0.800$^*$ & \textbf{0.200$^*$} \\
-\;\,$+$morph         & 0.667$^*$ & 0.667$^*$ & 0.000$^*$ & \textbf{1.000$^*$} & \textbf{0.200$^*$} & \textbf{0.800$^*$} & \textbf{1.000$^*$} & 0.000$^*$ \\
-\;\,$+$both          & \textbf{1.000$^*$} & 0.667$^*$ & 0.000$^*$ & \textbf{1.000$^*$} & \textbf{0.200$^*$} & 0.400$^*$ & 0.800$^*$ & \textbf{0.200$^*$} \\
+$\mathcal{F}_5$      & \textbf{0.600} & \textbf{0.800} & 0.567 & \textbf{0.600} \\
+\;\,$+$img           & \textbf{0.600} & 0.600 & \textbf{0.733} & \textbf{0.600} \\
+\;\,$+$morph         & 0.433 & 0.733 & 0.500 & 0.500 \\
+\;\,$+$both          & \textbf{0.600} & 0.533 & 0.400 & \textbf{0.600} \\
 \addlinespace[0.3pt]
-$\mathcal{F}_6$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & 0.333$^*$ & \textbf{1.000$^*$} & 0.400$^*$ & \textbf{0.800$^*$} & \textbf{0.800$^*$} & 0.000$^*$ \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.667$^*$} & \textbf{1.000$^*$} & \textbf{0.600$^*$} & 0.600$^*$ & \textbf{0.800$^*$} & 0.200$^*$ \\
-\;\,$+$morph         & \textbf{1.000$^*$} & \textbf{1.000$^*$} & 0.333$^*$ & \textbf{1.000$^*$} & 0.400$^*$ & \textbf{0.800$^*$} & \textbf{0.800$^*$} & \textbf{0.400$^*$} \\
-\;\,$+$both          & \textbf{1.000$^*$} & \textbf{1.000$^*$} & 0.333$^*$ & \textbf{1.000$^*$} & \textbf{0.600$^*$} & 0.600$^*$ & \textbf{0.800$^*$} & 0.000$^*$ \\
+$\mathcal{F}_6$      & 0.700 & \textbf{0.900} & 0.567 & 0.500 \\
+\;\,$+$img           & \textbf{0.800} & 0.800 & \textbf{0.733} & 0.600 \\
+\;\,$+$morph         & 0.700 & \textbf{0.900} & 0.567 & \textbf{0.700} \\
+\;\,$+$both          & \textbf{0.800} & 0.800 & 0.567 & 0.500 \\
 \addlinespace[0.3pt]
-$\mathcal{F}_7$      & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & \textbf{0.000$^*$} & 0.000$^*$ & \textbf{0.000$^*$} \\
-\;\,$+$img           & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & \textbf{0.000$^*$} & 0.000$^*$ & \textbf{0.000$^*$} \\
-\;\,$+$morph         & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & \textbf{0.000$^*$} & \textbf{0.200$^*$} & \textbf{0.000$^*$} \\
-\;\,$+$both          & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{1.000$^*$} & \textbf{0.000$^*$} & \textbf{0.000$^*$} & 0.000$^*$ & \textbf{0.000$^*$} \\
+$\mathcal{F}_7$      & \textbf{0.500} & \textbf{0.500} & 0.500 & \textbf{0.500} \\
+\;\,$+$img           & \textbf{0.500} & \textbf{0.500} & 0.500 & \textbf{0.500} \\
+\;\,$+$morph         & \textbf{0.500} & \textbf{0.500} & \textbf{0.600} & \textbf{0.500} \\
+\;\,$+$both          & \textbf{0.500} & \textbf{0.500} & 0.500 & \textbf{0.500} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[p]
 \caption{\textbf{Information gain from bone marrow imaging at every
-clinical feature level, external survival tasks (two sites).} Columns
-as in Table~\ref{tab:imgmorph_ext_cls}. C-index for EFS and OS. Base
-rows are re-evaluated on the morphology-available patient subset, so
-they can differ slightly from Table~\ref{tab:phase1_ext}. Ext-1
-survival is not evaluable: the morphology-available Ext-1 patients
-have no EFS/OS events (\textemdash). \textbf{Bold}: best variant
-within each Ext-2 level block (per column; ties all bolded).
-Fair-comparison subsets are small (Ext-1 $n{=}3$, Ext-2 $n{=}5$ at
-$\mathcal{F}_3$); indicative only.}
+clinical feature level, external survival tasks (merged external
+cohort).} Columns as in Table~\ref{tab:imgmorph_ext_cls}. C-index for
+EFS and OS. Base rows are re-evaluated on the morphology-available
+patient subset, so they can differ slightly from
+Table~\ref{tab:phase1_ext}. Pooling the two source hospitals gives the
+morphology-available subset EFS/OS events, so survival is evaluable
+across the whole panel (no \textemdash). \textbf{Bold}: best variant
+within each level block (per column; ties all bolded). The pooled
+external fair-comparison subset is small ($n{=}13$); indicative only.}
 \label{tab:imgmorph_ext_surv}
 \centering
 \scriptsize
 \renewcommand{\arraystretch}{0.6}
-\setlength{\tabcolsep}{3.5pt}
-\begin{tabular}{@{}l cccc cccc@{}}
+\setlength{\tabcolsep}{28pt}
+\begin{tabular}{@{}l cccc@{}}
 \toprule
- & \multicolumn{4}{c}{\textbf{Ext-1 (Lianyungang)}} & \multicolumn{4}{c}{\textbf{Ext-2 (Fudan)}} \\
-\cmidrule(lr){2-5}\cmidrule(lr){6-9}
- & Gm & Gma & Iv & Qw & Gm & Gma & Iv & Qw \\
+ & Gm & Gma & Iv & Qw \\
 \midrule
-\multicolumn{9}{l}{\textit{EFS (C-index)}} \\
-$\mathcal{F}_3$      & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.850} & 0.850 & 0.600 & \textbf{0.850} \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.850} & 0.850 & 0.600 & \textbf{0.850} \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.850} & \textbf{0.950} & \textbf{0.850} & 0.700 \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & 0.750 & 0.850 & 0.600 & 0.800 \\
+\multicolumn{5}{l}{\textit{EFS (C-index)}} \\
+$\mathcal{F}_3$      & 0.885 & 0.846 & 0.692 & \textbf{0.923} \\
+\;\,$+$img           & 0.846 & 0.744 & 0.654 & 0.795 \\
+\;\,$+$morph         & \textbf{0.897} & \textbf{0.910} & \textbf{0.833} & 0.744 \\
+\;\,$+$both          & 0.795 & 0.872 & 0.603 & 0.782 \\
 \addlinespace[2pt]
-$\mathcal{F}_4$      & \textemdash & \textemdash & \textemdash & \textemdash & 0.850 & 0.850 & 0.600 & 0.850 \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & 0.850 & 0.850 & 0.600 & \textbf{0.900} \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.900} & \textbf{0.950} & \textbf{0.850} & 0.700 \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & 0.700 & 0.850 & 0.500 & 0.800 \\
+$\mathcal{F}_4$      & 0.833 & 0.846 & 0.692 & \textbf{0.923} \\
+\;\,$+$img           & \textbf{0.846} & 0.744 & 0.603 & 0.782 \\
+\;\,$+$morph         & 0.808 & \textbf{0.910} & \textbf{0.833} & 0.744 \\
+\;\,$+$both          & 0.667 & 0.872 & 0.641 & 0.782 \\
 \addlinespace[2pt]
-$\mathcal{F}_5$      & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.900} & \textbf{0.850} & 0.750 & \textbf{0.500} \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & 0.850 & \textbf{0.850} & 0.700 & \textbf{0.500} \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & 0.850 & \textbf{0.850} & \textbf{0.850} & \textbf{0.500} \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & 0.850 & \textbf{0.850} & 0.700 & \textbf{0.500} \\
+$\mathcal{F}_5$      & 0.872 & \textbf{0.897} & 0.872 & \textbf{0.577} \\
+\;\,$+$img           & \textbf{0.910} & 0.885 & 0.692 & 0.500 \\
+\;\,$+$morph         & 0.859 & 0.872 & \textbf{0.885} & \textbf{0.577} \\
+\;\,$+$both          & 0.769 & 0.872 & 0.731 & 0.500 \\
 \addlinespace[2pt]
-$\mathcal{F}_6$      & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.700} & 0.400 & \textbf{0.700} & 0.500 \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & 0.650 & 0.500 & 0.550 & 0.500 \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & 0.550 & \textbf{0.650} & \textbf{0.700} & \textbf{0.600} \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & 0.550 & 0.450 & 0.550 & 0.450 \\
+$\mathcal{F}_6$      & \textbf{0.885} & 0.782 & 0.859 & 0.680 \\
+\;\,$+$img           & 0.846 & 0.821 & 0.756 & 0.731 \\
+\;\,$+$morph         & 0.808 & \textbf{0.859} & \textbf{0.897} & \textbf{0.859} \\
+\;\,$+$both          & 0.859 & 0.782 & 0.795 & 0.641 \\
 \addlinespace[2pt]
-$\mathcal{F}_7$      & \textemdash & \textemdash & \textemdash & \textemdash & 0.550 & 0.550 & \textbf{0.750} & 0.400 \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.600} & 0.350 & 0.500 & 0.400 \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & 0.500 & \textbf{0.650} & 0.700 & \textbf{0.700} \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & 0.550 & 0.350 & 0.600 & 0.400 \\
+$\mathcal{F}_7$      & \textbf{0.821} & 0.756 & \textbf{0.872} & 0.680 \\
+\;\,$+$img           & \textbf{0.821} & 0.718 & 0.692 & 0.551 \\
+\;\,$+$morph         & 0.782 & \textbf{0.782} & 0.859 & \textbf{0.692} \\
+\;\,$+$both          & 0.769 & 0.718 & 0.718 & 0.590 \\
 \midrule
-\multicolumn{9}{l}{\textit{OS (C-index)}} \\
-$\mathcal{F}_3$      & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.833} & \textbf{0.833} & \textbf{0.500} & 0.611 \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.833} & 0.778 & 0.333 & \textbf{0.889} \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.833} & 0.722 & \textbf{0.500} & 0.833 \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.833} & 0.722 & 0.333 & 0.667 \\
+\multicolumn{5}{l}{\textit{OS (C-index)}} \\
+$\mathcal{F}_3$      & \textbf{0.850} & \textbf{0.883} & 0.600 & 0.650 \\
+\;\,$+$img           & 0.817 & 0.750 & 0.600 & 0.750 \\
+\;\,$+$morph         & 0.817 & 0.850 & 0.600 & \textbf{0.833} \\
+\;\,$+$both          & 0.817 & 0.833 & \textbf{0.700} & 0.700 \\
 \addlinespace[2pt]
-$\mathcal{F}_4$      & \textemdash & \textemdash & \textemdash & \textemdash & 0.833 & \textbf{0.833} & \textbf{0.500} & 0.611 \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & 0.833 & 0.778 & 0.167 & \textbf{0.889} \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & 0.833 & 0.722 & \textbf{0.500} & 0.833 \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.889} & 0.722 & 0.389 & 0.667 \\
+$\mathcal{F}_4$      & 0.817 & \textbf{0.883} & \textbf{0.600} & 0.650 \\
+\;\,$+$img           & 0.817 & 0.750 & 0.550 & 0.750 \\
+\;\,$+$morph         & \textbf{0.900} & 0.850 & \textbf{0.600} & \textbf{0.833} \\
+\;\,$+$both          & 0.833 & 0.833 & \textbf{0.600} & 0.700 \\
 \addlinespace[2pt]
-$\mathcal{F}_5$      & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.833} & \textbf{0.944} & 0.833 & \textbf{0.667} \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & 0.722 & 0.833 & 0.833 & 0.500 \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & 0.722 & 0.889 & 0.556 & \textbf{0.667} \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & 0.722 & \textbf{0.944} & \textbf{0.944} & 0.500 \\
+$\mathcal{F}_5$      & \textbf{0.933} & \textbf{0.933} & 0.950 & \textbf{0.850} \\
+\;\,$+$img           & 0.900 & 0.783 & 0.950 & 0.500 \\
+\;\,$+$morph         & 0.800 & 0.900 & 0.867 & 0.800 \\
+\;\,$+$both          & 0.817 & 0.833 & \textbf{0.983} & 0.500 \\
 \addlinespace[2pt]
-$\mathcal{F}_6$      & \textemdash & \textemdash & \textemdash & \textemdash & 0.333 & 0.333 & 0.500 & \textbf{0.500} \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & 0.444 & \textbf{0.444} & 0.500 & 0.333 \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & 0.389 & 0.278 & 0.444 & \textbf{0.500} \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.500} & \textbf{0.444} & \textbf{0.833} & 0.333 \\
+$\mathcal{F}_6$      & 0.800 & 0.700 & 0.850 & 0.817 \\
+\;\,$+$img           & 0.833 & 0.750 & 0.817 & 0.567 \\
+\;\,$+$morph         & 0.817 & 0.700 & 0.833 & \textbf{0.850} \\
+\;\,$+$both          & \textbf{0.850} & \textbf{0.800} & \textbf{0.917} & 0.567 \\
 \addlinespace[2pt]
-$\mathcal{F}_7$      & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.556} & 0.333 & 0.444 & 0.444 \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & 0.500 & 0.500 & \textbf{0.833} & 0.500 \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & 0.500 & 0.333 & 0.444 & \textbf{0.667} \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & 0.389 & \textbf{0.556} & \textbf{0.833} & 0.500 \\
+$\mathcal{F}_7$      & 0.817 & 0.700 & 0.833 & 0.667 \\
+\;\,$+$img           & \textbf{0.850} & 0.617 & \textbf{0.933} & 0.650 \\
+\;\,$+$morph         & \textbf{0.850} & 0.700 & 0.833 & \textbf{0.900} \\
+\;\,$+$both          & 0.800 & \textbf{0.733} & 0.917 & 0.717 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -970,141 +976,146 @@ $\mathcal{F}_7$ & 0.562 & 0.607 & 0.505 & \textbf{0.628} & \textemdash & \textem
 \end{tabular}
 \end{table}
 
-\textbf{External validation (two sites, OOD).}
+\textbf{External validation (merged cohort, OOD).}
 With all 301 internal patients as training, RF and DT retained strong
-Final Risk discrimination at both sites (best RF~AUROC 0.965 at Site~1
-and 1.000 at Site~2; Table~\ref{tab:phase2_ext}), confirming transfer to
-independent institutions.
-Consistent with Phase~1, the remaining per-site classification targets
-are constrained by class imbalance: several reduce to a single class
-(reported as accuracy) or rest on one to two positives, so their AUROCs
-are not interpretable (Table~\ref{tab:phase2_ext}).
-For survival, the RSF transferred to Site~2 (EFS C-index~0.586 over
-21 events; OS~0.705 over 6 deaths); the Site~1 RSF is omitted for OS
-(1 death) and rests on only 3 events for EFS.
+Final Risk discrimination on the pooled external cohort (best DT
+AUROC~0.968, RF~0.991 at $\mathcal{F}_7$; Table~\ref{tab:phase2_ext}),
+confirming transfer to an independent patient population.
+Pooling the two source hospitals also resolves the single-class
+collapse seen when they were evaluated separately: Relapse and D19MRD
+are now two-class across the full external cohort and AUROC-evaluable
+— best Relapse~0.583 (DT) / 0.528 (RF) and best D19MRD~0.628 (DT) /
+0.635 (RF; Table~\ref{tab:phase2_ext_summary}) — while D46MRD still
+has only one positive case after pooling and is reported as accuracy
+(DT~0.732, RF~0.976).
+For survival, the pooled cohort (24 EFS events, 7 deaths) gave best
+RSF C-indices of 0.608 (EFS, $\mathcal{F}_7$) and 0.718 (OS,
+$\mathcal{F}_1$/$\mathcal{F}_2$), with DT reaching 0.603 (EFS,
+$\mathcal{F}_1$) and 0.710 (OS, $\mathcal{F}_7$).
 
 \begin{table}[p]
-\caption{\textbf{Phase~2 out-of-distribution results on the two external
-sites, across all feature levels} (train~=~all 301 internal patients).
-Classification: DT / RF AUROC; $*$~= accuracy where the cohort is
-single-class. Survival (EFS, OS): survival-tree (DT) / RSF C-index.
-\textbf{Bold} marks the best feature level in each column.
-\textemdash{}: not evaluable (D19/D46MRD are inputs at $\mathcal{F}_7$;
-Ext-1 OS has 1 death). Ext-1: Lianyungang ($n=20$); Ext-2: Fudan
-($n=21$). Cohorts are small; indicative only. $\mathcal{F}_3^{+\text{m}}$:
-$\mathcal{F}_3$ plus the quantitative morphology features
-(Section~\ref{sec:imgmorph}).}
+\caption{\textbf{Phase~2 out-of-distribution results on the pooled
+external cohort, across all feature levels} (train~=~all 301 internal
+patients; test~=~the two source hospitals pooled into a single
+external cohort, $n$=41). Classification: DT / RF AUROC; $^*$~=
+accuracy (D46MRD has only one positive case after pooling, so accuracy
+is reported instead). Survival (EFS, OS): survival-tree (DT) /
+random-survival-forest (RSF) C-index. \textbf{Bold} marks the best
+feature level in each column. \textemdash{}: not evaluable (D19/D46MRD
+are inputs at $\mathcal{F}_7$). Pooled external cohort; small, indicative
+only. $\mathcal{F}_3^{+\text{m}}$: $\mathcal{F}_3$ plus the quantitative
+morphology features (Section~\ref{sec:imgmorph}).}
 \label{tab:phase2_ext}
 \centering
 \footnotesize
 \renewcommand{\arraystretch}{0.84}
 \setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}l cc cc@{}}
+\begin{tabular}{@{}l cc@{}}
 \toprule
- & \multicolumn{2}{c}{\textbf{Ext-1 (Lianyungang)}} & \multicolumn{2}{c}{\textbf{Ext-2 (Fudan)}} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}
-\textbf{Lv.} & DT & RF & DT & RF \\
+\textbf{Lv.} & DT & RF \\
 \midrule
-\multicolumn{5}{l}{\textit{Final Risk (DT / RF)}} \\
-$\mathcal{F}_1$ & 0.778 & 0.909 & 0.783 & 0.867 \\
-$\mathcal{F}_2$ & 0.788 & 0.848 & 0.817 & 0.878 \\
-$\mathcal{F}_3$ & 0.697 & 0.884 & 0.794 & 0.844 \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.697 & 0.778 & 0.794 & 0.833 \\
-$\mathcal{F}_4$ & 0.702 & 0.798 & 0.806 & 0.806 \\
-$\mathcal{F}_5$ & \textbf{0.939} & 0.949 & 0.900 & 0.933 \\
-$\mathcal{F}_6$ & 0.939 & 0.914 & 0.900 & 0.961 \\
-$\mathcal{F}_7$ & 0.914 & \textbf{0.965} & \textbf{1.000} & \textbf{1.000} \\
-\multicolumn{5}{l}{\textit{D19 MRD (DT / RF)}} \\
-$\mathcal{F}_1$ & 0.400$^*$ & \textbf{1.000$^*$} & \textbf{0.706} & 0.632 \\
-$\mathcal{F}_2$ & 0.400$^*$ & 1.000$^*$ & 0.581 & \textbf{0.750} \\
-$\mathcal{F}_3$ & \textbf{0.550$^*$} & 1.000$^*$ & 0.463 & 0.419 \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.350$^*$ & 1.000$^*$ & 0.382 & 0.449 \\
-$\mathcal{F}_4$ & 0.550$^*$ & 1.000$^*$ & 0.463 & 0.456 \\
-$\mathcal{F}_5$ & 0.350$^*$ & 1.000$^*$ & 0.522 & 0.426 \\
-$\mathcal{F}_6$ & 0.350$^*$ & 1.000$^*$ & 0.522 & 0.654 \\
-$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash \\
-\multicolumn{5}{l}{\textit{D46 MRD (DT / RF)}} \\
-$\mathcal{F}_1$ & \textbf{0.974} & 0.842 & 0.667$^*$ & \textbf{1.000$^*$} \\
-$\mathcal{F}_2$ & 0.974 & 0.947 & 0.524$^*$ & 1.000$^*$ \\
-$\mathcal{F}_3$ & 0.184 & 0.947 & \textbf{0.714$^*$} & 1.000$^*$ \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.553 & 0.895 & 0.524$^*$ & 1.000$^*$ \\
-$\mathcal{F}_4$ & 0.553 & 0.553 & 0.333$^*$ & 1.000$^*$ \\
-$\mathcal{F}_5$ & 0.184 & 0.947 & 0.714$^*$ & 1.000$^*$ \\
-$\mathcal{F}_6$ & 0.184 & \textbf{1.000} & 0.714$^*$ & 1.000$^*$ \\
-$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash \\
-\multicolumn{5}{l}{\textit{Relapse (DT / RF)}} \\
-$\mathcal{F}_1$ & \textbf{0.708} & 0.847 & 0.667$^*$ & 0.000$^*$ \\
-$\mathcal{F}_2$ & 0.431 & \textbf{0.861} & 0.143$^*$ & \textbf{0.048$^*$} \\
-$\mathcal{F}_3$ & 0.472 & 0.556 & 0.524$^*$ & 0.000$^*$ \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.444 & 0.806 & \textbf{0.762$^*$} & 0.000$^*$ \\
-$\mathcal{F}_4$ & 0.667 & 0.556 & 0.000$^*$ & 0.000$^*$ \\
-$\mathcal{F}_5$ & 0.472 & 0.778 & 0.524$^*$ & 0.000$^*$ \\
-$\mathcal{F}_6$ & 0.528 & 0.639 & 0.476$^*$ & 0.000$^*$ \\
-$\mathcal{F}_7$ & 0.583 & 0.750 & 0.476$^*$ & 0.000$^*$ \\
-\multicolumn{5}{l}{\textit{EFS (DT / RSF C-index)}} \\
-$\mathcal{F}_1$ & 0.667 & 0.762 & 0.483 & 0.562 \\
-$\mathcal{F}_2$ & 0.667 & 0.738 & 0.517 & \textbf{0.586} \\
-$\mathcal{F}_3$ & 0.512 & 0.833 & 0.475 & 0.493 \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.667 & 0.667 & 0.559 & 0.517 \\
-$\mathcal{F}_4$ & 0.560 & 0.643 & \textbf{0.571} & 0.542 \\
-$\mathcal{F}_5$ & 0.488 & 0.691 & 0.438 & 0.473 \\
-$\mathcal{F}_6$ & 0.488 & 0.714 & 0.438 & 0.453 \\
-$\mathcal{F}_7$ & \textbf{0.821} & \textbf{0.905} & 0.510 & 0.571 \\
-\multicolumn{5}{l}{\textit{OS (DT / RSF C-index)}} \\
-$\mathcal{F}_1$ & \textemdash & \textemdash & \textbf{0.705} & 0.686 \\
-$\mathcal{F}_2$ & \textemdash & \textemdash & 0.676 & 0.610 \\
-$\mathcal{F}_3$ & \textemdash & \textemdash & 0.681 & 0.562 \\
-$\mathcal{F}_3^{+\text{m}}$ & \textemdash & \textemdash & 0.681 & \textbf{0.705} \\
-$\mathcal{F}_4$ & \textemdash & \textemdash & 0.681 & 0.619 \\
-$\mathcal{F}_5$ & \textemdash & \textemdash & 0.657 & 0.600 \\
-$\mathcal{F}_6$ & \textemdash & \textemdash & 0.657 & 0.571 \\
-$\mathcal{F}_7$ & \textemdash & \textemdash & 0.690 & 0.657 \\
+\multicolumn{3}{l}{\textit{Final Risk (DT / RF)}} \\
+$\mathcal{F}_1$ & 0.805 & 0.878 \\
+$\mathcal{F}_2$ & 0.827 & 0.863 \\
+$\mathcal{F}_3$ & 0.779 & 0.843 \\
+$\mathcal{F}_3^{+\text{m}}$ & 0.779 & 0.799 \\
+$\mathcal{F}_4$ & 0.778 & 0.750 \\
+$\mathcal{F}_5$ & 0.912 & 0.938 \\
+$\mathcal{F}_6$ & 0.912 & 0.934 \\
+$\mathcal{F}_7$ & \textbf{0.968} & \textbf{0.991} \\
+\multicolumn{3}{l}{\textit{D19 MRD (DT / RF)}} \\
+$\mathcal{F}_1$ & \textbf{0.628} & 0.591 \\
+$\mathcal{F}_2$ & 0.466 & \textbf{0.635} \\
+$\mathcal{F}_3$ & 0.382 & 0.335 \\
+$\mathcal{F}_3^{+\text{m}}$ & 0.264 & 0.294 \\
+$\mathcal{F}_4$ & 0.382 & 0.341 \\
+$\mathcal{F}_5$ & 0.392 & 0.307 \\
+$\mathcal{F}_6$ & 0.392 & 0.453 \\
+$\mathcal{F}_7$ & \textemdash & \textemdash \\
+\multicolumn{3}{l}{\textit{D46 MRD (DT / RF)}} \\
+$\mathcal{F}_1$ & \textbf{0.732$^*$} & \textbf{0.976$^*$} \\
+$\mathcal{F}_2$ & 0.561$^*$ & 0.976$^*$ \\
+$\mathcal{F}_3$ & 0.488$^*$ & 0.976$^*$ \\
+$\mathcal{F}_3^{+\text{m}}$ & 0.342$^*$ & 0.976$^*$ \\
+$\mathcal{F}_4$ & 0.244$^*$ & 0.976$^*$ \\
+$\mathcal{F}_5$ & 0.488$^*$ & 0.976$^*$ \\
+$\mathcal{F}_6$ & 0.488$^*$ & 0.976$^*$ \\
+$\mathcal{F}_7$ & \textemdash & \textemdash \\
+\multicolumn{3}{l}{\textit{Relapse (DT / RF)}} \\
+$\mathcal{F}_1$ & \textbf{0.583} & \textbf{0.528} \\
+$\mathcal{F}_2$ & 0.397 & 0.494 \\
+$\mathcal{F}_3$ & 0.333 & 0.300 \\
+$\mathcal{F}_3^{+\text{m}}$ & 0.447 & 0.390 \\
+$\mathcal{F}_4$ & 0.525 & 0.272 \\
+$\mathcal{F}_5$ & 0.333 & 0.377 \\
+$\mathcal{F}_6$ & 0.219 & 0.267 \\
+$\mathcal{F}_7$ & 0.250 & 0.383 \\
+\multicolumn{3}{l}{\textit{EFS (DT / RSF C-index)}} \\
+$\mathcal{F}_1$ & \textbf{0.603} & 0.567 \\
+$\mathcal{F}_2$ & 0.552 & 0.572 \\
+$\mathcal{F}_3$ & 0.507 & 0.434 \\
+$\mathcal{F}_3^{+\text{m}}$ & 0.576 & 0.439 \\
+$\mathcal{F}_4$ & 0.509 & 0.475 \\
+$\mathcal{F}_5$ & 0.419 & 0.444 \\
+$\mathcal{F}_6$ & 0.419 & 0.439 \\
+$\mathcal{F}_7$ & 0.490 & \textbf{0.608} \\
+\multicolumn{3}{l}{\textit{OS (DT / RSF C-index)}} \\
+$\mathcal{F}_1$ & 0.619 & \textbf{0.718} \\
+$\mathcal{F}_2$ & 0.657 & 0.718 \\
+$\mathcal{F}_3$ & 0.571 & 0.468 \\
+$\mathcal{F}_3^{+\text{m}}$ & 0.587 & 0.659 \\
+$\mathcal{F}_4$ & 0.702 & 0.512 \\
+$\mathcal{F}_5$ & 0.647 & 0.556 \\
+$\mathcal{F}_6$ & 0.647 & 0.512 \\
+$\mathcal{F}_7$ & \textbf{0.710} & 0.643 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[t]
-\caption{\textbf{Method comparison on the two external sites}
-(out-of-distribution; no temporal split). Rows are methods: LLM
-zero-shot (Gemini, best feature level, evaluated per site); decision tree
-(DT, a survival tree for EFS/OS) and random forest (RF, RSF for EFS/OS),
-trained on all 301 internal patients. Classification: AUROC ($*$~=
-accuracy, single-class cohort); survival (EFS, OS): C-index.
-\textbf{Bold} marks the best method at each site. \textemdash{}: Ext-1 OS
-has 1 death (RSF omitted). Ext-1: Lianyungang ($n$=20); Ext-2: Fudan
-($n$=21). Full per-feature-level detail in Table~\ref{tab:phase2_ext}.}
+\caption{\textbf{Method comparison on the pooled external cohort}
+(out-of-distribution; no temporal split; the two source hospitals
+pooled into a single cohort, $n$=41). Rows are methods: LLM zero-shot
+(Gemini, best feature level); decision tree (DT, a survival tree for
+EFS/OS) and random forest (RF, RSF for EFS/OS), trained on all 301
+internal patients. Classification: AUROC ($^*$~= accuracy; D46MRD has
+only one positive case after pooling, so accuracy is reported instead);
+survival (EFS, OS): C-index. \textbf{Bold} marks the best method for
+each task. Pooled external cohort; small, indicative only. Full
+per-feature-level detail in Table~\ref{tab:phase2_ext}.}
 \label{tab:phase2_ext_summary}
 \centering
 \small
 \setlength{\tabcolsep}{7pt}
-\begin{tabular}{@{}l cc@{}}
+\begin{tabular}{@{}l c@{}}
 \toprule
-\textbf{Method} & \textbf{Ext-1 (Lianyungang)} & \textbf{Ext-2 (Fudan)} \\
+\textbf{Method} & \textbf{External} \\
+ & \footnotesize $n$=41 \\
 \midrule
-\multicolumn{3}{l}{\textit{Final Risk (AUROC)}} \\
-LLM (Gemini) & 0.900 & 0.933 \\
-DT & 0.939 & \textbf{1.000} \\
-RF & \textbf{0.965} & \textbf{1.000} \\
-\multicolumn{3}{l}{\textit{D19 MRD (AUROC)}} \\
-LLM (Gemini) & 0.750$^*$ & 0.515 \\
-DT & 0.550$^*$ & 0.706 \\
-RF & \textbf{1.000$^*$} & \textbf{0.750} \\
-\multicolumn{3}{l}{\textit{D46 MRD (AUROC)}} \\
-LLM (Gemini) & 0.357 & 0.714$^*$ \\
-DT & 0.974 & 0.714$^*$ \\
-RF & \textbf{1.000} & \textbf{1.000$^*$} \\
-\multicolumn{3}{l}{\textit{Relapse (AUROC)}} \\
-LLM (Gemini) & 0.750 & 0.429$^*$ \\
-DT & 0.708 & \textbf{0.762$^*$} \\
-RF & \textbf{0.861} & 0.048$^*$ \\
-\multicolumn{3}{l}{\textit{EFS (C-index)}} \\
-LLM (Gemini) & 0.690 & \textbf{0.741} \\
-DT & 0.821 & 0.571 \\
-RSF & \textbf{0.905} & 0.586 \\
-\multicolumn{3}{l}{\textit{OS (C-index)}} \\
-LLM (Gemini) & \textemdash & \textbf{0.829} \\
-DT & \textemdash & 0.705 \\
-RSF & \textemdash & 0.705 \\
+\multicolumn{2}{l}{\textit{Final Risk (AUROC)}} \\
+LLM (Gemini) & 0.925 \\
+DT & 0.968 \\
+RF & \textbf{0.991} \\
+\multicolumn{2}{l}{\textit{D19 MRD (AUROC)}} \\
+LLM (Gemini) & 0.550 \\
+DT & 0.628 \\
+RF & \textbf{0.635} \\
+\multicolumn{2}{l}{\textit{D46 MRD (accuracy)}} \\
+LLM (Gemini) & 0.690$^*$ \\
+DT & 0.732$^*$ \\
+RF & \textbf{0.976$^*$} \\
+\multicolumn{2}{l}{\textit{Relapse (AUROC)}} \\
+LLM (Gemini) & \textbf{0.717} \\
+DT & 0.583 \\
+RF & 0.528 \\
+\multicolumn{2}{l}{\textit{EFS (C-index)}} \\
+LLM (Gemini) & \textbf{0.715} \\
+DT & 0.603 \\
+RSF & 0.608 \\
+\multicolumn{2}{l}{\textit{OS (C-index)}} \\
+LLM (Gemini) & \textbf{0.810} \\
+DT & 0.710 \\
+RSF & 0.718 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1164,7 +1175,7 @@ is uninformative.
 \caption{Cosine RAG belief revision: RF AUROC before ($p_\text{RF}$) and
 after ($p_\text{rev}$) belief revision ($K=5$, $\alpha_\text{base}=0.6$),
 best experiment per task. Internal results are reported per temporal
-split; external results are pooled across both sites, as the per-site
+split; external results use the pooled external cohort, as the per-site
 external cohorts are too small or single-class for this analysis.
 \textbf{Bold}: largest gain. $\dagger$~insufficient positives; not
 computed.}
@@ -1190,7 +1201,7 @@ Relapse & Split~1 & 0.547 & 0.546 & $-0.001$ \\
 Relapse & Split~2 & 0.630 & 0.588 & $-0.042$ \\
 Relapse & Split~3 & 0.500 & 0.476 & $-0.024$ \\
 \midrule
-\multicolumn{5}{l}{\textit{External (pooled across both sites)}} \\
+\multicolumn{5}{l}{\textit{External (pooled cohort)}} \\
 Final Risk & --- & 0.991 & 1.000 & $+0.009$ \\
 D19MRD & --- & 0.335 & 0.270 & $-0.064$ \\
 D46MRD & --- & \multicolumn{3}{c}{$\dagger$ ($n_\text{pos}=1$)} \\
@@ -1294,10 +1305,12 @@ includes a meaningful understanding of paediatric ALL risk factors, and
 that LLMs may serve as strong priors when historical case databases are
 small or absent—for example, at the time a new treatment protocol is
 introduced.
-On external Site~1, LLM Final Risk AUROCs of 0.810--0.925 surpassed
-the internal zero-shot values for some models, likely due to differences
-in class distribution (larger IR/HR proportion in the external cohort)
-rather than genuine improvement in discriminative ability.
+On the merged external cohort, LLM Final Risk AUROCs at the best
+feature level ($\mathcal{F}_7$) ranged 0.750--0.925 across models,
+surpassing the internal zero-shot values for some models, likely due
+to differences in class distribution (larger IR/HR proportion in the
+external cohort) rather than genuine improvement in discriminative
+ability.
 
 \textbf{Imaging information: morphology text, not raw pixels.}
 The multimodal comparison (Section~\ref{sec:imgmorph}) shows an
@@ -1323,20 +1336,22 @@ morphometric text profile retains additive prognostic value even after
 molecular and MRD data arrive, while raw pixels do not.
 
 \textbf{External validation: generalisation and limitations.}
-Phase~2 RF Final Risk AUROC of 0.991 on External Site~1 (versus
-0.998 internally) demonstrates strong cross-site generalisation.
+Phase~2 RF Final Risk AUROC of 0.991 on the merged external cohort
+(versus 0.998 internally) demonstrates strong generalisation across
+independent institutions.
 However, D19MRD AUROC dropped from 0.807 (internal) to 0.635
 (external), indicating feature-distribution shift that partly limits
 generalisation for this target.
-The very low positive rate for D46MRD at the external site ($n=1$)
-precluded belief revision and produced unstable AUC estimates,
-highlighting the need for larger external cohorts with balanced
-outcome distributions.
-Both external sites are small (20 and 21 patients) and the Site~2
-referral cohort is relapse-enriched (all relapsed), so several per-site
-targets are single-class or event-sparse; larger, prospectively
-balanced external cohorts remain necessary for a definitive test of
-cross-site robustness.
+The single D46MRD-positive patient remaining after pooling ($n=1$ of
+29 labelled patients) precluded belief revision and produced unstable
+AUC estimates, highlighting the need for larger external cohorts with
+balanced outcome distributions.
+The pooled external cohort remains small (41 patients from two
+hospitals of 20 and 21) and includes a relapse-enriched referral
+sub-cohort (see Limitations), so some targets remain
+event-sparse even after pooling (e.g., D46MRD, $n=1$ positive);
+larger, prospectively balanced external cohorts remain necessary for
+a definitive test of cross-institution robustness.
 
 \textbf{Integrating six targets in a unified framework.}
 Treating EFS and OS as targets~5--6 of the same feature hierarchy—rather
@@ -1373,14 +1388,26 @@ Future multi-omics integration within the temporal feature hierarchy
 may improve relapse prediction.
 
 \textbf{Limitations.}
-Both cohorts are single-institution retrospective studies; multi-centre
-prospective validation is required before clinical deployment.
+The internal cohort is a single-institution retrospective study, and
+the external cohort—though pooled across two hospitals—remains small;
+multi-centre prospective validation at greater scale is required
+before clinical deployment.
 The internal cohort ($n=301$) limits statistical power for OS
 (24 events) and Split~3 ($n_\text{test}=17$).
 The imaging comparison is complete at all feature levels internally,
-but its external fair-comparison subsets are very small (Ext-1 $n=3$,
-Ext-2 $n=5$, with Ext-1 survival not evaluable for lack of events), so
-the imaging findings are internal-cohort evidence primarily.
+but its external fair-comparison subsets remain small (classification
+$n=8$, survival $n=13$); pooling now makes external survival
+evaluable across the full feature range, but the imaging findings
+should still be read primarily as internal-cohort evidence.
+The external cohort pools two hospitals, one of which (Fudan) is a
+relapse-enriched referral cohort in which all patients relapsed;
+the pooled external relapse rate is therefore far above that of an
+unselected ALL population, so external metrics—particularly for
+relapse—are exploratory rather than representative estimates;
+moreover, the complete-label subset used for the Phase~1
+classification metrics ($n{=}29$) is more skewed still (23 of 29
+relapsed, 79\%), because joint-label completeness retained all
+relapse-positive patients.
 Phase~1 LLMs were evaluated zero-shot; fine-tuning on labelled clinical
 data may yield further improvements.
 Physician evaluation of LLM narratives (Table~\ref{tab:narrative_eval})
@@ -1404,13 +1431,14 @@ haematological indices, immunophenotype, 51-marker flow cytometry panel,
 cytogenetics, MRD values) and bone marrow aspirate microscopy images
 (Giemsa-stained, $\sim$20 fields per patient).
 
-The external validation data were supplied as a single merged file
-spanning two independent institutions, distinguished by the recorded
-hospital field: External Site~1 (Lianyungang First People's Hospital;
-20 patients, 2019--2023) and External Site~2 (Children's Hospital of
-Fudan University, Shanghai; 21 patients, 2017--2021, a relapse-enriched
-referral cohort in which all patients relapsed); ethics approval:
-[ETHICS NUMBERS Ext-1, Ext-2]. We evaluate the two sites separately.
+The external validation cohort ($n=41$) was supplied as a single
+merged file spanning two source hospitals, distinguished by the
+recorded hospital field: Lianyungang First People's Hospital (20
+patients, 2019--2023) and Children's Hospital of Fudan University,
+Shanghai (21 patients, 2017--2021, a relapse-enriched referral cohort
+in which all patients relapsed); ethics approval: [ETHICS NUMBERS,
+external cohort]. We pool the two hospitals and evaluate the external
+cohort as a single group throughout (Section~\ref{sec:ood}).
 No external data were used in any model training.
 
 \subsection{Temporally-structured feature hierarchy}\label{sec:features}
@@ -1719,7 +1747,7 @@ training.
 cases generates predictions and decision paths; RAG retrieves the
 $K=5$ most similar cases; LLM synthesises a clinical narrative.
 \textbf{d,}~Evaluation scope: internal temporal splits (three splits) and
-external OOD validation (two independent sites).}
+external OOD validation (merged external cohort).}
 \label{fig:overview}
 \end{figure}
 
@@ -1733,7 +1761,7 @@ targets.}
 Vertical dashed lines indicate clinical timepoints: Day~1 (flow
 cytometry), Day~5 (early response), Day~7--10
 (cytogenetics), Day~46 (MRD, $\mathcal{F}_7$).
-Open symbols: internal cohort. Filled symbols: External Site~1.}
+Open symbols: internal cohort. Filled symbols: External cohort.}
 \label{fig:ablation}
 \end{figure}
 
@@ -1760,7 +1788,7 @@ temporal splits; shaded band: 95\% bootstrap CI for Split~3
 ($n_\text{test}=17$).
 \textbf{b,}~Training-set size vs AUROC for Final Risk and Relapse
 (DT and RF) at $\mathcal{F}_7$.
-\textbf{c,}~External Site~1 RF AUROC comparison with internal
+\textbf{c,}~External cohort RF AUROC comparison with internal
 Split~2 RF AUROC across all four classification tasks.}
 \label{fig:p2ablation}
 \end{figure}
@@ -1772,10 +1800,10 @@ C-index summary.}
 for the best Phase~1 model (Gemma, $\mathcal{F}_7$, internal cohort).
 \textbf{b,}~EFS KM curves for Phase~2 RSF (Split~2, $\mathcal{F}_7$,
 log-rank $p=0.010$).
-\textbf{c,}~OS KM curves for Phase~2 RSF on External Site~1
+\textbf{c,}~OS KM curves for Phase~2 RSF on the external cohort
 (log-rank $p=0.031$).
 \textbf{d,}~C-index heatmap: all LLMs $\times$ all feature levels
-for EFS (internal, left; Ext-1, right).
+for EFS (internal, left; external cohort, right).
 Numbers at risk and 95\% CI shown.}
 \label{fig:km}
 \end{figure}
@@ -1784,7 +1812,7 @@ Numbers at risk and 95\% CI shown.}
 \caption{\textbf{RAG belief revision and representative case narratives.}
 \textbf{a,}~AUROC before vs after belief revision across four tasks
 and three splits; point size proportional to training-set size.
-Filled points: internal; open points: External Site~1.
+Filled points: internal; open points: External cohort.
 \textbf{b--c,}~Two representative cases from $\mathcal{F}_7$/Split~3.
 For each case: patient feature summary, DT decision path, top-3
 retrieved similar historical cases with outcomes, and LLM-generated
