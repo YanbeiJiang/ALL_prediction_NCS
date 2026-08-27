@@ -1208,13 +1208,23 @@ but is counter-productive when class representation is too sparse to
 yield informative neighbours.
 
 \textbf{Survival belief revision.}
-For EFS and OS, belief revision was applied to normalised RSF risk
-scores using event indicators as binary outcomes.
-Effects were near-neutral for EFS (mean $\Delta$C-index $= -0.003$
-across splits) and slightly negative for OS
-(mean $\Delta$C-index $= -0.007$), where the low event rate
-(8\%) renders most retrieved neighbours censored and the RAG evidence
-is uninformative.
+Extending belief revision to EFS and OS requires handling censored
+neighbour outcomes.
+A naive adaptation that treats the event indicator as a binary outcome
+(ignoring censoring) is near-neutral to slightly negative
+(EFS mean $\Delta$C-index $-0.003$, OS $-0.007$).
+Replacing that evidence with a censoring-aware similarity-weighted
+Kaplan--Meier neighbourhood event probability at 24 months
+(Table~\ref{tab:belief_revision}, survival rows) instead applies the
+revision to the normalised RSF risk score and yields small but
+consistent gains: mean $\Delta$C-index $+0.006$ over all 70
+experiment$\times$split$\times$endpoint cells (Wilcoxon $p=0.001$),
+significant for internal EFS ($+0.006$, $p=0.004$), internal OS
+($+0.006$, $p=0.016$) and external OS ($+0.014$, $p=0.045$); external
+EFS was neutral.
+The gains are modest and concentrated in mid-ranked configurations—the
+best RSF models are already near-optimal and change little—consistent
+with belief revision helping most where the base model is imperfect.
 
 \begin{table}[ht]
 \caption{Cosine RAG belief revision: RF AUROC before ($p_\text{RF}$) and
@@ -1222,8 +1232,13 @@ after ($p_\text{rev}$) belief revision ($K=5$, $\alpha_\text{base}=0.6$),
 best experiment per task. Internal results are reported per temporal
 split; external results use the pooled external cohort, as the per-site
 external cohorts are too small or single-class for this analysis.
+For the survival endpoints (EFS, OS) the values are Harrell's C-index:
+base is the RSF risk score and the revision replaces the
+similarity-weighted binary-outcome mean by a similarity-weighted
+Kaplan--Meier neighbourhood event probability at 24 months
+(experiment~P2-Exp8, the MRD-augmented feature set).
 \textbf{Bold}: largest gain. $\dagger$~insufficient positives; not
-computed.}
+computed. \textemdash: too few events (OS, 2019 test split).}
 \label{tab:belief_revision}
 \centering
 \small
@@ -1245,12 +1260,24 @@ D46MRD & Split~3 & 0.655 & \textbf{0.881} & $\mathbf{+0.226}$ \\
 Relapse & Split~1 & 0.547 & 0.546 & $-0.001$ \\
 Relapse & Split~2 & 0.630 & 0.588 & $-0.042$ \\
 Relapse & Split~3 & 0.500 & 0.476 & $-0.024$ \\
+\addlinespace[2pt]
+\multicolumn{5}{l}{\quad\textit{Survival endpoints (C-index; RSF base vs KM revision)}} \\
+EFS & Split~1 & 0.684 & 0.704 & $+0.020$ \\
+EFS & Split~2 & 0.746 & 0.745 & $-0.001$ \\
+EFS & Split~3 & 0.691 & 0.706 & $+0.015$ \\
+OS & Split~1 & 0.607 & 0.617 & $+0.010$ \\
+OS & Split~2 & 0.629 & 0.634 & $+0.005$ \\
+OS & Split~3 & \multicolumn{3}{c}{\textemdash} \\
 \midrule
 \multicolumn{5}{l}{\textit{External (pooled cohort)}} \\
 Final Risk & --- & 0.991 & 1.000 & $+0.009$ \\
 D19MRD & --- & 0.335 & 0.270 & $-0.064$ \\
 D46MRD & --- & \multicolumn{3}{c}{$\dagger$ ($n_\text{pos}=1$)} \\
 Relapse & --- & 0.267 & 0.283 & $+0.016$ \\
+\addlinespace[2pt]
+\multicolumn{5}{l}{\quad\textit{Survival endpoints (C-index; RSF base vs KM revision)}} \\
+EFS & --- & 0.608 & 0.613 & $+0.005$ \\
+OS & --- & 0.643 & 0.659 & $+0.016$ \\
 \bottomrule
 \end{tabular}
 \end{table}
