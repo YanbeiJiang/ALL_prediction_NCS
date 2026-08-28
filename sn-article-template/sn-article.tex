@@ -501,13 +501,22 @@ $\mathcal{F}_5$--$\mathcal{F}_7$; deltas $-0.027$ to $+0.033$),
 whereas $+$img (9/20) and $+$both (6/20) are net neutral to harmful,
 and for OS no variant helps consistently (at best $+$morph, 8/20;
 $+$img degrades OS by up to $-0.235$).
-The morphology profile also strengthens the tabular Phase~2 models:
-adding the quantitative morphology features to $\mathcal{F}_3$ raised
-D19MRD to DT~AUROC~0.743 / RF~AUROC~0.807
-($\mathcal{F}_3^{+\text{m}}$, Table~\ref{tab:phase2_int_full}),
-showing that quantitative cell-level characterisation carries
-prognostic signal available already at diagnosis.
-These are unadjusted differences on a single internal cohort, without
+The morphology profile also augments the tabular Phase~2 random
+forest, but systematically across all five clinical levels
+($\mathcal{F}_3$--$\mathcal{F}_7$, Table~\ref{tab:phase2_morph}) the
+effect is not uniformly positive. On the internal temporal splits,
+adding the SHAP-selected morphology features leaves classification
+essentially unchanged on average (mean $\Delta$AUROC~$\approx-0.003$,
+Wilcoxon $p=0.86$) and significantly worsens survival discrimination
+(mean $\Delta$C-index~$=-0.052$, $p<0.001$; morph better in only
+8\% of level--task--split cells), consistent with the extra features
+overfitting the small temporal splits. On the pooled external
+cohort the pattern is different for survival: RSF C-index improves
+with morphology in 80\% of cells (mean $\Delta=+0.087$, $p=0.027$),
+while external classification stays neutral (mean
+$\Delta\approx-0.002$) — echoing the Phase~1 finding that morphology
+aids survival more than classification.
+The $+$img/$+$morph/$+$both comparisons above are unadjusted differences on a single internal cohort, without
 significance testing, and should be read as directional evidence; the
 external fair-comparison subsets (Tables~\ref{tab:imgmorph_ext_cls}
 and~\ref{tab:imgmorph_ext_surv}) are too small to confirm or refute
@@ -877,9 +886,10 @@ Final Risk DT AUROC rose from 0.810 at $\mathcal{F}_1$ to
 Including MRD at $\mathcal{F}_7$ further raised DT AUROC to
 \textbf{0.949} (RF:~0.998), the highest classification result across
 all conditions.
-D19MRD achieved DT AUROC~0.743 and RF AUROC~0.807 at $\mathcal{F}_3^{+\text{morph}}$,
-where the quantitative cell-morphology features from the pipeline
-augment the tabular model; D46MRD reached DT~0.671 and RF~0.636 at
+Systematically adding the SHAP-selected morphology features across
+$\mathcal{F}_3$--$\mathcal{F}_7$ (Table~\ref{tab:phase2_morph}) gives
+no consistent internal AUROC gain for D19MRD or the other
+classification tasks; D46MRD reached DT~0.671 and RF~0.636 at
 $\mathcal{F}_4$.
 Relapse prediction remained difficult for Phase~2 as for Phase~1
 (best DT AUROC~0.529, RF~0.630), mirroring the broader literature
@@ -919,15 +929,15 @@ DT & 0.893 & 0.949 & 0.979 \\
 RF & \textbf{0.996} & \textbf{0.998} & \textbf{1.000} \\
 \multicolumn{4}{l}{\textit{D19 MRD (AUROC)}} \\
 LLM (Gemini) & 0.651 & 0.745 & 0.560 \\
-DT & 0.555 & 0.743 & \textbf{0.893} \\
-RF & \textbf{0.696} & \textbf{0.853} & 0.833 \\
+DT & 0.555 & 0.725 & \textbf{0.893} \\
+RF & \textbf{0.668} & \textbf{0.853} & 0.833 \\
 \multicolumn{4}{l}{\textit{D46 MRD (AUROC)}} \\
 LLM (Gemini) & \textbf{0.614} & 0.632 & 0.560 \\
 DT & 0.545 & \textbf{0.671} & 0.464 \\
 RF & 0.597 & 0.636 & \textbf{0.655} \\
 \multicolumn{4}{l}{\textit{Relapse (AUROC)}} \\
 LLM (Gemini) & \textbf{0.593} & 0.589 & \textbf{0.786} \\
-DT & 0.559 & 0.529 & 0.500 \\
+DT & 0.550 & 0.529 & 0.500 \\
 RF & 0.591 & \textbf{0.630} & 0.500 \\
 \multicolumn{4}{l}{\textit{EFS (C-index)}} \\
 LLM (Gemini) & 0.661 & 0.674 & \textbf{0.772} \\
@@ -949,9 +959,7 @@ Table~\ref{tab:phase2_int}). Classification: DT / RF AUROC; survival
 the best feature level in each column. Splits by enrolment year: S1
 train~$\leq$16/test~17--19; S2 $\leq$17/18--19; S3 $\leq$18/19.
 \textemdash{}: not evaluable (D19/D46MRD are inputs at $\mathcal{F}_7$;
-no OS events in the 2019 test set). $\mathcal{F}_3^{+\text{m}}$:
-$\mathcal{F}_3$ plus the quantitative morphology features
-(Section~\ref{sec:imgmorph}).}
+no OS events in the 2019 test set).}
 \label{tab:phase2_int_full}
 \centering
 \footnotesize
@@ -967,7 +975,6 @@ $\mathcal{F}_3$ plus the quantitative morphology features
 $\mathcal{F}_1$ & 0.759 & 0.842 & 0.810 & 0.871 & 0.799 & 0.806 \\
 $\mathcal{F}_2$ & 0.759 & 0.820 & 0.810 & 0.830 & 0.778 & 0.847 \\
 $\mathcal{F}_3$ & 0.711 & 0.849 & 0.782 & 0.872 & 0.771 & 0.743 \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.731 & 0.878 & 0.784 & 0.875 & 0.771 & 0.750 \\
 $\mathcal{F}_4$ & 0.711 & 0.852 & 0.757 & 0.847 & 0.771 & 0.799 \\
 $\mathcal{F}_5$ & \textbf{0.893} & 0.897 & 0.909 & 0.943 & 0.736 & 0.847 \\
 $\mathcal{F}_6$ & 0.893 & 0.922 & 0.911 & 0.951 & 0.736 & 0.882 \\
@@ -976,25 +983,22 @@ $\mathcal{F}_7$ & 0.891 & \textbf{0.996} & \textbf{0.949} & \textbf{0.998} & \te
 $\mathcal{F}_1$ & 0.538 & 0.512 & 0.483 & 0.425 & 0.393 & 0.643 \\
 $\mathcal{F}_2$ & 0.497 & 0.487 & 0.495 & 0.495 & 0.464 & 0.667 \\
 $\mathcal{F}_3$ & \textbf{0.555} & 0.629 & 0.687 & 0.767 & \textbf{0.893} & \textbf{0.833} \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.555 & \textbf{0.696} & \textbf{0.743} & 0.807 & 0.821 & 0.774 \\
-$\mathcal{F}_4$ & 0.555 & 0.641 & 0.725 & \textbf{0.853} & 0.893 & 0.786 \\
-$\mathcal{F}_5$ & 0.555 & 0.668 & 0.687 & 0.764 & 0.750 & 0.738 \\
+$\mathcal{F}_4$ & 0.555 & 0.641 & \textbf{0.725} & \textbf{0.853} & 0.893 & 0.786 \\
+$\mathcal{F}_5$ & 0.555 & \textbf{0.668} & 0.687 & 0.764 & 0.750 & 0.738 \\
 $\mathcal{F}_6$ & 0.555 & 0.643 & 0.687 & 0.840 & 0.845 & 0.833 \\
 $\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
 \multicolumn{7}{l}{\textit{D46 MRD (DT / RF AUROC)}} \\
 $\mathcal{F}_1$ & 0.364 & 0.534 & 0.405 & 0.516 & \textbf{0.464} & 0.619 \\
 $\mathcal{F}_2$ & 0.519 & 0.396 & 0.405 & 0.533 & 0.321 & \textbf{0.655} \\
 $\mathcal{F}_3$ & \textbf{0.545} & 0.564 & 0.519 & 0.605 & 0.369 & 0.309 \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.477 & 0.580 & 0.514 & 0.525 & 0.417 & 0.524 \\
 $\mathcal{F}_4$ & 0.531 & 0.528 & \textbf{0.671} & \textbf{0.636} & 0.369 & 0.417 \\
 $\mathcal{F}_5$ & 0.545 & 0.555 & 0.548 & 0.550 & 0.369 & 0.167 \\
 $\mathcal{F}_6$ & 0.545 & \textbf{0.597} & 0.548 & 0.613 & 0.369 & 0.464 \\
 $\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
 \multicolumn{7}{l}{\textit{Relapse (DT / RF AUROC)}} \\
 $\mathcal{F}_1$ & 0.480 & 0.439 & \textbf{0.529} & 0.465 & 0.274 & 0.476 \\
-$\mathcal{F}_2$ & 0.550 & 0.546 & 0.483 & 0.526 & \textbf{0.500} & 0.357 \\
+$\mathcal{F}_2$ & \textbf{0.550} & 0.546 & 0.483 & 0.526 & \textbf{0.500} & 0.357 \\
 $\mathcal{F}_3$ & 0.528 & 0.483 & 0.411 & 0.485 & 0.286 & 0.274 \\
-$\mathcal{F}_3^{+\text{m}}$ & \textbf{0.559} & 0.516 & 0.411 & 0.561 & 0.333 & 0.202 \\
 $\mathcal{F}_4$ & 0.540 & 0.564 & 0.411 & 0.471 & 0.286 & 0.036 \\
 $\mathcal{F}_5$ & 0.527 & 0.517 & 0.411 & 0.624 & 0.286 & 0.286 \\
 $\mathcal{F}_6$ & 0.528 & 0.547 & 0.411 & \textbf{0.630} & 0.488 & \textbf{0.500} \\
@@ -1003,7 +1007,6 @@ $\mathcal{F}_7$ & 0.529 & \textbf{0.591} & 0.411 & 0.597 & 0.488 & 0.429 \\
 $\mathcal{F}_1$ & 0.468 & 0.532 & 0.443 & 0.610 & \textbf{0.691} & \textbf{0.706} \\
 $\mathcal{F}_2$ & 0.482 & 0.516 & 0.501 & 0.597 & 0.529 & 0.559 \\
 $\mathcal{F}_3$ & 0.527 & 0.542 & 0.477 & 0.552 & 0.390 & 0.500 \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.557 & 0.530 & 0.547 & 0.516 & 0.507 & 0.397 \\
 $\mathcal{F}_4$ & 0.546 & 0.520 & 0.482 & 0.533 & 0.426 & 0.485 \\
 $\mathcal{F}_5$ & 0.494 & 0.511 & 0.490 & 0.572 & 0.390 & 0.588 \\
 $\mathcal{F}_6$ & 0.497 & 0.560 & 0.485 & 0.592 & 0.390 & 0.662 \\
@@ -1012,7 +1015,6 @@ $\mathcal{F}_7$ & \textbf{0.674} & \textbf{0.684} & \textbf{0.718} & \textbf{0.7
 $\mathcal{F}_1$ & 0.541 & \textbf{0.688} & 0.531 & 0.497 & \textemdash & \textemdash \\
 $\mathcal{F}_2$ & 0.467 & 0.651 & 0.541 & 0.540 & \textemdash & \textemdash \\
 $\mathcal{F}_3$ & 0.512 & 0.556 & 0.440 & 0.515 & \textemdash & \textemdash \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.505 & 0.536 & 0.402 & 0.415 & \textemdash & \textemdash \\
 $\mathcal{F}_4$ & 0.498 & 0.590 & 0.472 & 0.529 & \textemdash & \textemdash \\
 $\mathcal{F}_5$ & 0.492 & 0.586 & 0.445 & 0.622 & \textemdash & \textemdash \\
 $\mathcal{F}_6$ & \textbf{0.562} & 0.621 & \textbf{0.562} & 0.620 & \textemdash & \textemdash \\
@@ -1048,8 +1050,7 @@ is reported instead). Survival (EFS, OS): survival-tree (DT) /
 random-survival-forest (RSF) C-index. \textbf{Bold} marks the best
 feature level in each column. \textemdash{}: not evaluable (D19/D46MRD
 are inputs at $\mathcal{F}_7$). Pooled external cohort; small, indicative
-only. $\mathcal{F}_3^{+\text{m}}$: $\mathcal{F}_3$ plus the quantitative
-morphology features (Section~\ref{sec:imgmorph}).}
+only.}
 \label{tab:phase2_ext}
 \centering
 \footnotesize
@@ -1063,7 +1064,6 @@ morphology features (Section~\ref{sec:imgmorph}).}
 $\mathcal{F}_1$ & 0.805 & 0.878 \\
 $\mathcal{F}_2$ & 0.827 & 0.863 \\
 $\mathcal{F}_3$ & 0.779 & 0.843 \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.779 & 0.799 \\
 $\mathcal{F}_4$ & 0.778 & 0.750 \\
 $\mathcal{F}_5$ & 0.912 & 0.938 \\
 $\mathcal{F}_6$ & 0.912 & 0.934 \\
@@ -1072,7 +1072,6 @@ $\mathcal{F}_7$ & \textbf{0.968} & \textbf{0.991} \\
 $\mathcal{F}_1$ & \textbf{0.628} & 0.591 \\
 $\mathcal{F}_2$ & 0.466 & \textbf{0.635} \\
 $\mathcal{F}_3$ & 0.382 & 0.335 \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.264 & 0.294 \\
 $\mathcal{F}_4$ & 0.382 & 0.341 \\
 $\mathcal{F}_5$ & 0.392 & 0.307 \\
 $\mathcal{F}_6$ & 0.392 & 0.453 \\
@@ -1081,7 +1080,6 @@ $\mathcal{F}_7$ & \textemdash & \textemdash \\
 $\mathcal{F}_1$ & \textbf{0.732$^*$} & \textbf{0.976$^*$} \\
 $\mathcal{F}_2$ & 0.561$^*$ & 0.976$^*$ \\
 $\mathcal{F}_3$ & 0.488$^*$ & 0.976$^*$ \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.342$^*$ & 0.976$^*$ \\
 $\mathcal{F}_4$ & 0.244$^*$ & 0.976$^*$ \\
 $\mathcal{F}_5$ & 0.488$^*$ & 0.976$^*$ \\
 $\mathcal{F}_6$ & 0.488$^*$ & 0.976$^*$ \\
@@ -1090,7 +1088,6 @@ $\mathcal{F}_7$ & \textemdash & \textemdash \\
 $\mathcal{F}_1$ & \textbf{0.583} & \textbf{0.528} \\
 $\mathcal{F}_2$ & 0.397 & 0.494 \\
 $\mathcal{F}_3$ & 0.333 & 0.300 \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.447 & 0.390 \\
 $\mathcal{F}_4$ & 0.525 & 0.272 \\
 $\mathcal{F}_5$ & 0.333 & 0.377 \\
 $\mathcal{F}_6$ & 0.219 & 0.267 \\
@@ -1099,7 +1096,6 @@ $\mathcal{F}_7$ & 0.250 & 0.383 \\
 $\mathcal{F}_1$ & \textbf{0.603} & 0.567 \\
 $\mathcal{F}_2$ & 0.552 & 0.572 \\
 $\mathcal{F}_3$ & 0.507 & 0.434 \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.576 & 0.439 \\
 $\mathcal{F}_4$ & 0.509 & 0.475 \\
 $\mathcal{F}_5$ & 0.419 & 0.444 \\
 $\mathcal{F}_6$ & 0.419 & 0.439 \\
@@ -1108,7 +1104,6 @@ $\mathcal{F}_7$ & 0.490 & \textbf{0.608} \\
 $\mathcal{F}_1$ & 0.619 & \textbf{0.718} \\
 $\mathcal{F}_2$ & 0.657 & 0.718 \\
 $\mathcal{F}_3$ & 0.571 & 0.468 \\
-$\mathcal{F}_3^{+\text{m}}$ & 0.587 & 0.659 \\
 $\mathcal{F}_4$ & 0.702 & 0.512 \\
 $\mathcal{F}_5$ & 0.647 & 0.556 \\
 $\mathcal{F}_6$ & 0.647 & 0.512 \\
@@ -1161,6 +1156,119 @@ RSF & 0.608 \\
 LLM (Gemini) & \textbf{0.810} \\
 DT & 0.710 \\
 RSF & 0.718 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[p]
+\caption{\textbf{Morphology information gain for the Phase~2 random forest
+across clinical feature levels.} For each base level $\mathcal{F}_k$
+($k=3\text{--}7$), the $+$morph row adds the SHAP-selected quantitative
+bone-marrow morphology features (Section~\ref{sec:imgmorph}); raw images
+cannot enter a tabular RF. Classification: RF AUROC; EFS/OS: RSF C-index.
+Columns are the three internal temporal splits and the pooled external
+cohort ($n$=41, indicative only). \textbf{Bold}: $+$morph exceeds the
+same-level base in that column. \textemdash: OS is not evaluable in the
+2019 test split (Split~3), which has no observed OS events. D19/D46MRD
+are shown only up to $\mathcal{F}_6$, as MRD status is an input feature
+at $\mathcal{F}_7$.}
+\label{tab:phase2_morph}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}ll cccc@{}}
+\toprule
+\textbf{Lv.} & & \textbf{Split~1} & \textbf{Split~2} & \textbf{Split~3} & \textbf{Ext} \\
+\midrule
+\multicolumn{6}{l}{\textit{Final Risk (RF AUROC)}} \\
+$\mathcal{F}_3$ & base & 0.849 & 0.872 & 0.743 & 0.843 \\
+& \;\,$+$morph & \textbf{0.859} & 0.868 & \textbf{0.854} & 0.799 \\
+\addlinespace[2pt]
+$\mathcal{F}_4$ & base & 0.852 & 0.847 & 0.799 & 0.750 \\
+& \;\,$+$morph & \textbf{0.874} & \textbf{0.859} & 0.729 & \textbf{0.808} \\
+\addlinespace[2pt]
+$\mathcal{F}_5$ & base & 0.897 & 0.943 & 0.847 & 0.938 \\
+& \;\,$+$morph & \textbf{0.916} & 0.932 & \textbf{0.882} & 0.913 \\
+\addlinespace[2pt]
+$\mathcal{F}_6$ & base & 0.922 & 0.951 & 0.882 & 0.934 \\
+& \;\,$+$morph & \textbf{0.926} & 0.938 & 0.882 & 0.914 \\
+\addlinespace[2pt]
+$\mathcal{F}_7$ & base & 0.996 & 0.998 & 1.000 & 0.991 \\
+& \;\,$+$morph & 0.994 & \textbf{0.999} & 1.000 & 0.976 \\
+\midrule
+\multicolumn{6}{l}{\textit{D19 MRD (RF AUROC)}} \\
+$\mathcal{F}_3$ & base & 0.629 & 0.767 & 0.833 & 0.335 \\
+& \;\,$+$morph & \textbf{0.704} & 0.754 & \textbf{0.881} & 0.294 \\
+\addlinespace[2pt]
+$\mathcal{F}_4$ & base & 0.641 & 0.853 & 0.786 & 0.341 \\
+& \;\,$+$morph & \textbf{0.709} & 0.841 & \textbf{0.833} & 0.277 \\
+\addlinespace[2pt]
+$\mathcal{F}_5$ & base & 0.668 & 0.764 & 0.738 & 0.307 \\
+& \;\,$+$morph & \textbf{0.689} & \textbf{0.785} & \textbf{0.881} & 0.307 \\
+\addlinespace[2pt]
+$\mathcal{F}_6$ & base & 0.643 & 0.840 & 0.833 & 0.453 \\
+& \;\,$+$morph & \textbf{0.712} & 0.766 & 0.762 & 0.182 \\
+\midrule
+\multicolumn{6}{l}{\textit{D46 MRD (RF AUROC)}} \\
+$\mathcal{F}_3$ & base & 0.564 & 0.605 & 0.310 & 0.975 \\
+& \;\,$+$morph & \textbf{0.606} & 0.470 & \textbf{0.393} & 0.925 \\
+\addlinespace[2pt]
+$\mathcal{F}_4$ & base & 0.528 & 0.636 & 0.417 & 0.725 \\
+& \;\,$+$morph & 0.527 & 0.595 & 0.286 & \textbf{0.925} \\
+\addlinespace[2pt]
+$\mathcal{F}_5$ & base & 0.555 & 0.550 & 0.167 & 0.975 \\
+& \;\,$+$morph & \textbf{0.609} & \textbf{0.558} & \textbf{0.452} & \textbf{0.988} \\
+\addlinespace[2pt]
+$\mathcal{F}_6$ & base & 0.597 & 0.613 & 0.464 & 1.000 \\
+& \;\,$+$morph & 0.576 & 0.468 & \textbf{0.595} & 0.938 \\
+\midrule
+\multicolumn{6}{l}{\textit{Relapse (RF AUROC)}} \\
+$\mathcal{F}_3$ & base & 0.483 & 0.485 & 0.274 & 0.300 \\
+& \;\,$+$morph & \textbf{0.521} & \textbf{0.497} & 0.143 & \textbf{0.390} \\
+\addlinespace[2pt]
+$\mathcal{F}_4$ & base & 0.564 & 0.471 & 0.036 & 0.272 \\
+& \;\,$+$morph & 0.530 & \textbf{0.506} & \textbf{0.167} & \textbf{0.337} \\
+\addlinespace[2pt]
+$\mathcal{F}_5$ & base & 0.517 & 0.624 & 0.286 & 0.377 \\
+& \;\,$+$morph & \textbf{0.533} & 0.522 & \textbf{0.333} & 0.373 \\
+\addlinespace[2pt]
+$\mathcal{F}_6$ & base & 0.547 & 0.630 & 0.500 & 0.267 \\
+& \;\,$+$morph & \textbf{0.556} & 0.519 & 0.345 & \textbf{0.333} \\
+\addlinespace[2pt]
+$\mathcal{F}_7$ & base & 0.591 & 0.597 & 0.429 & 0.383 \\
+& \;\,$+$morph & 0.491 & 0.430 & 0.214 & \textbf{0.449} \\
+\midrule
+\multicolumn{6}{l}{\textit{EFS (RSF C-index)}} \\
+$\mathcal{F}_3$ & base & 0.542 & 0.552 & 0.500 & 0.434 \\
+& \;\,$+$morph & 0.530 & 0.516 & 0.397 & \textbf{0.439} \\
+\addlinespace[2pt]
+$\mathcal{F}_4$ & base & 0.520 & 0.533 & 0.485 & 0.475 \\
+& \;\,$+$morph & 0.517 & \textbf{0.559} & 0.368 & 0.455 \\
+\addlinespace[2pt]
+$\mathcal{F}_5$ & base & 0.511 & 0.572 & 0.588 & 0.444 \\
+& \;\,$+$morph & \textbf{0.547} & 0.520 & 0.471 & 0.435 \\
+\addlinespace[2pt]
+$\mathcal{F}_6$ & base & 0.560 & 0.592 & 0.662 & 0.439 \\
+& \;\,$+$morph & 0.549 & 0.556 & 0.353 & \textbf{0.477} \\
+\addlinespace[2pt]
+$\mathcal{F}_7$ & base & 0.684 & 0.746 & 0.691 & 0.608 \\
+& \;\,$+$morph & 0.668 & 0.671 & 0.603 & \textbf{0.626} \\
+\midrule
+\multicolumn{6}{l}{\textit{OS (RSF C-index)}} \\
+$\mathcal{F}_3$ & base & 0.556 & 0.515 & \textemdash & 0.468 \\
+& \;\,$+$morph & 0.536 & 0.415 & \textemdash & \textbf{0.659} \\
+\addlinespace[2pt]
+$\mathcal{F}_4$ & base & 0.590 & 0.529 & \textemdash & 0.512 \\
+& \;\,$+$morph & 0.541 & 0.508 & \textemdash & \textbf{0.714} \\
+\addlinespace[2pt]
+$\mathcal{F}_5$ & base & 0.586 & 0.622 & \textemdash & 0.556 \\
+& \;\,$+$morph & 0.570 & 0.542 & \textemdash & \textbf{0.718} \\
+\addlinespace[2pt]
+$\mathcal{F}_6$ & base & 0.621 & 0.620 & \textemdash & 0.512 \\
+& \;\,$+$morph & 0.611 & 0.550 & \textemdash & \textbf{0.762} \\
+\addlinespace[2pt]
+$\mathcal{F}_7$ & base & 0.607 & 0.629 & \textemdash & 0.643 \\
+& \;\,$+$morph & 0.599 & 0.618 & \textemdash & \textbf{0.671} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1411,7 +1519,8 @@ molecular and MRD data arrive, while raw pixels do not.
 Phase~2 RF Final Risk AUROC of 0.991 on the merged external cohort
 (versus 0.998 internally) demonstrates strong generalisation across
 independent institutions.
-However, D19MRD AUROC dropped from 0.807 (internal) to 0.635
+However, D19MRD AUROC dropped from 0.853 (internal RF at
+$\mathcal{F}_4$, Split~2, Table~\ref{tab:phase2_int_full}) to 0.635
 (external), indicating feature-distribution shift that partly limits
 generalisation for this target.
 The single D46MRD-positive patient remaining after pooling ($n=1$ of
@@ -1847,8 +1956,10 @@ profile.
 \textbf{b,}~Representative segmented cells with BiomedCLIP cell-type
 assignments.
 \textbf{c,}~Predictive contribution of the morphology features in
-Phase~2: D19MRD DT/RF AUROC at $\mathcal{F}_3$ (no morphology) versus
-$\mathcal{F}_3^{+\text{morph}}$ (with morphology features).}
+Phase~2: base versus $+$morph RF AUROC for D19MRD at $\mathcal{F}_3$;
+the systematic base-vs-$+$morph comparison across all feature levels
+($\mathcal{F}_3$--$\mathcal{F}_7$, RF/RSF, internal and external) is
+in Table~\ref{tab:phase2_morph}.}
 \label{fig:morph}
 \end{figure}
 
