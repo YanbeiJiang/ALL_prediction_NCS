@@ -47,10 +47,9 @@
 Paediatric acute lymphoblastic leukaemia (ALL) is the most common
 childhood malignancy, yet 15--20\% of patients relapse after
 apparently successful treatment.
-Existing risk-stratification approaches operate on single-timepoint
-snapshots and have not been systematically evaluated across the full
-clinical decision timeline nor validated across multiple independent
-centres.
+Existing prediction models typically target a single endpoint at a
+single decision point and are rarely validated temporally or in
+independent centres.
 Here we present a temporally-structured prediction framework
 evaluated on six clinical targets simultaneously: four classification
 tasks (Final Risk, D19MRD, D46MRD, Relapse) and two survival endpoints
@@ -111,14 +110,16 @@ These rules do not fully exploit the information that
 accumulates during treatment, nor do they yield personalised
 probability estimates for future relapse or survival.
 Computational approaches promise to fill this gap, but most published
-models make simplifications that break down at the bedside: they treat
+models~\cite{[CITE:Pan2017],[CITE:He2022],[CITE:Mosquera2024],[CITE:Gurumurthy2025]}
+make simplifications that break down at the bedside: they treat
 outcome prediction as a static, single-shot problem, when in reality
 paediatric ALL management unfolds as a structured sequence of events in
 time.
 
 We argue that realistic clinical prediction is governed by three
-distinct and largely independent timelines, and that existing methods
-collapse or ignore all three.
+distinct and largely independent timelines, and that existing
+paediatric ALL models address them at most partially
+(Section~\ref{sec:related}).
 The first is the \emph{feature-acquisition timeline}: a patient's data
 do not arrive at once but in a fixed clinical order—white blood cell
 count and age at admission (Day~0), immunophenotype (Day~1),
@@ -172,6 +173,182 @@ belief revision that refines model probabilities and generates
 interpretable LLM clinical narratives; and (\textit{v})~multi-site
 external validation at independent centres that received no training
 data.
+
+%%==============================================================%%
+\section{Related work}\label{sec:related}
+%%==============================================================%%
+
+Table~\ref{tab:related} groups prior outcome-prediction studies into
+three families and contrasts them with this work along the dimensions
+introduced above.
+
+\textbf{Risk stratification and statistical models in paediatric ALL.}
+Contemporary risk assignment rests on protocol rules that combine
+presenting features, cytogenetics and early treatment response: the
+Children's Oncology Group scheme assigns four risk groups from age,
+white blood cell count, cytogenetics, day-14 marrow response and
+end-of-induction MRD~\cite{[CITE:Schultz2007]}, and large
+cooperative-group studies established flow-cytometric and PCR-based MRD
+as the strongest prognostic factor~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}.
+These schemes are defined by group-wise survival rather than by
+individual-level discrimination.
+Cox-regression nomograms add individual estimates for overall survival
+on registry data~\cite{[CITE:Mao2020],[CITE:Zhang2020],[CITE:Sang2026]}
+and for EFS in a 1,693-patient multicentre cohort~\cite{[CITE:He2022]},
+but they combine predictors from different time points in a single
+model and are validated on random splits of the same data source, even
+where the validation set is described as external.
+Two studies from the CCCG-ALL-2015 group use the same day-19 and
+day-46 MRD time points as our cohort, but report a weighted risk score
+without internal or external validation~\cite{[CITE:Liu2022TALL]} or
+associations with relapse rather than a predictive
+model~\cite{[CITE:Chen2025FrontPediatr]}.
+
+\textbf{Machine-learning and omics models in paediatric ALL.}
+Machine-learning studies have mostly predicted one endpoint at one
+decision point: random forests and boosting models for relapse from
+routine clinical variables~\cite{[CITE:Pan2017],[CITE:Mehrbakhsh2024],[CITE:Saravanan2026]},
+a random forest for EFS in Ph-like ALL~\cite{[CITE:Song2025]}, and a
+transformer survival model on registry variables~\cite{[CITE:Cui2025Transformer]}.
+Molecular and single-cell profiles add prognostic information in
+selected cohorts—gene-expression signatures~\cite{[CITE:Kang2010],[CITE:Fitter2021]},
+single-cell developmental states~\cite{[CITE:Good2018]}, exome
+variants~\cite{[CITE:Bohannan2022]}, DNA methylation~\cite{[CITE:Mosquera2024]}
+and RNA-seq subtypes~\cite{[CITE:Zhai2026]}—whereas computational
+flow-cytometry immunophenotyping at diagnosis failed to predict
+relapse~\cite{[CITE:Martinez2025]}.
+Cohort size alone does not guarantee discrimination: the largest
+relapse model in Table~\ref{tab:related}, PREPARE-ALL (2,252 patients),
+reached 68.5\% sensitivity at 50.3\% specificity~\cite{[CITE:Saravanan2026]}.
+The work closest to ours, clinTALL~\cite{[CITE:Stoiber2026]}, jointly
+predicts T-ALL subtypes, competing events and EFS with a multi-task
+network restricted to pre-induction variables; its features are not,
+however, organised along the acquisition timeline, and its outcome
+predictions were not quantitatively evaluated on the external cohorts
+beyond an eight-patient check.
+Validation in this literature is mostly by random split or
+cross-validation: a systematic review found external validation in only
+5 of 20 machine-learning models for paediatric haematological
+malignancies~\cite{[CITE:Gurumurthy2025]}, a meta-analysis of
+childhood-cancer prognosis models reported that no study had yet
+assessed AI-based models in haematological malignancies~\cite{[CITE:Varga2024]}, and
+among the paediatric ALL studies in Table~\ref{tab:related} only four
+use an independent cohort~\cite{[CITE:Kang2010],[CITE:Bohannan2022],[CITE:Mosquera2024],[CITE:Stoiber2026]}
+and none uses an enrolment-year temporal split.
+
+\textbf{Language models and retrieval for clinical prediction.}
+Language models have been used for outcome prediction mainly on adult
+hospital data.
+A clinical language model pretrained and fine-tuned on a health
+system's notes was validated temporally and in a prospective
+deployment~\cite{[CITE:Jiang2023NYUTron]}, and a generative transformer
+trained on tokenised patient timelines predicts several outcomes
+zero-shot~\cite{[CITE:Renc2024ETHOS]}.
+When general-purpose LLMs are prompted with serialised structured data,
+results depend on the comparator: on structured records, ClinicRealm
+found LLMs often ahead of conventional models trained on ten examples
+but behind fully trained ones~\cite{[CITE:Zhu2026ClinicRealm]}, whereas ClinicalBench and Brown
+et al.\ found prompted LLMs well below locally trained machine-learning
+models~\cite{[CITE:ClinicalBench2026],[CITE:Brown2025JAMIA]}.
+LLMs have also been used to extract prognostic features from clinical
+notes for a downstream survival model in adult cancer~\cite{[CITE:Kiermeyer2026]}.
+Retrieval augmentation has drawn either on similar patients—improving
+zero-shot prediction of emergency-department revisits without reaching
+a gradient-boosting baseline~\cite{[CITE:ChenPSB2026]}, yielding
+modest gains that did not close the gap to locally trained
+models~\cite{[CITE:Brown2025JAMIA]}, and supplying examples
+to a fine-tuned model~\cite{[CITE:Datta2026]}—or on external knowledge
+from the literature, knowledge graphs and
+textbooks~\cite{[CITE:Xu2024RAMEHR],[CITE:Zhu2024EMERGE],[CITE:Chen2025JMIR]}.
+None of these studies concerns paediatric oncology, and none uses
+retrieved cases to revise the probabilities of a trained tabular model
+or extends retrieval to censored survival outcomes.
+
+\textbf{Positioning of this work.}
+Relative to these families, our contribution lies less in any single
+model than in aligning data, targets and validation with the clinical
+timeline (Table~\ref{tab:related}): features are organised into seven
+nested levels that mirror data acquisition, six classification and
+survival targets are evaluated jointly on that hierarchy, trained
+models learn from a case database partitioned by enrolment year, and
+both zero-shot LLMs and trained models are tested without retraining on
+an external cohort from two hospitals.
+To our knowledge, no previous paediatric ALL study combines these
+elements.
+Our cohorts are, however, smaller than the cooperative-group and
+registry studies above, and prospective
+deployment~\cite{[CITE:Jiang2023NYUTron]} remains a stronger standard
+of validation than the retrospective temporal and external evaluation
+used here.
+
+\begin{table}[p]
+\caption{\textbf{Prior outcome-prediction studies grouped by family,
+compared with this work.}
+Data: Clin, clinical and laboratory variables; Cyto, cytogenetics or
+molecular genetics; MRD, minimal residual disease; Flow, flow
+cytometry; EHR, structured electronic health records; Notes, free-text
+clinical notes; KG, knowledge graph.
+Endpoints: $^\star$~modelled jointly by one model; otherwise separate
+models or a single endpoint.
+TL (timeline): $\checkmark$~only features available at the time of
+prediction; $\times$~features from different time points combined, or
+post-prediction variables included; part.~partially; nested~features
+organised into timeline-ordered nested levels and evaluated at each
+decision node.
+Validation: App.~apparent (no hold-out); Rand.~random split; CV
+cross-validation; Temp.~temporal split; Ext.~independent external
+cohort; Prosp.~prospective deployment; $^\ddagger$~the set described
+as independent or external comes from the same source; $^\S$~the
+external cohort was not used to evaluate outcome prediction.
+LLM: ZS~zero-shot prompting or generation; FT~domain-pretrained or
+fine-tuned language model; RAG~retrieval augmentation.}
+\label{tab:related}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
+\begin{tabular}{@{}llllllll@{}}
+\toprule
+\textbf{Study} & \textbf{Population ($n$)} & \textbf{Model} & \textbf{Data} & \textbf{Endpoints} & \textbf{TL} & \textbf{Validation} & \textbf{LLM} \\
+\midrule
+\multicolumn{8}{@{}l}{\textit{Paediatric ALL: risk-stratification rules and statistical models}} \\
+Schultz 2007~\cite{[CITE:Schultz2007]} & B-ALL (6,238) & Rule-based groups & Clin, Cyto, MRD & EFS & $\checkmark$ & App. & -- \\
+Borowitz 2008~\cite{[CITE:Borowitz2008]} & B-ALL (2,143) & Prognostic factors & Clin, MRD & EFS & $\checkmark$ & App. & -- \\
+Conter 2010~\cite{[CITE:Conter2010]} & BCP-ALL (3,184) & MRD-based rule & MRD & EFS & $\checkmark$ & App. & -- \\
+Mao 2020~\cite{[CITE:Mao2020]} & ALL (673 + 299) & Cox nomogram & Clin, Cyto, MRD & OS & $\times$ & Rand.$^\ddagger$ & -- \\
+He 2022~\cite{[CITE:He2022]} & ALL (1,693) & Cox nomogram & Clin, Cyto, MRD & EFS & $\times$ & Rand.$^\ddagger$ & -- \\
+Liu 2022~\cite{[CITE:Liu2022TALL]} & T-ALL (105) & Weighted score & Clin, Cyto, MRD & OS, EFS, RFS & $\checkmark$ & App. & -- \\
+Chen 2025~\cite{[CITE:Chen2025FrontPediatr]} & ALL (436) & Logistic regression & Clin, Cyto, MRD & Relapse & $\checkmark$ & App. & -- \\
+\addlinespace[2pt]
+\multicolumn{8}{@{}l}{\textit{Paediatric ALL: machine-learning and omics models}} \\
+Kang 2010~\cite{[CITE:Kang2010]} & B-ALL (207 + 84) & Expression classifiers & Transcriptome, Clin, MRD & RFS; day-29 MRD & part. & CV + Ext. & -- \\
+Pan 2017~\cite{[CITE:Pan2017]} & ALL (570) & Random forest & Clin & Relapse & $\times$ & Rand., CV & -- \\
+Good 2018~\cite{[CITE:Good2018]} & BCP-ALL (54) & Single-cell states + Cox & Mass cytometry, Clin & Relapse & $\checkmark$ & Rand.$^\ddagger$ & -- \\
+Bohannan 2022~\cite{[CITE:Bohannan2022]} & HR B-ALL (156) & Random survival forest & Exome & EFS & $\checkmark$ & Rand. + Ext.$^\S$ & -- \\
+Mehrbakhsh 2024~\cite{[CITE:Mehrbakhsh2024]} & ALL (161) & 10 ML classifiers & Clin & Death; relapse & $\checkmark$ & Rand. & -- \\
+Mosquera Orgueira 2024~\cite{[CITE:Mosquera2024]} & ALL (763 + 426) & Random survival forest & DNA methylation & RFS; OS & $\checkmark$ & Rand. + Ext. & -- \\
+Mart\'inez-Rubio 2025~\cite{[CITE:Martinez2025]} & B-ALL (188) & FlowSOM + ML & Flow & Relapse & $\checkmark$ & Nested CV & -- \\
+Song 2025~\cite{[CITE:Song2025]} & Ph-like ALL (226) & Random forest & Clin, MRD & EFS & $\times$ & Rand., CV$^\ddagger$ & -- \\
+Saravanan 2026~\cite{[CITE:Saravanan2026]} & ALL (2,252) & XGBoost & Clin, Cyto, MRD & Relapse & $\checkmark$ & Rand. & -- \\
+Zhai 2026~\cite{[CITE:Zhai2026]} & B-ALL (531) & RNA-seq groups + Cox & Transcriptome, Clin, MRD & EFS, OS & $\checkmark$ & App. & -- \\
+Stoiber 2026~\cite{[CITE:Stoiber2026]} & T-ALL (1,309 + 228) & Multi-task network & Clin, genome, transcriptome & Subtype, events, EFS$^\star$ & $\checkmark$ & CV + Ext.$^\S$ & -- \\
+\addlinespace[2pt]
+\multicolumn{8}{@{}l}{\textit{Language models and retrieval for clinical prediction (adult, non-leukaemia)}} \\
+Jiang 2023~\cite{[CITE:Jiang2023NYUTron]} & Adult inpatients & Clinical LM (NYUTron) & Notes & 5 tasks & $\checkmark$ & Temp. + Prosp. & FT \\
+Renc 2024~\cite{[CITE:Renc2024ETHOS]} & Adult (MIMIC-IV) & EHR transformer (ETHOS) & EHR events & Multiple$^\star$ & $\checkmark$ & Rand. & ZS \\
+Brown 2025~\cite{[CITE:Brown2025JAMIA]} & Adult (2 sites) & LLM vs boosted trees & EHR & 2 tasks & $\checkmark$ & CV, bootstrap & ZS, RAG \\
+Zhu 2026~\cite{[CITE:Zhu2026ClinicRealm]} & Adult (MIMIC, TJH) & LLM vs ML (ClinicRealm) & EHR & 3 tasks & $\checkmark$ & Rand. & ZS \\
+Chen 2026~\cite{[CITE:ClinicalBench2026]} & Adult (MIMIC) & LLM vs ML (ClinicalBench) & EHR codes as text & 3 tasks & $\checkmark$ & Rand. & ZS \\
+Chen 2026~\cite{[CITE:ChenPSB2026]} & Adult ED (87,112) & LLM vs LightGBM & EHR, Notes & ED revisit & $\checkmark$ & Temp. & ZS, RAG \\
+Datta 2026~\cite{[CITE:Datta2026]} & Adult ICU (MIMIC-III) & LLM + ML (KAMELEON) & EHR, Notes, KG & 2 tasks$^\star$ & part. & Rand. & FT, RAG \\
+Zhu 2024~\cite{[CITE:Zhu2024EMERGE]} & Adult ICU (MIMIC) & LLM + fusion (EMERGE) & EHR, Notes, KG & 2 tasks & $\checkmark$ & Rand. & RAG \\
+Kiermeyer 2026~\cite{[CITE:Kiermeyer2026]} & Adult cancer (3,522) & LLM features + RSF & Notes, TNM & OS & $\checkmark$ & CV & ZS \\
+\midrule
+\textbf{This work} & Paed.\ ALL (301 + 41) & LLMs; DT/RF/RSF; RAG & Clin, Flow, Cyto, MRD & 6 targets$^\star$ & nested & Temp. + Ext. & ZS, RAG \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
 
 %%==============================================================%%
 \section{Results}\label{sec:results}
@@ -875,7 +1052,8 @@ OS & --- & 0.643 & 0.659 & $+0.016$ \\
 After belief revision, an LLM prompt was constructed for each test
 patient containing: (i) the patient's serialised feature vector;
 (ii) the RF-predicted label, revised probability $p_\text{rev}$, and
-the human-readable DT decision path from root to leaf;
+the human-readable DT decision path from root to
+leaf~\cite{[CITE:Rudin2019]};
 (iii) the six patient-salient features ranked by
 $\text{importance}_j \times |z_{ij}|$;
 and (iv) the structured profiles and outcomes of the top-5 retrieved
@@ -945,7 +1123,7 @@ Several findings warrant discussion.
 The largest single performance gain in Phase~2—DT AUROC for Final Risk
 from 0.912 ($\mathcal{F}_6$, cytogenetics) to 0.949 ($\mathcal{F}_7$,
 plus D19/D46 MRD)—quantitatively confirms the central role of MRD
-in clinical risk stratification~\cite{[CITE:Conter2010]}.
+in clinical risk stratification~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}.
 The same pattern holds for LLM EFS C-index, which peaked at feature
 levels including MRD (Gemma: 0.716 at $\mathcal{F}_7$), and for
 Phase~2 RSF EFS (C-index~0.746, $p=0.010$).
@@ -964,6 +1142,13 @@ includes a meaningful understanding of paediatric ALL risk factors, and
 that LLMs may serve as strong priors when historical case databases are
 small or absent—for example, at the time a new treatment protocol is
 introduced.
+This conclusion is conditional on the comparator: with serialised
+structured data, prompted LLMs have often outperformed conventional
+models trained on few examples~\cite{[CITE:Zhu2026ClinicRealm]} but fallen
+well short of fully trained ones~\cite{[CITE:ClinicalBench2026],[CITE:Brown2025JAMIA]},
+and in our temporal splits the trained Phase~2 models outperform the
+zero-shot LLMs for most targets once a case database has accrued
+(Table~\ref{tab:phase2_int}).
 On the merged external cohort, LLM Final Risk BAs at the best
 feature level ($\mathcal{F}_7$) ranged 0.750--0.925 across models,
 surpassing the internal zero-shot values for some models, likely due
@@ -1023,8 +1208,11 @@ retrieved labels.
 \textbf{Relapse remains an open problem.}
 Relapse prediction was intractable for all Phase~1 and Phase~2 models
 (Split~2: best RF AUROC~0.630, DT~0.529; best LLM BA~0.643),
-consistent with the broader
-literature~\cite{[CITE:Martinez2025],[CITE:Good2018]}.
+consistent with the failure of computational flow cytometry at
+diagnosis~\cite{[CITE:Martinez2025]} and the modest discrimination of
+a large clinical relapse model~\cite{[CITE:Saravanan2026]}; stronger
+relapse signal has so far come mainly from single-cell and molecular
+profiles~\cite{[CITE:Good2018],[CITE:Mosquera2024]}.
 Our feature set does not include genomic or epigenomic data (e.g.,
 copy-number variation, DNA methylation), which have shown modest
 incremental utility~\cite{[CITE:Mosquera2024]}.
@@ -1451,35 +1639,29 @@ Pui, C.-H., Robison, L.L. \& Look, A.T.
 Acute lymphoblastic leukaemia.
 \textit{Lancet} \textbf{371}, 1030--1043 (2008).
 
-\bibitem{[CITE:Good2018]}
-Good, Z. et al.
-Single-cell developmental classification of B cell precursor acute
-lymphoblastic leukemia at diagnosis reveals predictors of relapse.
-\textit{Nat. Med.} \textbf{24}, 474--483 (2018).
-
-\bibitem{[CITE:Fitter2021]}
-Fitter, S. et al.
-CKLF and IL1B transcript levels at diagnosis are predictive of
-relapse in children with pre-B-cell acute lymphoblastic leukaemia.
-\textit{Br. J. Haematol.} \textbf{193}, 171--175 (2021).
-
-\bibitem{[CITE:Mosquera2024]}
-Mosquera Orgueira, A. et al.
-Refining risk prediction in pediatric acute lymphoblastic leukemia
-through DNA methylation profiling.
-\textit{Clin. Epigenetics} \textbf{16}, 53 (2024).
-
 \bibitem{[CITE:Pan2017]}
 Pan, L. et al.
 Machine learning applications for prediction of relapse in childhood
 acute lymphoblastic leukemia.
 \textit{Sci. Rep.} \textbf{7}, 7402 (2017).
 
-\bibitem{[CITE:Martinez2025]}
-Mart\'inez-Rubio, \'{A}. et al.
-Computational flow cytometry immunophenotyping at diagnosis is unable
-to predict relapse in childhood B-cell acute lymphoblastic leukemia.
-\textit{Comput. Biol. Med.} \textbf{185}, 109831 (2025).
+\bibitem{[CITE:He2022]}
+He, Y.-Y. et al.
+A nomogram for predicting event-free survival in childhood acute
+lymphoblastic leukemia: a multicenter retrospective study.
+\textit{Front. Oncol.} \textbf{12}, 854798 (2022).
+
+\bibitem{[CITE:Mosquera2024]}
+Mosquera Orgueira, A. et al.
+Refining risk prediction in pediatric acute lymphoblastic leukemia
+through DNA methylation profiling.
+\textit{Clin. Epigenetics} \textbf{16}, 49 (2024).
+
+\bibitem{[CITE:Gurumurthy2025]}
+Gurumurthy, G., Gurumurthy, J. \& Gurumurthy, S.
+Machine learning in paediatric haematological malignancies: a
+systematic review of prognosis, toxicity and treatment response models.
+\textit{Pediatr. Res.} \textbf{97}, 524--531 (2025).
 
 \bibitem{[CITE:Steyerberg2019]}
 Steyerberg, E.W.
@@ -1490,8 +1672,21 @@ Phaterpekar, T. et al.
 Investigating fine-tuning versus zero-shot learning for general large
 language models when predicting cancer survival from initial oncology
 consultation documents.
-\textit{ESMO Real World Data Digit. Oncol.} (2026).
-doi:10.1016/j.esmorw.2026.100703.
+\textit{ESMO Real World Data Digit. Oncol.} \textbf{12}, 100703 (2026).
+
+\bibitem{[CITE:Schultz2007]}
+Schultz, K.R. et al.
+Risk- and response-based classification of childhood B-precursor acute
+lymphoblastic leukemia: a combined analysis of prognostic markers from
+the Pediatric Oncology Group (POG) and Children's Cancer Group (CCG).
+\textit{Blood} \textbf{109}, 926--935 (2007).
+
+\bibitem{[CITE:Borowitz2008]}
+Borowitz, M.J. et al.
+Clinical significance of minimal residual disease in childhood acute
+lymphoblastic leukemia and its relationship to other prognostic
+factors: a Children's Oncology Group study.
+\textit{Blood} \textbf{111}, 5477--5485 (2008).
 
 \bibitem{[CITE:Conter2010]}
 Conter, V. et al.
@@ -1500,11 +1695,179 @@ children and adolescents with B-cell precursor acute lymphoblastic
 leukemia: results in 3184 patients of the AIEOP-BFM ALL 2000 study.
 \textit{Blood} \textbf{115}, 3206--3214 (2010).
 
-\bibitem{[CITE:Rudin2019]}
-Rudin, C.
-Stop explaining black box machine learning models for high stakes
-decisions and use interpretable models instead.
-\textit{Nat. Mach. Intell.} \textbf{1}, 206--215 (2019).
+\bibitem{[CITE:Mao2020]}
+Mao, R. et al.
+Prognostic nomogram for childhood acute lymphoblastic leukemia: a
+comprehensive analysis of 673 patients.
+\textit{Front. Oncol.} \textbf{10}, 1673 (2020).
+
+\bibitem{[CITE:Zhang2020]}
+Zhang, D. et al.
+A nomogram for the prediction of progression and overall survival in
+childhood acute lymphoblastic leukemia.
+\textit{Front. Oncol.} \textbf{10}, 1550 (2020).
+
+\bibitem{[CITE:Sang2026]}
+Sang, Y. et al.
+Construction of nomogram for the clinical outcome for pediatric acute
+lymphoblastic leukemia patients.
+\textit{Medicine (Baltimore)} \textbf{105}, e50259 (2026).
+
+\bibitem{[CITE:Liu2022TALL]}
+Liu, X. et al.
+A novel risk defining system for pediatric T-cell acute lymphoblastic
+leukemia from CCCG-ALL-2015 group.
+\textit{Front. Oncol.} \textbf{12}, 841179 (2022).
+
+\bibitem{[CITE:Chen2025FrontPediatr]}
+Chen, X. et al.
+Pediatric acute lymphoblastic leukemia relapse and prognosis: key
+predictors and therapeutic implications.
+\textit{Front. Pediatr.} \textbf{13}, 1710578 (2025).
+
+\bibitem{[CITE:Mehrbakhsh2024]}
+Mehrbakhsh, Z. et al.
+Machine learning-based evaluation of prognostic factors for mortality
+and relapse in patients with acute lymphoblastic leukemia: a
+comparative simulation study.
+\textit{BMC Med. Inform. Decis. Mak.} \textbf{24}, 261 (2024).
+
+\bibitem{[CITE:Saravanan2026]}
+Saravanan, S. et al.
+PREPARE ALL: an artificial intelligence tool for predicting relapse in
+children with acute lymphoblastic leukemia.
+\textit{JCO Clin. Cancer Inform.} \textbf{10}, e2500222 (2026).
+
+\bibitem{[CITE:Song2025]}
+Song, X.-D. et al.
+Survival prediction for Philadelphia chromosome-like acute
+lymphoblastic leukemia by machine learning analysis: a multicenter
+cohort study.
+\textit{Front. Cell Dev. Biol.} \textbf{13}, 1650810 (2025).
+
+\bibitem{[CITE:Cui2025Transformer]}
+Cui, Y. et al.
+Explainable transformer-based deep survival analysis in childhood
+acute lymphoblastic leukemia.
+\textit{Comput. Biol. Med.} \textbf{191}, 110118 (2025).
+
+\bibitem{[CITE:Kang2010]}
+Kang, H. et al.
+Gene expression classifiers for relapse-free survival and minimal
+residual disease improve risk classification and outcome prediction in
+pediatric B-precursor acute lymphoblastic leukemia.
+\textit{Blood} \textbf{115}, 1394--1405 (2010).
+
+\bibitem{[CITE:Fitter2021]}
+Fitter, S. et al.
+CKLF and IL1B transcript levels at diagnosis are predictive of
+relapse in children with pre-B-cell acute lymphoblastic leukaemia.
+\textit{Br. J. Haematol.} \textbf{193}, 171--175 (2021).
+
+\bibitem{[CITE:Good2018]}
+Good, Z. et al.
+Single-cell developmental classification of B cell precursor acute
+lymphoblastic leukemia at diagnosis reveals predictors of relapse.
+\textit{Nat. Med.} \textbf{24}, 474--483 (2018).
+
+\bibitem{[CITE:Bohannan2022]}
+Bohannan, Z.S., Coffman, F. \& Mitrofanova, A.
+Random survival forest model identifies novel biomarkers of event-free
+survival in high-risk pediatric acute lymphoblastic leukemia.
+\textit{Comput. Struct. Biotechnol. J.} \textbf{20}, 583--597 (2022).
+
+\bibitem{[CITE:Zhai2026]}
+Zhai, Y., Yuan, H. \& Kong, L.
+RNA-seq molecular risk classification refines prognostic
+stratification in childhood B-cell acute lymphoblastic leukemia
+treated with the CCCG-ALL-2020 protocol: a real-world cohort study.
+\textit{Pediatr. Blood Cancer} \textbf{73}, e70548 (2026).
+
+\bibitem{[CITE:Martinez2025]}
+Mart\'inez-Rubio, \'{A}. et al.
+Computational flow cytometry immunophenotyping at diagnosis is unable
+to predict relapse in childhood B-cell acute lymphoblastic leukemia.
+\textit{Comput. Biol. Med.} \textbf{188}, 109831 (2025).
+
+\bibitem{[CITE:Stoiber2026]}
+Stoiber, L. et al.
+clinTALL: machine learning-driven multimodal subtype classification
+and treatment outcome prediction in pediatric T-ALL.
+\textit{Genome Med.} \textbf{18}, 108 (2026).
+
+\bibitem{[CITE:Varga2024]}
+Varga, P. et al.
+From simple factors to artificial intelligence: evolution of prognosis
+prediction in childhood cancer: a systematic review and meta-analysis.
+\textit{eClinicalMedicine} \textbf{78}, 102902 (2024).
+
+\bibitem{[CITE:Jiang2023NYUTron]}
+Jiang, L.Y. et al.
+Health system-scale language models are all-purpose prediction engines.
+\textit{Nature} \textbf{619}, 357--362 (2023).
+
+\bibitem{[CITE:Renc2024ETHOS]}
+Renc, P. et al.
+Zero shot health trajectory prediction using transformer.
+\textit{npj Digit. Med.} \textbf{7}, 256 (2024).
+
+\bibitem{[CITE:Zhu2026ClinicRealm]}
+Zhu, Y. et al.
+ClinicRealm: re-evaluating large language models with conventional
+machine learning for non-generative clinical prediction tasks.
+\textit{npj Digit. Med.} \textbf{9}, 319 (2026).
+
+\bibitem{[CITE:ClinicalBench2026]}
+Chen, C. et al.
+ClinicalBench: can LLMs beat traditional ML models in clinical
+prediction?
+In \textit{Proc. 32nd ACM SIGKDD Conference on Knowledge Discovery and
+Data Mining} 10567--10577 (2026).
+
+\bibitem{[CITE:Brown2025JAMIA]}
+Brown, K.E. et al.
+Large language models are less effective at clinical prediction tasks
+than locally trained machine learning models.
+\textit{J. Am. Med. Inform. Assoc.} \textbf{32}, 811--822 (2025).
+
+\bibitem{[CITE:Kiermeyer2026]}
+Kiermeyer, N. et al.
+Large language models enable prognostic stratification of cancer
+patients using real-world clinical notes.
+\textit{PLOS Digit. Health} \textbf{5}, e0001546 (2026).
+
+\bibitem{[CITE:ChenPSB2026]}
+Chen, E. et al.
+Evaluation of large language models as emergency department revisit
+predictors.
+\textit{Pac. Symp. Biocomput.} \textbf{31}, 130--143 (2026).
+
+\bibitem{[CITE:Datta2026]}
+Datta, R. et al.
+Knowledge-augmented large language model for multimodal electronic
+health record--based risk prediction: development and validation study.
+\textit{JMIR AI} \textbf{5}, e88356 (2026).
+
+\bibitem{[CITE:Xu2024RAMEHR]}
+Xu, R. et al.
+RAM-EHR: retrieval augmentation meets clinical predictions on
+electronic health records.
+In \textit{Proc. 62nd Annual Meeting of the Association for
+Computational Linguistics (Volume 2: Short Papers)} 754--765 (2024).
+
+\bibitem{[CITE:Zhu2024EMERGE]}
+Zhu, Y. et al.
+EMERGE: enhancing multimodal electronic health records predictive
+modeling with retrieval-augmented generation.
+In \textit{Proc. 33rd ACM International Conference on Information and
+Knowledge Management (CIKM)} 3549--3559 (2024).
+
+\bibitem{[CITE:Chen2025JMIR]}
+Chen, Y.-H., Ruan, S.-J. \& Chen, P.-f.
+Predicting 30-day postoperative mortality and American Society of
+Anesthesiologists physical status using retrieval-augmented large
+language models: development and validation study.
+\textit{J. Med. Internet Res.} \textbf{27}, e75052 (2025).
 
 \bibitem{[CITE:vLLM]}
 Kwon, W. et al.
@@ -1512,16 +1875,22 @@ Efficient memory management for large language model serving with
 PagedAttention.
 \textit{Proc. ACM SOSP} (2023).
 
-\bibitem{[CITE:Uno2011]}
-Uno, H. et al.
-On the C-statistics for evaluating overall adequacy of risk prediction
-procedures with censored survival data.
-\textit{Stat. Med.} \textbf{30}, 1105--1117 (2011).
+\bibitem{[CITE:Rudin2019]}
+Rudin, C.
+Stop explaining black box machine learning models for high stakes
+decisions and use interpretable models instead.
+\textit{Nat. Mach. Intell.} \textbf{1}, 206--215 (2019).
 
 \bibitem{[CITE:Ishwaran2008]}
 Ishwaran, H. et al.
 Random survival forests.
 \textit{Ann. Appl. Stat.} \textbf{2}, 841--860 (2008).
+
+\bibitem{[CITE:Uno2011]}
+Uno, H. et al.
+On the C-statistics for evaluating overall adequacy of risk prediction
+procedures with censored survival data.
+\textit{Stat. Med.} \textbf{30}, 1105--1117 (2011).
 
 \bibitem{[CITE:sklearn]}
 Pedregosa, F. et al.
