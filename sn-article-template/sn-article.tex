@@ -19,8 +19,8 @@
 %%==============================================================%%
 %% Title
 %%==============================================================%%
-\title[Temporal multimodal ALL prediction]{%
-  Temporally-structured multimodal prediction across six clinical
+\title[Temporal ALL prediction]{%
+  Temporally-structured prediction across six clinical
   targets in paediatric acute lymphoblastic leukaemia}
 
 %%==============================================================%%
@@ -51,17 +51,12 @@ Existing risk-stratification approaches operate on single-timepoint
 snapshots and have not been systematically evaluated across the full
 clinical decision timeline nor validated across multiple independent
 centres.
-Here we present a temporally-structured multimodal prediction framework
+Here we present a temporally-structured prediction framework
 evaluated on six clinical targets simultaneously: four classification
 tasks (Final Risk, D19MRD, D46MRD, Relapse) and two survival endpoints
 (event-free survival, EFS; overall survival, OS), whose feature sets
 are strictly aligned with the clinical data-acquisition timeline from
 hospital admission to Day~46.
-An automated morphology pipeline converts bone marrow smear images
-into structured cell-level profiles, and we systematically test—at
-every feature level—whether raw images or derived morphology add
-predictive signal beyond the clinical features—signal that current
-risk-stratification rules leave unused.
 Phase~1 evaluates four large language models (LLMs) in a zero-shot
 setting; Phase~2 trains decision trees, random forests, and random
 survival forests on a temporally partitioned case database.
@@ -81,7 +76,7 @@ makes Relapse and D19MRD two-class and evaluable, although the
 cohort remains small and, because one source hospital is a
 relapse-enriched referral series, external relapse metrics are
 exploratory.
-This framework demonstrates that temporally stratified multimodal
+This framework demonstrates that temporally stratified
 learning, aligned with clinical workflows, enables consistent
 multi-target prediction that generalises to independent cohorts.
 }
@@ -112,7 +107,7 @@ Current standard-of-care risk stratification—Initial Risk at
 diagnosis and Final Risk after the Day~46 induction assessment—relies
 on pre-specified categorical cut-offs for age, white blood cell count,
 cytogenetics, immunophenotype, and minimal residual disease (MRD).
-These rules do not fully exploit the multimodal information that
+These rules do not fully exploit the information that
 accumulates during treatment, nor do they yield personalised
 probability estimates for future relapse or survival.
 Computational approaches promise to fill this gap, but most published
@@ -164,28 +159,17 @@ prospective deployment as the data-accumulation timeline advances.
 A retrieval-augmented generation (RAG) component then leverages the
 accumulated database to apply a similarity-weighted belief revision to
 model probabilities and to generate interpretable clinical narratives.
-In parallel, an automated bone marrow morphology pipeline (SAM~3
-text-prompted cell segmentation, rule-based nucleated-cell filtering
-and per-cell morphometry) converts smear images
-into a structured cell-morphology profile, letting us test—at every
-level of the clinical feature hierarchy—whether imaging adds
-prognostic information that current risk rules and prior computational
-studies leave unused.
 
 Our contributions are: (\textit{i})~a seven-level, three-timeline
 clinical feature-and-target hierarchy aligned with the clinical
 workflow; (\textit{ii})~Phase~1, a systematic zero-shot evaluation of
 four LLMs across all feature levels and all six prediction targets,
-establishing training-free baselines; (\textit{iii})~a systematic
-test of whether bone marrow smear images—unused by current
-risk-stratification rules—add predictive signal beyond clinical
-features, finding that a structured morphology profile derived from
-the images carries relapse-relevant signal at diagnosis; (\textit{iv})~Phase~2, a decision
+establishing training-free baselines; (\textit{iii})~Phase~2, a decision
 tree, random forest, and random survival forest system trained on a
 dynamic case database partitioned by enrolment year and validated
-under three temporal splits; (\textit{v})~a cosine-similarity RAG
+under three temporal splits; (\textit{iv})~a cosine-similarity RAG
 belief revision that refines model probabilities and generates
-interpretable LLM clinical narratives; and (\textit{vi})~multi-site
+interpretable LLM clinical narratives; and (\textit{v})~multi-site
 external validation at independent centres that received no training
 data.
 
@@ -242,11 +226,7 @@ The External cohort pools patients from two independent hospitals
 $\dagger$~patients with complete labels
 for all four classification targets.
 MRD percentages are of patients with a recorded value (internal
-D19MRD $n=299$, D46MRD $n=298$; external $n=29$ and $n=31$).
-$\ddagger$~patients with at least one nucleated cell retained by the
-automated pipeline from the diagnostic smear (retained cells are
-treated as blasts; Methods); only these enter the imaging analysis
-(Section~\ref{sec:imgmorph}).}
+D19MRD $n=299$, D46MRD $n=298$; external $n=29$ and $n=31$).}
 \label{tab:cohort}
 \centering
 \small
@@ -270,11 +250,6 @@ D46MRD $\geq 0.01\%$ & 29 (9.7\%) & 1 \\
 \multicolumn{3}{l}{\textit{Survival endpoints}} \\
 EFS events & 75 (24.9\%) & 24 (58.5\%) \\
 OS events & 24 (8.0\%) & 7 (17.1\%) \\
-\midrule
-\multicolumn{3}{l}{\textit{Multimodal data}} \\
-Bone marrow images & 299 (99.3\%) & 41 \\
-Morphology features & 287 (95.3\%) & 40 \\
-\;\,non-empty morphology profile$^\ddagger$ & 221 (73.4\%) & 13 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -465,422 +440,6 @@ $\mathcal{F}_7$ & 0.802 & 0.615 & \textbf{0.859} & 0.665 \\
 \end{table}
 
 %%--------------------------------------------------------------%%
-\subsection{Testing whether bone marrow imaging adds prognostic
-information beyond clinical features}
-\label{sec:imgmorph}
-%%--------------------------------------------------------------%%
-
-Bone marrow smear microscopy is performed for every ALL patient at
-diagnosis, yet current risk-stratification rules use only the blast
-percentage derived from it—the images themselves enter no downstream
-risk calculation, and prior computational studies of paediatric ALL
-risk have likewise not tested whether the images carry additional
-prognostic signal.
-We therefore evaluate, at every clinical feature level
-$\mathcal{F}_3$--$\mathcal{F}_7$, three ways of injecting imaging
-information into the zero-shot LLMs:
-($+$img)~the raw smear images as direct multimodal input;
-($+$morph)~a structured morphology profile generated by a four-stage
-automated pipeline (SAM~3 segmentation, nucleated-cell filtering,
-$\sim$40 morphological descriptors per cell, and per-patient
-aggregation into 17 summary descriptors; Methods,
-Section~\ref{sec:morph}), serialised as text;
-($+$both)~images and profile together.
-To keep comparisons fair, each level's base row is re-evaluated on the
-same patient subset as its imaging variants (patients with a non-empty
-morphology profile).
-Table~\ref{tab:imgmorph_int} reports the internal cohort;
-Tables~\ref{tab:imgmorph_ext_cls} and~\ref{tab:imgmorph_ext_surv}
-report the merged external cohort.
-
-With the comparison now complete at all five levels, the clearest and
-most consistent internal-cohort gain is for relapse prediction from
-the morphology profile: $+$morph improves Relapse BA over base for
-a majority of models (3--4 of 4) at three of the five levels (4/4 at
-$\mathcal{F}_3$ and $\mathcal{F}_5$, 3/4 at $\mathcal{F}_6$), with
-per-model deltas ranging from $-0.043$ to $+0.070$ across levels.
-Raw images help less reliably: $+$img improves Final Risk for 3/4
-models at $\mathcal{F}_3$ and $\mathcal{F}_6$ but for at most 2/4 at
-the other levels, and improves Relapse for only 1/4 models at
-$\mathcal{F}_3$--$\mathcal{F}_5$ (4/4 at $\mathcal{F}_6$).
-At $\mathcal{F}_7$, where the D19/D46 MRD measurements are already
-inputs, the morphology profile still adds Final Risk signal—improving
-all four models ($+0.005$ to $+0.102$)—whereas raw images degrade
-Final Risk for all four ($-0.034$ to $-0.005$); Relapse changes at
-$\mathcal{F}_7$ are small for every variant ($-0.019$ to $+0.027$).
-For survival, $+$morph is again the only variant with a consistent
-benefit: it improves EFS over base in 15 of 20 model--level
-comparisons (4/4 models at $\mathcal{F}_4$, 3/4 at
-$\mathcal{F}_5$--$\mathcal{F}_7$; deltas $-0.027$ to $+0.033$),
-whereas $+$img (9/20) and $+$both (6/20) are net neutral to harmful,
-and for OS no variant helps consistently (at best $+$morph, 8/20;
-$+$img degrades OS by up to $-0.235$).
-The same 17 morphology descriptors also augment the tabular Phase~2
-random forest (without any label-based feature selection), but
-systematically across all five clinical levels
-($\mathcal{F}_3$--$\mathcal{F}_7$, Table~\ref{tab:phase2_morph}) the
-effect is not uniformly positive. On the internal temporal splits,
-adding them leaves classification essentially unchanged on average
-(mean $\Delta$AUROC~$=+0.002$, Wilcoxon $p=0.65$) and significantly
-worsens survival discrimination (mean $\Delta$C-index~$=-0.061$,
-$p=0.001$; morph better in only 28\% of level--endpoint--split cells),
-consistent with the extra features overfitting the small temporal
-splits. On the pooled external cohort, RSF C-index improves with
-morphology in 8 of 10 level--endpoint cells (mean $\Delta=+0.087$),
-although this does not reach significance ($p=0.064$), while external
-classification stays neutral (mean $\Delta=+0.004$) — directionally
-echoing the Phase~1 finding that morphology aids survival more than
-classification.
-The $+$img/$+$morph/$+$both comparisons above are unadjusted differences on a single internal cohort, without
-significance testing, and should be read as directional evidence; the
-external fair-comparison subsets (Tables~\ref{tab:imgmorph_ext_cls}
-and~\ref{tab:imgmorph_ext_surv}) are too small to confirm or refute
-them.
-
-\begin{table}[p]
-\caption{\textbf{Information gain from bone marrow imaging at every
-clinical feature level (internal cohort).} For each base level
-$\mathcal{F}_k$ ($k=3..7$): $+$img adds raw smear images, $+$morph the
-structured morphology profile, $+$both adds both. Classification
-targets: BA; EFS/OS: C-index. Base rows are re-evaluated on the
-subset of patients with a non-empty automated morphology profile
-(at least one nucleated cell retained by the pipeline), so they can differ slightly
-from Table~\ref{tab:phase1_full}. \textbf{Bold}: best variant within
-each level block (per model column; ties all bolded). \textemdash: not
-applicable (D19/D46MRD are inputs at $\mathcal{F}_7$).}
-\label{tab:imgmorph_int}
-\centering
-\tiny
-\renewcommand{\arraystretch}{0.5}
-\setlength{\tabcolsep}{3.5pt}
-\begin{tabular}{@{}l cccc @{\hskip 1.2em} l cccc@{}}
-\toprule
- & Gm & Gma & Iv & Qw & & Gm & Gma & Iv & Qw \\
-\midrule
-\multicolumn{5}{l}{\textit{Final Risk (BA)}} & \multicolumn{5}{l}{\textit{Relapse (BA)}} \\
-$\mathcal{F}_3$      & 0.792 & 0.827 & 0.558 & 0.812 & $\mathcal{F}_3$      & 0.543 & 0.532 & 0.505 & 0.481 \\
-\;\,$+$img           & \textbf{0.801} & 0.823 & \textbf{0.561} & \textbf{0.822} & \;\,$+$img           & 0.484 & 0.513 & 0.484 & 0.486 \\
-\;\,$+$morph         & 0.759 & \textbf{0.833} & 0.546 & 0.798 & \;\,$+$morph         & \textbf{0.565} & \textbf{0.535} & \textbf{0.511} & \textbf{0.521} \\
-\;\,$+$both          & 0.767 & 0.811 & 0.552 & 0.769 & \;\,$+$both          & 0.554 & 0.497 & 0.503 & 0.510 \\
-\addlinespace[2pt]
-$\mathcal{F}_4$      & \textbf{0.811} & 0.822 & 0.560 & 0.817 & $\mathcal{F}_4$      & 0.540 & 0.511 & 0.484 & \textbf{0.536} \\
-\;\,$+$img           & 0.757 & \textbf{0.823} & 0.579 & 0.809 & \;\,$+$img           & 0.508 & \textbf{0.524} & 0.465 & 0.490 \\
-\;\,$+$morph         & 0.782 & 0.821 & \textbf{0.616} & \textbf{0.839} & \;\,$+$morph         & 0.557 & 0.468 & 0.511 & 0.515 \\
-\;\,$+$both          & 0.776 & 0.794 & 0.577 & 0.800 & \;\,$+$both          & \textbf{0.562} & 0.508 & \textbf{0.516} & 0.508 \\
-\addlinespace[2pt]
-$\mathcal{F}_5$      & 0.783 & 0.839 & 0.804 & 0.827 & $\mathcal{F}_5$      & 0.602 & 0.546 & 0.540 & 0.502 \\
-\;\,$+$img           & 0.763 & 0.806 & \textbf{0.840} & 0.812 & \;\,$+$img           & 0.586 & 0.513 & 0.557 & 0.491 \\
-\;\,$+$morph         & 0.784 & 0.779 & 0.795 & \textbf{0.843} & \;\,$+$morph         & \textbf{0.616} & \textbf{0.594} & \textbf{0.581} & 0.550 \\
-\;\,$+$both          & \textbf{0.788} & \textbf{0.844} & 0.775 & 0.795 & \;\,$+$both          & \textbf{0.616} & 0.551 & 0.530 & \textbf{0.572} \\
-\addlinespace[2pt]
-$\mathcal{F}_6$      & 0.818 & 0.872 & 0.832 & 0.874 & $\mathcal{F}_6$      & 0.546 & 0.479 & 0.618 & 0.486 \\
-\;\,$+$img           & \textbf{0.840} & 0.880 & \textbf{0.838} & 0.873 & \;\,$+$img           & \textbf{0.624} & 0.495 & \textbf{0.621} & \textbf{0.505} \\
-\;\,$+$morph         & 0.820 & 0.875 & 0.800 & \textbf{0.876} & \;\,$+$morph         & 0.616 & \textbf{0.527} & 0.602 & 0.492 \\
-\;\,$+$both          & 0.821 & \textbf{0.881} & 0.822 & 0.862 & \;\,$+$both          & 0.600 & 0.508 & 0.565 & 0.502 \\
-\addlinespace[2pt]
-$\mathcal{F}_7$      & 0.837 & 0.761 & 0.699 & 0.852 & $\mathcal{F}_7$      & \textbf{0.589} & 0.591 & 0.559 & 0.564 \\
-\;\,$+$img           & 0.803 & 0.745 & 0.694 & 0.832 & \;\,$+$img           & \textbf{0.589} & \textbf{0.597} & 0.567 & \textbf{0.578} \\
-\;\,$+$morph         & \textbf{0.842} & \textbf{0.770} & \textbf{0.801} & \textbf{0.858} & \;\,$+$morph         & \textbf{0.589} & 0.573 & 0.557 & 0.564 \\
-\;\,$+$both          & 0.786 & 0.731 & 0.715 & 0.765 & \;\,$+$both          & 0.575 & 0.581 & \textbf{0.586} & \textbf{0.578} \\
-\addlinespace[2pt]
-Avg & \textbf{0.808} & \textbf{0.824} & 0.691 & 0.836 & Avg & 0.564 & 0.532 & 0.541 & 0.514 \\
-\;\,$+$img & 0.793 & 0.815 & 0.702 & 0.830 & \;\,$+$img & 0.558 & 0.528 & 0.539 & 0.510 \\
-\;\,$+$morph & 0.797 & 0.816 & \textbf{0.712} & \textbf{0.843} & \;\,$+$morph & \textbf{0.588} & \textbf{0.539} & \textbf{0.552} & 0.529 \\
-\;\,$+$both & 0.787 & 0.812 & 0.688 & 0.798 & \;\,$+$both & 0.581 & 0.529 & 0.540 & \textbf{0.534} \\
-\midrule
-\multicolumn{5}{l}{\textit{D19 MRD (BA)}} & \multicolumn{5}{l}{\textit{EFS (C-index)}} \\
-$\mathcal{F}_3$      & \textbf{0.615} & 0.608 & 0.478 & 0.575 & $\mathcal{F}_3$      & 0.550 & 0.585 & \textbf{0.513} & 0.532 \\
-\;\,$+$img           & 0.590 & \textbf{0.704} & 0.499 & \textbf{0.644} & \;\,$+$img           & 0.580 & 0.575 & 0.448 & \textbf{0.552} \\
-\;\,$+$morph         & 0.538 & 0.677 & 0.488 & 0.412 & \;\,$+$morph         & 0.567 & \textbf{0.593} & 0.496 & 0.525 \\
-\;\,$+$both          & 0.579 & 0.643 & \textbf{0.512} & 0.461 & \;\,$+$both          & \textbf{0.602} & 0.576 & 0.452 & 0.522 \\
-\addlinespace[2pt]
-$\mathcal{F}_4$      & 0.591 & 0.606 & 0.478 & 0.519 & $\mathcal{F}_4$      & 0.559 & 0.584 & 0.484 & 0.555 \\
-\;\,$+$img           & \textbf{0.626} & 0.642 & \textbf{0.508} & 0.548 & \;\,$+$img           & \textbf{0.612} & \textbf{0.600} & 0.456 & \textbf{0.572} \\
-\;\,$+$morph         & 0.609 & \textbf{0.658} & 0.493 & \textbf{0.613} & \;\,$+$morph         & 0.568 & 0.585 & \textbf{0.502} & 0.560 \\
-\;\,$+$both          & 0.584 & 0.586 & \textbf{0.508} & 0.536 & \;\,$+$both          & 0.577 & 0.589 & 0.470 & 0.547 \\
-\addlinespace[2pt]
-$\mathcal{F}_5$      & 0.612 & 0.632 & \textbf{0.574} & \textbf{0.644} & $\mathcal{F}_5$      & 0.608 & 0.552 & \textbf{0.574} & 0.520 \\
-\;\,$+$img           & 0.615 & 0.636 & 0.504 & 0.606 & \;\,$+$img           & 0.585 & 0.577 & 0.473 & 0.500 \\
-\;\,$+$morph         & \textbf{0.655} & 0.608 & 0.538 & 0.611 & \;\,$+$morph         & \textbf{0.609} & \textbf{0.585} & 0.574 & \textbf{0.535} \\
-\;\,$+$both          & 0.644 & \textbf{0.655} & 0.501 & 0.589 & \;\,$+$both          & 0.584 & 0.582 & 0.570 & 0.503 \\
-\addlinespace[2pt]
-$\mathcal{F}_6$      & 0.678 & 0.669 & 0.560 & 0.606 & $\mathcal{F}_6$      & 0.625 & \textbf{0.613} & 0.606 & 0.547 \\
-\;\,$+$img           & 0.660 & \textbf{0.694} & \textbf{0.590} & \textbf{0.679} & \;\,$+$img           & 0.602 & 0.598 & 0.556 & 0.550 \\
-\;\,$+$morph         & 0.636 & 0.684 & 0.556 & 0.591 & \;\,$+$morph         & \textbf{0.650} & 0.586 & \textbf{0.610} & 0.577 \\
-\;\,$+$both          & \textbf{0.720} & 0.684 & 0.563 & 0.627 & \;\,$+$both          & 0.624 & 0.585 & 0.578 & \textbf{0.593} \\
-\addlinespace[2pt]
-$\mathcal{F}_7$      & \textemdash & \textemdash & \textemdash & \textemdash & $\mathcal{F}_7$      & 0.658 & 0.700 & 0.615 & 0.622 \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & \;\,$+$img           & 0.659 & 0.668 & 0.518 & \textbf{0.631} \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & \;\,$+$morph         & \textbf{0.667} & \textbf{0.701} & \textbf{0.636} & 0.621 \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & \;\,$+$both          & 0.666 & 0.650 & 0.545 & 0.599 \\
-\addlinespace[2pt]
-Avg & 0.624 & 0.629 & 0.522 & 0.586 & Avg & 0.600 & 0.607 & 0.558 & 0.555 \\
-\;\,$+$img & 0.623 & \textbf{0.669} & \textbf{0.525} & \textbf{0.619} & \;\,$+$img & 0.608 & 0.604 & 0.490 & 0.561 \\
-\;\,$+$morph & 0.609 & 0.657 & 0.519 & 0.557 & \;\,$+$morph & \textbf{0.612} & \textbf{0.610} & \textbf{0.563} & \textbf{0.564} \\
-\;\,$+$both & \textbf{0.632} & 0.642 & 0.521 & 0.553 & \;\,$+$both & 0.610 & 0.596 & 0.523 & 0.553 \\
-\midrule
-\multicolumn{5}{l}{\textit{D46 MRD (BA)}} & \multicolumn{5}{l}{\textit{OS (C-index)}} \\
-$\mathcal{F}_3$      & 0.501 & 0.488 & 0.498 & 0.488 & $\mathcal{F}_3$      & 0.684 & 0.630 & \textbf{0.482} & 0.622 \\
-\;\,$+$img           & 0.516 & 0.524 & \textbf{0.506} & 0.498 & \;\,$+$img           & 0.672 & 0.639 & 0.343 & 0.584 \\
-\;\,$+$morph         & 0.535 & 0.505 & 0.505 & 0.519 & \;\,$+$morph         & 0.634 & 0.633 & 0.460 & 0.595 \\
-\;\,$+$both          & \textbf{0.560} & \textbf{0.589} & 0.420 & \textbf{0.547} & \;\,$+$both          & \textbf{0.687} & \textbf{0.647} & 0.430 & \textbf{0.637} \\
-\addlinespace[2pt]
-$\mathcal{F}_4$      & \textbf{0.509} & 0.529 & 0.495 & \textbf{0.558} & $\mathcal{F}_4$      & 0.705 & \textbf{0.663} & \textbf{0.439} & 0.639 \\
-\;\,$+$img           & 0.501 & 0.551 & 0.508 & 0.546 & \;\,$+$img           & 0.672 & 0.635 & 0.387 & 0.576 \\
-\;\,$+$morph         & 0.505 & 0.546 & 0.477 & 0.485 & \;\,$+$morph         & 0.660 & 0.652 & 0.430 & \textbf{0.677} \\
-\;\,$+$both          & 0.502 & \textbf{0.582} & \textbf{0.521} & 0.493 & \;\,$+$both          & \textbf{0.714} & 0.649 & 0.366 & 0.600 \\
-\addlinespace[2pt]
-$\mathcal{F}_5$      & 0.525 & 0.565 & 0.494 & 0.560 & $\mathcal{F}_5$      & 0.695 & \textbf{0.701} & \textbf{0.720} & 0.602 \\
-\;\,$+$img           & \textbf{0.626} & 0.504 & 0.529 & 0.496 & \;\,$+$img           & 0.682 & 0.622 & 0.485 & 0.509 \\
-\;\,$+$morph         & 0.598 & 0.508 & \textbf{0.542} & 0.488 & \;\,$+$morph         & \textbf{0.728} & 0.670 & 0.712 & \textbf{0.620} \\
-\;\,$+$both          & 0.578 & \textbf{0.570} & 0.466 & \textbf{0.572} & \;\,$+$both          & 0.683 & 0.602 & 0.691 & 0.530 \\
-\addlinespace[2pt]
-$\mathcal{F}_6$      & 0.606 & 0.524 & \textbf{0.536} & 0.503 & $\mathcal{F}_6$      & 0.658 & 0.683 & \textbf{0.742} & \textbf{0.665} \\
-\;\,$+$img           & 0.604 & 0.565 & 0.499 & 0.497 & \;\,$+$img           & 0.656 & 0.633 & 0.580 & 0.588 \\
-\;\,$+$morph         & \textbf{0.685} & \textbf{0.592} & 0.487 & \textbf{0.528} & \;\,$+$morph         & 0.675 & \textbf{0.701} & 0.704 & 0.638 \\
-\;\,$+$both          & 0.679 & 0.531 & 0.511 & 0.471 & \;\,$+$both          & \textbf{0.680} & 0.658 & 0.680 & 0.583 \\
-\addlinespace[2pt]
-$\mathcal{F}_7$      & \textemdash & \textemdash & \textemdash & \textemdash & $\mathcal{F}_7$      & 0.680 & 0.698 & \textbf{0.752} & 0.668 \\
-\;\,$+$img           & \textemdash & \textemdash & \textemdash & \textemdash & \;\,$+$img           & 0.669 & \textbf{0.718} & 0.532 & 0.677 \\
-\;\,$+$morph         & \textemdash & \textemdash & \textemdash & \textemdash & \;\,$+$morph         & \textbf{0.702} & 0.693 & 0.739 & \textbf{0.685} \\
-\;\,$+$both          & \textemdash & \textemdash & \textemdash & \textemdash & \;\,$+$both          & 0.699 & 0.694 & 0.639 & 0.678 \\
-\addlinespace[2pt]
-Avg & 0.535 & 0.526 & 0.506 & \textbf{0.527} & Avg & 0.684 & \textbf{0.675} & \textbf{0.627} & 0.639 \\
-\;\,$+$img & 0.561 & 0.536 & \textbf{0.510} & 0.509 & \;\,$+$img & 0.670 & 0.649 & 0.465 & 0.587 \\
-\;\,$+$morph & \textbf{0.581} & 0.538 & 0.503 & 0.505 & \;\,$+$morph & 0.680 & 0.670 & 0.609 & \textbf{0.643} \\
-\;\,$+$both & 0.580 & \textbf{0.568} & 0.479 & 0.521 & \;\,$+$both & \textbf{0.692} & 0.650 & 0.561 & 0.605 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[p]
-\caption{\textbf{Information gain from bone marrow imaging at every
-clinical feature level, external classification tasks (merged external
-cohort).} Gm/Gma/Iv/Qw =
-Gemini/Gemma/InternVL/Qwen. For each base level $\mathcal{F}_k$
-($k=3..7$ for Final Risk and Relapse, $k=3..6$ for D19/D46MRD): $+$img
-adds raw smear images, $+$morph the structured morphology profile,
-$+$both adds both. BA ($^*$~= accuracy, single-class task/level).
-Base rows are re-evaluated on the morphology-available patient subset,
-so they can differ slightly from Table~\ref{tab:phase1_ext}.
-\textbf{Bold}: best variant within each level block (per column; ties
-all bolded). The pooled external fair-comparison subset is small
-($n{=}8$; one model--level cell $n{=}7$ owing to a parse-filtered
-response); indicative only.}
-\label{tab:imgmorph_ext_cls}
-\centering
-\tiny
-\renewcommand{\arraystretch}{0.5}
-\setlength{\tabcolsep}{28pt}
-\setlength{\aboverulesep}{0.5pt}
-\setlength{\belowrulesep}{0.5pt}
-\begin{tabular}{@{}l cccc@{}}
-\toprule
- & Gm & Gma & Iv & Qw \\
-\midrule
-\multicolumn{5}{l}{\textit{Final Risk (BA; $^*$=accuracy)}} \\
-$\mathcal{F}_3$      & \textbf{0.750} & 0.750 & \textbf{0.625} & 0.750 \\
-\;\,$+$img           & \textbf{0.750} & 0.750 & 0.500 & 0.750 \\
-\;\,$+$morph         & 0.625 & 0.750 & \textbf{0.625} & \textbf{0.875} \\
-\;\,$+$both          & \textbf{0.750} & \textbf{0.875} & \textbf{0.625} & 0.500 \\
-\addlinespace[0.3pt]
-$\mathcal{F}_4$      & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} \\
-\;\,$+$img           & \textbf{0.750} & \textbf{0.750} & 0.625 & \textbf{0.750} \\
-\;\,$+$morph         & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} \\
-\;\,$+$both          & 0.625 & \textbf{0.750} & 0.625 & 0.625 \\
-\addlinespace[0.3pt]
-$\mathcal{F}_5$      & \textbf{0.875} & \textbf{0.875} & 0.625 & 0.750 \\
-\;\,$+$img           & 0.750 & \textbf{0.875} & \textbf{0.750} & 0.750 \\
-\;\,$+$morph         & 0.750 & 0.750 & \textbf{0.750} & \textbf{0.875} \\
-\;\,$+$both          & \textbf{0.875} & \textbf{0.875} & \textbf{0.750} & \textbf{0.875} \\
-\addlinespace[0.3pt]
-$\mathcal{F}_6$      & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} \\
-\;\,$+$img           & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} \\
-\;\,$+$morph         & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} \\
-\;\,$+$both          & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} \\
-\addlinespace[0.3pt]
-$\mathcal{F}_7$      & \textbf{1.000} & 0.750 & 0.750 & \textbf{0.875} \\
-\;\,$+$img           & \textbf{1.000} & \textbf{0.875} & \textbf{0.875} & 0.750 \\
-\;\,$+$morph         & \textbf{1.000} & 0.625 & 0.750 & \textbf{0.875} \\
-\;\,$+$both          & 0.750 & 0.750 & 0.625 & \textbf{0.875} \\
-\addlinespace[2pt]
-Avg & \textbf{0.850} & 0.800 & 0.725 & 0.800 \\
-\;\,$+$img & 0.825 & \textbf{0.825} & 0.725 & 0.775 \\
-\;\,$+$morph & 0.800 & 0.750 & \textbf{0.750} & \textbf{0.850} \\
-\;\,$+$both & 0.775 & \textbf{0.825} & 0.700 & 0.750 \\
-\midrule
-\multicolumn{5}{l}{\textit{D19 MRD (BA; $^*$=accuracy)}} \\
-$\mathcal{F}_3$      & \textbf{0.625$^*$} & \textbf{0.625$^*$} & 0.000$^*$ & \textbf{0.625$^*$} \\
-\;\,$+$img           & \textbf{0.625$^*$} & 0.500$^*$ & 0.000$^*$ & 0.500$^*$ \\
-\;\,$+$morph         & 0.375$^*$ & 0.125$^*$ & 0.000$^*$ & \textbf{0.625$^*$} \\
-\;\,$+$both          & 0.375$^*$ & 0.000$^*$ & \textbf{0.125$^*$} & 0.375$^*$ \\
-\addlinespace[0.3pt]
-$\mathcal{F}_4$      & \textbf{0.625$^*$} & \textbf{0.625$^*$} & \textbf{0.000$^*$} & \textbf{0.625$^*$} \\
-\;\,$+$img           & \textbf{0.625$^*$} & 0.500$^*$ & \textbf{0.000$^*$} & 0.250$^*$ \\
-\;\,$+$morph         & 0.375$^*$ & 0.125$^*$ & \textbf{0.000$^*$} & 0.500$^*$ \\
-\;\,$+$both          & 0.375$^*$ & 0.125$^*$ & \textbf{0.000$^*$} & 0.375$^*$ \\
-\addlinespace[0.3pt]
-$\mathcal{F}_5$      & \textbf{0.875$^*$} & \textbf{0.750$^*$} & 0.000$^*$ & \textbf{0.750$^*$} \\
-\;\,$+$img           & \textbf{0.875$^*$} & \textbf{0.750$^*$} & 0.000$^*$ & \textbf{0.750$^*$} \\
-\;\,$+$morph         & \textbf{0.875$^*$} & 0.375$^*$ & \textbf{0.250$^*$} & \textbf{0.750$^*$} \\
-\;\,$+$both          & 0.750$^*$ & 0.375$^*$ & 0.000$^*$ & \textbf{0.750$^*$} \\
-\addlinespace[0.3pt]
-$\mathcal{F}_6$      & \textbf{0.750$^*$} & \textbf{0.500$^*$} & 0.375$^*$ & \textbf{1.000$^*$} \\
-\;\,$+$img           & \textbf{0.750$^*$} & \textbf{0.500$^*$} & \textbf{0.500$^*$} & 0.500$^*$ \\
-\;\,$+$morph         & 0.625$^*$ & 0.375$^*$ & 0.250$^*$ & 0.750$^*$ \\
-\;\,$+$both          & 0.625$^*$ & \textbf{0.500$^*$} & 0.250$^*$ & 0.875$^*$ \\
-\addlinespace[2pt]
-Avg & \textbf{0.719$^*$} & \textbf{0.625$^*$} & 0.094$^*$ & \textbf{0.750$^*$} \\
-\;\,$+$img & \textbf{0.719$^*$} & 0.563$^*$ & \textbf{0.125$^*$} & 0.500$^*$ \\
-\;\,$+$morph & 0.563$^*$ & 0.250$^*$ & \textbf{0.125$^*$} & 0.656$^*$ \\
-\;\,$+$both & 0.531$^*$ & 0.250$^*$ & 0.094$^*$ & 0.594$^*$ \\
-\midrule
-\multicolumn{5}{l}{\textit{D46 MRD (accuracy; single positive)}} \\
-$\mathcal{F}_3$      & \textbf{0.625$^*$} & \textbf{0.625$^*$} & 0.000$^*$ & \textbf{0.625$^*$} \\
-\;\,$+$img           & \textbf{0.625$^*$} & 0.500$^*$ & \textbf{0.125$^*$} & 0.500$^*$ \\
-\;\,$+$morph         & 0.500$^*$ & 0.125$^*$ & 0.000$^*$ & 0.250$^*$ \\
-\;\,$+$both          & 0.500$^*$ & 0.125$^*$ & \textbf{0.125$^*$} & 0.375$^*$ \\
-\addlinespace[0.3pt]
-$\mathcal{F}_4$      & \textbf{0.625$^*$} & \textbf{0.625$^*$} & \textbf{0.000$^*$} & \textbf{0.750$^*$} \\
-\;\,$+$img           & 0.500$^*$ & \textbf{0.625$^*$} & \textbf{0.000$^*$} & 0.500$^*$ \\
-\;\,$+$morph         & 0.375$^*$ & 0.250$^*$ & \textbf{0.000$^*$} & 0.625$^*$ \\
-\;\,$+$both          & 0.500$^*$ & 0.000$^*$ & \textbf{0.000$^*$} & 0.500$^*$ \\
-\addlinespace[0.3pt]
-$\mathcal{F}_5$      & \textbf{0.875$^*$} & \textbf{0.625$^*$} & \textbf{0.125$^*$} & \textbf{0.875$^*$} \\
-\;\,$+$img           & 0.750$^*$ & \textbf{0.625$^*$} & \textbf{0.125$^*$} & 0.750$^*$ \\
-\;\,$+$morph         & \textbf{0.875$^*$} & 0.375$^*$ & 0.000$^*$ & 0.750$^*$ \\
-\;\,$+$both          & \textbf{0.875$^*$} & 0.125$^*$ & 0.000$^*$ & 0.750$^*$ \\
-\addlinespace[0.3pt]
-$\mathcal{F}_6$      & \textbf{0.750$^*$} & \textbf{0.500$^*$} & 0.250$^*$ & \textbf{0.875$^*$} \\
-\;\,$+$img           & \textbf{0.750$^*$} & \textbf{0.500$^*$} & \textbf{0.375$^*$} & 0.750$^*$ \\
-\;\,$+$morph         & 0.500$^*$ & \textbf{0.500$^*$} & 0.125$^*$ & 0.750$^*$ \\
-\;\,$+$both          & 0.625$^*$ & 0.375$^*$ & 0.000$^*$ & 0.625$^*$ \\
-\addlinespace[2pt]
-Avg & \textbf{0.719$^*$} & \textbf{0.594$^*$} & 0.094$^*$ & \textbf{0.781$^*$} \\
-\;\,$+$img & 0.656$^*$ & 0.563$^*$ & \textbf{0.156$^*$} & 0.625$^*$ \\
-\;\,$+$morph & 0.563$^*$ & 0.313$^*$ & 0.031$^*$ & 0.594$^*$ \\
-\;\,$+$both & 0.625$^*$ & 0.156$^*$ & 0.031$^*$ & 0.563$^*$ \\
-\midrule
-\multicolumn{5}{l}{\textit{Relapse (BA)}} \\
-$\mathcal{F}_3$      & \textbf{0.800} & 0.800 & \textbf{0.667} & 0.600 \\
-\;\,$+$img           & \textbf{0.800} & 0.800 & \textbf{0.667} & 0.700 \\
-\;\,$+$morph         & 0.633 & \textbf{0.833} & 0.500 & \textbf{0.800} \\
-\;\,$+$both          & 0.733 & \textbf{0.833} & 0.500 & \textbf{0.800} \\
-\addlinespace[0.3pt]
-$\mathcal{F}_4$      & 0.600 & \textbf{0.800} & \textbf{0.567} & 0.500 \\
-\;\,$+$img           & \textbf{0.800} & 0.700 & 0.500 & 0.625 \\
-\;\,$+$morph         & \textbf{0.800} & 0.733 & 0.500 & \textbf{0.708} \\
-\;\,$+$both          & 0.633 & 0.733 & 0.500 & 0.583 \\
-\addlinespace[0.3pt]
-$\mathcal{F}_5$      & \textbf{0.600} & \textbf{0.800} & 0.567 & \textbf{0.600} \\
-\;\,$+$img           & \textbf{0.600} & 0.600 & \textbf{0.733} & \textbf{0.600} \\
-\;\,$+$morph         & 0.433 & 0.733 & 0.500 & 0.500 \\
-\;\,$+$both          & \textbf{0.600} & 0.533 & 0.400 & \textbf{0.600} \\
-\addlinespace[0.3pt]
-$\mathcal{F}_6$      & 0.700 & \textbf{0.900} & 0.567 & 0.500 \\
-\;\,$+$img           & \textbf{0.800} & 0.800 & \textbf{0.733} & 0.600 \\
-\;\,$+$morph         & 0.700 & \textbf{0.900} & 0.567 & \textbf{0.700} \\
-\;\,$+$both          & \textbf{0.800} & 0.800 & 0.567 & 0.500 \\
-\addlinespace[0.3pt]
-$\mathcal{F}_7$      & \textbf{0.500} & \textbf{0.500} & 0.500 & \textbf{0.500} \\
-\;\,$+$img           & \textbf{0.500} & \textbf{0.500} & 0.500 & \textbf{0.500} \\
-\;\,$+$morph         & \textbf{0.500} & \textbf{0.500} & \textbf{0.600} & \textbf{0.500} \\
-\;\,$+$both          & \textbf{0.500} & \textbf{0.500} & 0.500 & \textbf{0.500} \\
-\addlinespace[2pt]
-Avg & 0.640 & \textbf{0.760} & 0.573 & 0.540 \\
-\;\,$+$img & \textbf{0.700} & 0.680 & \textbf{0.627} & 0.605 \\
-\;\,$+$morph & 0.613 & 0.740 & 0.533 & \textbf{0.642} \\
-\;\,$+$both & 0.653 & 0.680 & 0.493 & 0.597 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[p]
-\caption{\textbf{Information gain from bone marrow imaging at every
-clinical feature level, external survival tasks (merged external
-cohort).} Columns as in Table~\ref{tab:imgmorph_ext_cls}. C-index for
-EFS and OS. Base rows are re-evaluated on the morphology-available
-patient subset, so they can differ slightly from
-Table~\ref{tab:phase1_ext}. Pooling the two source hospitals gives the
-morphology-available subset EFS/OS events, so survival is evaluable
-across the whole panel (no \textemdash). \textbf{Bold}: best variant
-within each level block (per column; ties all bolded). The pooled
-external fair-comparison subset is small ($n{=}13$); indicative only.}
-\label{tab:imgmorph_ext_surv}
-\centering
-\scriptsize
-\renewcommand{\arraystretch}{0.6}
-\setlength{\tabcolsep}{28pt}
-\begin{tabular}{@{}l cccc@{}}
-\toprule
- & Gm & Gma & Iv & Qw \\
-\midrule
-\multicolumn{5}{l}{\textit{EFS (C-index)}} \\
-$\mathcal{F}_3$      & 0.885 & 0.846 & 0.692 & \textbf{0.923} \\
-\;\,$+$img           & 0.846 & 0.744 & 0.654 & 0.795 \\
-\;\,$+$morph         & \textbf{0.897} & \textbf{0.910} & \textbf{0.833} & 0.744 \\
-\;\,$+$both          & 0.795 & 0.872 & 0.603 & 0.782 \\
-\addlinespace[2pt]
-$\mathcal{F}_4$      & 0.833 & 0.846 & 0.692 & \textbf{0.923} \\
-\;\,$+$img           & \textbf{0.846} & 0.744 & 0.603 & 0.782 \\
-\;\,$+$morph         & 0.808 & \textbf{0.910} & \textbf{0.833} & 0.744 \\
-\;\,$+$both          & 0.667 & 0.872 & 0.641 & 0.782 \\
-\addlinespace[2pt]
-$\mathcal{F}_5$      & 0.872 & \textbf{0.897} & 0.872 & \textbf{0.577} \\
-\;\,$+$img           & \textbf{0.910} & 0.885 & 0.692 & 0.500 \\
-\;\,$+$morph         & 0.859 & 0.872 & \textbf{0.885} & \textbf{0.577} \\
-\;\,$+$both          & 0.769 & 0.872 & 0.731 & 0.500 \\
-\addlinespace[2pt]
-$\mathcal{F}_6$      & \textbf{0.885} & 0.782 & 0.859 & 0.680 \\
-\;\,$+$img           & 0.846 & 0.821 & 0.756 & 0.731 \\
-\;\,$+$morph         & 0.808 & \textbf{0.859} & \textbf{0.897} & \textbf{0.859} \\
-\;\,$+$both          & 0.859 & 0.782 & 0.795 & 0.641 \\
-\addlinespace[2pt]
-$\mathcal{F}_7$      & \textbf{0.821} & 0.756 & \textbf{0.872} & 0.680 \\
-\;\,$+$img           & \textbf{0.821} & 0.718 & 0.692 & 0.551 \\
-\;\,$+$morph         & 0.782 & \textbf{0.782} & 0.859 & \textbf{0.692} \\
-\;\,$+$both          & 0.769 & 0.718 & 0.718 & 0.590 \\
-\addlinespace[2pt]
-Avg & \textbf{0.859} & 0.826 & 0.797 & \textbf{0.756} \\
-\;\,$+$img & 0.854 & 0.782 & 0.679 & 0.672 \\
-\;\,$+$morph & 0.831 & \textbf{0.867} & \textbf{0.862} & 0.723 \\
-\;\,$+$both & 0.772 & 0.823 & 0.697 & 0.659 \\
-\midrule
-\multicolumn{5}{l}{\textit{OS (C-index)}} \\
-$\mathcal{F}_3$      & \textbf{0.850} & \textbf{0.883} & 0.600 & 0.650 \\
-\;\,$+$img           & 0.817 & 0.750 & 0.600 & 0.750 \\
-\;\,$+$morph         & 0.817 & 0.850 & 0.600 & \textbf{0.833} \\
-\;\,$+$both          & 0.817 & 0.833 & \textbf{0.700} & 0.700 \\
-\addlinespace[2pt]
-$\mathcal{F}_4$      & 0.817 & \textbf{0.883} & \textbf{0.600} & 0.650 \\
-\;\,$+$img           & 0.817 & 0.750 & 0.550 & 0.750 \\
-\;\,$+$morph         & \textbf{0.900} & 0.850 & \textbf{0.600} & \textbf{0.833} \\
-\;\,$+$both          & 0.833 & 0.833 & \textbf{0.600} & 0.700 \\
-\addlinespace[2pt]
-$\mathcal{F}_5$      & \textbf{0.933} & \textbf{0.933} & 0.950 & \textbf{0.850} \\
-\;\,$+$img           & 0.900 & 0.783 & 0.950 & 0.500 \\
-\;\,$+$morph         & 0.800 & 0.900 & 0.867 & 0.800 \\
-\;\,$+$both          & 0.817 & 0.833 & \textbf{0.983} & 0.500 \\
-\addlinespace[2pt]
-$\mathcal{F}_6$      & 0.800 & 0.700 & 0.850 & 0.817 \\
-\;\,$+$img           & 0.833 & 0.750 & 0.817 & 0.567 \\
-\;\,$+$morph         & 0.817 & 0.700 & 0.833 & \textbf{0.850} \\
-\;\,$+$both          & \textbf{0.850} & \textbf{0.800} & \textbf{0.917} & 0.567 \\
-\addlinespace[2pt]
-$\mathcal{F}_7$      & 0.817 & 0.700 & 0.833 & 0.667 \\
-\;\,$+$img           & \textbf{0.850} & 0.617 & \textbf{0.933} & 0.650 \\
-\;\,$+$morph         & \textbf{0.850} & 0.700 & 0.833 & \textbf{0.900} \\
-\;\,$+$both          & 0.800 & \textbf{0.733} & 0.917 & 0.717 \\
-\addlinespace[2pt]
-Avg & \textbf{0.843} & \textbf{0.820} & 0.767 & 0.727 \\
-\;\,$+$img & \textbf{0.843} & 0.730 & 0.770 & 0.643 \\
-\;\,$+$morph & 0.837 & 0.800 & 0.747 & \textbf{0.843} \\
-\;\,$+$both & 0.823 & 0.807 & \textbf{0.823} & 0.637 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-%%--------------------------------------------------------------%%
 \subsection{Phase~2: Temporal validation and classification+survival
 results}
 \label{sec:phase2}
@@ -906,10 +465,7 @@ Including MRD at $\mathcal{F}_7$ further raised DT AUROC to
 \textbf{0.949} (RF:~0.998), the highest classification result across
 all conditions.
 On Split~2, D19MRD reached RF~0.811 (DT~0.705) and D46MRD RF~0.674
-(DT~0.549); systematically adding the 17 morphology descriptors across
-$\mathcal{F}_3$--$\mathcal{F}_7$ (Table~\ref{tab:phase2_morph}) gives
-no consistent internal AUROC gain for these or the other
-classification tasks.
+(DT~0.549).
 Relapse prediction remained difficult for Phase~2 as for Phase~1
 (Split~2: best DT AUROC~0.529, RF~0.630), mirroring the broader literature
 on relapse biology~\cite{[CITE:Martinez2025]}.
@@ -1192,120 +748,6 @@ RSF & 0.718 \\
 \end{tabular}
 \end{table}
 
-\begin{table}[p]
-\caption{\textbf{Morphology information gain for the Phase~2 random forest
-across clinical feature levels.} For each base level $\mathcal{F}_k$
-($k=3\text{--}7$), the $+$morph row adds the 17 quantitative
-bone-marrow morphology descriptors of the $+$morph text profile
-(Section~\ref{sec:morph}; no label-based feature selection); raw images
-cannot enter a tabular RF. Classification: RF AUROC; EFS/OS: RSF C-index.
-Columns are the three internal temporal splits and the pooled external
-cohort ($n$=41, indicative only). \textbf{Bold}: $+$morph exceeds the
-same-level base in that column. \textemdash: OS is not evaluable in the
-2019 test split (Split~3), which has no observed OS events. D19/D46MRD
-are shown only up to $\mathcal{F}_6$, as MRD status is an input feature
-at $\mathcal{F}_7$.}
-\label{tab:phase2_morph}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}ll cccc@{}}
-\toprule
-\textbf{Lv.} & & \textbf{Split~1} & \textbf{Split~2} & \textbf{Split~3} & \textbf{Ext} \\
-\midrule
-\multicolumn{6}{l}{\textit{Final Risk (RF AUROC)}} \\
-$\mathcal{F}_3$ & base & 0.849 & 0.872 & 0.743 & 0.843 \\
-& \;\,$+$morph & \textbf{0.862} & 0.857 & \textbf{0.806} & 0.811 \\
-\addlinespace[2pt]
-$\mathcal{F}_4$ & base & 0.852 & 0.847 & 0.799 & 0.750 \\
-& \;\,$+$morph & \textbf{0.863} & \textbf{0.849} & 0.785 & \textbf{0.793} \\
-\addlinespace[2pt]
-$\mathcal{F}_5$ & base & 0.897 & 0.943 & 0.847 & 0.938 \\
-& \;\,$+$morph & \textbf{0.936} & \textbf{0.944} & \textbf{0.896} & 0.900 \\
-\addlinespace[2pt]
-$\mathcal{F}_6$ & base & 0.922 & 0.951 & 0.882 & 0.934 \\
-& \;\,$+$morph & \textbf{0.946} & 0.940 & \textbf{0.903} & 0.931 \\
-\addlinespace[2pt]
-$\mathcal{F}_7$ & base & 0.996 & 0.998 & 1.000 & 0.991 \\
-& \;\,$+$morph & 0.989 & 0.993 & 1.000 & 0.969 \\
-\midrule
-\multicolumn{6}{l}{\textit{D19 MRD (RF AUROC)}} \\
-$\mathcal{F}_3$ & base & 0.657 & 0.791 & 0.810 & 0.265 \\
-& \;\,$+$morph & \textbf{0.695} & 0.734 & \textbf{0.833} & \textbf{0.315} \\
-\addlinespace[2pt]
-$\mathcal{F}_4$ & base & 0.672 & 0.799 & 0.810 & 0.285 \\
-& \;\,$+$morph & 0.668 & 0.797 & 0.702 & \textbf{0.435} \\
-\addlinespace[2pt]
-$\mathcal{F}_5$ & base & 0.631 & 0.740 & 0.845 & 0.290 \\
-& \;\,$+$morph & \textbf{0.680} & \textbf{0.768} & 0.738 & \textbf{0.520} \\
-\addlinespace[2pt]
-$\mathcal{F}_6$ & base & 0.684 & 0.811 & 0.631 & 0.330 \\
-& \;\,$+$morph & \textbf{0.704} & 0.795 & \textbf{0.774} & 0.310 \\
-\midrule
-\multicolumn{6}{l}{\textit{D46 MRD (RF AUROC)}} \\
-$\mathcal{F}_3$ & base & 0.555 & 0.570 & 0.321 & 0.967 \\
-& \;\,$+$morph & \textbf{0.594} & \textbf{0.636} & \textbf{0.512} & 0.800 \\
-\addlinespace[2pt]
-$\mathcal{F}_4$ & base & 0.554 & 0.595 & 0.298 & 0.833 \\
-& \;\,$+$morph & \textbf{0.602} & 0.581 & \textbf{0.357} & 0.767 \\
-\addlinespace[2pt]
-$\mathcal{F}_5$ & base & 0.601 & 0.636 & 0.345 & 0.883 \\
-& \;\,$+$morph & 0.571 & 0.549 & \textbf{0.393} & 0.800 \\
-\addlinespace[2pt]
-$\mathcal{F}_6$ & base & 0.586 & 0.674 & 0.429 & 0.983 \\
-& \;\,$+$morph & \textbf{0.588} & 0.517 & \textbf{0.464} & 0.900 \\
-\midrule
-\multicolumn{6}{l}{\textit{Relapse (RF AUROC)}} \\
-$\mathcal{F}_3$ & base & 0.483 & 0.485 & 0.274 & 0.300 \\
-& \;\,$+$morph & \textbf{0.596} & \textbf{0.591} & 0.143 & \textbf{0.356} \\
-\addlinespace[2pt]
-$\mathcal{F}_4$ & base & 0.564 & 0.471 & 0.036 & 0.272 \\
-& \;\,$+$morph & \textbf{0.565} & \textbf{0.522} & \textbf{0.167} & \textbf{0.292} \\
-\addlinespace[2pt]
-$\mathcal{F}_5$ & base & 0.517 & 0.624 & 0.286 & 0.377 \\
-& \;\,$+$morph & \textbf{0.560} & 0.554 & 0.179 & 0.325 \\
-\addlinespace[2pt]
-$\mathcal{F}_6$ & base & 0.547 & 0.630 & 0.500 & 0.267 \\
-& \;\,$+$morph & 0.543 & 0.545 & 0.333 & \textbf{0.362} \\
-\addlinespace[2pt]
-$\mathcal{F}_7$ & base & 0.591 & 0.597 & 0.429 & 0.383 \\
-& \;\,$+$morph & 0.548 & 0.559 & 0.333 & 0.380 \\
-\midrule
-\multicolumn{6}{l}{\textit{EFS (RSF C-index)}} \\
-$\mathcal{F}_3$ & base & 0.542 & 0.552 & 0.500 & 0.434 \\
-& \;\,$+$morph & \textbf{0.553} & \textbf{0.566} & 0.456 & \textbf{0.486} \\
-\addlinespace[2pt]
-$\mathcal{F}_4$ & base & 0.520 & 0.533 & 0.485 & 0.475 \\
-& \;\,$+$morph & \textbf{0.546} & \textbf{0.547} & 0.353 & 0.435 \\
-\addlinespace[2pt]
-$\mathcal{F}_5$ & base & 0.511 & 0.572 & 0.588 & 0.444 \\
-& \;\,$+$morph & \textbf{0.541} & 0.509 & 0.471 & \textbf{0.466} \\
-\addlinespace[2pt]
-$\mathcal{F}_6$ & base & 0.560 & 0.592 & 0.662 & 0.439 \\
-& \;\,$+$morph & 0.552 & 0.565 & 0.412 & \textbf{0.451} \\
-\addlinespace[2pt]
-$\mathcal{F}_7$ & base & 0.684 & 0.746 & 0.691 & 0.608 \\
-& \;\,$+$morph & 0.680 & 0.640 & 0.471 & 0.565 \\
-\midrule
-\multicolumn{6}{l}{\textit{OS (RSF C-index)}} \\
-$\mathcal{F}_3$ & base & 0.556 & 0.515 & \textemdash & 0.468 \\
-& \;\,$+$morph & \textbf{0.590} & 0.442 & \textemdash & \textbf{0.679} \\
-\addlinespace[2pt]
-$\mathcal{F}_4$ & base & 0.590 & 0.529 & \textemdash & 0.512 \\
-& \;\,$+$morph & \textbf{0.603} & 0.404 & \textemdash & \textbf{0.750} \\
-\addlinespace[2pt]
-$\mathcal{F}_5$ & base & 0.586 & 0.622 & \textemdash & 0.556 \\
-& \;\,$+$morph & 0.557 & 0.437 & \textemdash & \textbf{0.714} \\
-\addlinespace[2pt]
-$\mathcal{F}_6$ & base & 0.621 & 0.620 & \textemdash & 0.512 \\
-& \;\,$+$morph & 0.557 & 0.498 & \textemdash & \textbf{0.730} \\
-\addlinespace[2pt]
-$\mathcal{F}_7$ & base & 0.607 & 0.629 & \textemdash & 0.643 \\
-& \;\,$+$morph & 0.592 & 0.535 & \textemdash & \textbf{0.679} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 %%--------------------------------------------------------------%%
 \subsection{Cosine RAG belief revision}
 \label{sec:rag}
@@ -1493,7 +935,7 @@ Inter-rater $\kappa$ & — & — & — & — & — \\
 \section{Discussion}\label{sec:discussion}
 %%==============================================================%%
 
-This study presents a temporally-structured multimodal framework
+This study presents a temporally-structured prediction framework
 evaluated jointly across six ALL prediction targets—four classification
 tasks and two survival endpoints—and validated on an external cohort
 pooled from two independent hospitals.
@@ -1528,29 +970,6 @@ surpassing the internal zero-shot values for some models, likely due
 to differences in class distribution (larger IR/HR proportion in the
 external cohort) rather than genuine improvement in discriminative
 ability.
-
-\textbf{Imaging information: morphology text, not raw pixels.}
-The multimodal comparison (Section~\ref{sec:imgmorph}) shows an
-asymmetry at diagnosis: the structured morphology profile improved
-zero-shot relapse prediction for all four LLMs ($\Delta$BA
-$+0.003$ to $+0.040$), whereas raw smear images improved Final Risk
-for three of four models only marginally and degraded relapse
-prediction for three of four.
-This suggests that current multimodal LLMs extract prognostic
-morphology more reliably from a quantitative, pipeline-derived text
-profile than from raw microscopy, supporting automated morphometry as
-the practical route for injecting imaging information into clinical
-risk models.
-The completed comparisons across all five feature levels reinforce
-this asymmetry: the morphology profile improved relapse prediction for
-a majority of models at three of five levels and EFS in 15 of 20
-model--level comparisons, and even at $\mathcal{F}_7$—with MRD already
-among the inputs—it improved Final Risk for all four models ($+0.005$
-to $+0.102$), whereas raw images degraded Final Risk there for all
-four.
-The effects remain small and unadjusted, but they indicate that the
-morphometric text profile retains additive prognostic value even after
-molecular and MRD data arrive, while raw pixels do not.
 
 \textbf{External validation: generalisation and limitations.}
 Phase~2 RF Final Risk AUROC of 0.991 on the merged external cohort
@@ -1619,11 +1038,6 @@ multi-centre prospective validation at greater scale is required
 before clinical deployment.
 The internal cohort ($n=301$) limits statistical power for OS
 (24 events) and Split~3 ($n_\text{test}=17$).
-The imaging comparison is complete at all feature levels internally,
-but its external fair-comparison subsets remain small (classification
-$n=8$, survival $n=13$); pooling now makes external survival
-evaluable across the full feature range, but the imaging findings
-should still be read primarily as internal-cohort evidence.
 The external cohort pools two hospitals, one of which (Fudan) is a
 relapse-enriched referral cohort in which all patients relapsed;
 the pooled external relapse rate is therefore far above that of an
@@ -1653,9 +1067,7 @@ Ethics approval was obtained from [ETHICS NUMBER]; all data were
 de-identified prior to analysis.
 Each patient record includes structured clinical data (demographics,
 haematological indices, immunophenotype, 51-marker flow cytometry panel,
-cytogenetics, MRD values) and bone marrow aspirate microscopy images
-(Giemsa-stained, $\sim$20 fields per patient; available for 299 of the
-301 patients).
+cytogenetics, MRD values).
 
 The external validation cohort ($n=41$) was supplied as a single
 merged file spanning two source hospitals, distinguished by the
@@ -1697,54 +1109,6 @@ z_{ij}^{(\text{test})} =
 \end{equation}
 with missing values imputed by training-split medians.
 
-\subsection{Bone marrow morphology pipeline}\label{sec:morph}
-
-\textbf{Stage~1: Cell segmentation.}
-SAM~3~\cite{[CITE:SAM]} was applied to each smear image with the text
-prompt \textit{``dark stained nucleated cell''} (mask score
-$\geq 0.5$). Masks that were not darker than the image as a whole
-(mean-brightness ratio $\geq 0.82$) or contained fewer than 5\% dark,
-saturated pixels were discarded, and each remaining mask was cropped
-to a $224\times224$ patch.
-
-\textbf{Stage~2: Nucleated-cell filtering.}
-Rule-based quality control removed red cells, platelets, debris and
-partially captured cells: a patch was retained only if it had
-sufficient area ($\geq 500$ pixels) and an intact contour (no thin
-crescent or straight cut edge), contained a compact, very dark
-blue--violet nuclear component (Giemsa-stained chromatin; OpenCV hue
-100--160) covering at least 3\% of the cell area, was not pale overall,
-and did not show the bright-centre pattern of erythroid precursors.
-
-\textbf{Stage~3: Morphological feature extraction.}
-For each retained cell, $\sim$40 descriptors were computed:
-geometry (area, perimeter, major and minor axes, aspect ratio,
-eccentricity, circularity, extent, solidity), nuclear measures
-(nucleus-to-cytoplasm (N/C) and nucleus-to-cell ratios, nuclear colour
-and solidity), chromatin texture (GLCM, local binary patterns,
-high-frequency texture, chromatin fineness), nucleoli count and size,
-cytoplasmic colour and basophilia, vacuoles, and a hand-mirror shape
-score.
-
-\textbf{Stage~4: Per-patient aggregation.}
-No cell-type classification is applied in the final pipeline: because
-diagnostic ALL marrow is dominated by lymphoblasts, all retained
-nucleated cells from the diagnostic smear are treated as the blast
-population (automated cell typing with BiomedCLIP
-prototypes~\cite{[CITE:BiomedCLIP]} was explored but not adopted).
-Cell-level descriptors were aggregated per patient into 17 summary
-descriptors (mean cell area, major and minor axis, aspect ratio,
-eccentricity, circularity, extent, N/C ratio, nucleus-to-cell ratio,
-chromatin fineness, chromatin high-frequency texture, GLCM contrast,
-nucleoli count and size, morphological uniformity, and the fractions
-of hand-mirror and vacuolated cells).
-This profile is serialised as the $+$morph text input in the
-multimodal comparison (Section~\ref{sec:imgmorph}), and the same
-17 numeric descriptors augment the tabular Phase~2 models, with no
-label-based feature selection.
-Across the internal cohort, 9,501 nucleated cells were retained from
-the diagnostic smears of 221 patients.
-
 \subsection{Phase~1: LLM zero-shot inference}\label{sec:llm_inference}
 
 For classification tasks, each patient's features were serialised into a
@@ -1759,8 +1123,8 @@ classification performance is summarised by balanced accuracy,
 $\mathrm{BA}=\tfrac{1}{2}(\mathrm{TPR}+\mathrm{TNR})$, which equals
 the AUROC of the binary prediction.
 Per-patient outputs were cached; the cohort was scored for every
-combination of feature level ($\times 7$, plus the imaging variants of
-Section~\ref{sec:imgmorph}), task ($\times 6$), and model ($\times 4$).
+combination of feature level ($\times 7$), task ($\times 6$), and
+model ($\times 4$).
 
 \subsection{Phase~2: Decision tree and random forest}\label{sec:dt}
 
@@ -1908,8 +1272,7 @@ with [HOSPITAL NAME]; requests to the corresponding author.
 \section*{Code availability}
 %%==============================================================%%
 
-Analysis code, LLM prompts, and the bone marrow morphology pipeline
-will be made available at
+Analysis code and LLM prompts will be made available at
 \url{https://github.com/YanbeiJiang/ALL_prediction_NCS}
 upon acceptance.
 
@@ -1983,7 +1346,6 @@ $\mathcal{F}_4$ & (base $\mathcal{F}_3$) $+$ non-risk clinical factors: chief-co
 $\mathcal{F}_5$ & (base $\mathcal{F}_3$) $+$ CNS status (CNSL); Day-5 peripheral blast\%; Initial Risk \\
 $\mathcal{F}_6$ & (base $\mathcal{F}_5$) $+$ Fusion gene; Karyotype; FISH \\
 $\mathcal{F}_7$ & (base $\mathcal{F}_6$) $+$ D19MRD; D46MRD (as input features) \\
-$\mathcal{F}_k^{+\text{img/morph/both}}$ & (base $\mathcal{F}_k$, $k\in\{3,\dots,7\}$) $+$ raw bone marrow smear images ($+$img), the structured morphology profile from the automated SAM~3 pipeline: 17 per-patient descriptors of the retained nucleated cells (mean area, major and minor axis, aspect ratio, eccentricity, circularity, extent, nucleus-to-cytoplasm ratio, nucleus-to-cell ratio, chromatin fineness, chromatin high-frequency texture, GLCM contrast, nucleoli count and size, morphological uniformity, hand-mirror \%, vacuolated \%) ($+$morph), or both ($+$both) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1993,7 +1355,7 @@ $\mathcal{F}_k^{+\text{img/morph/both}}$ & (base $\mathcal{F}_k$, $k\in\{3,\dots
 %%==============================================================%%
 
 \begin{figure}[ht]
-\caption{\textbf{Overview of the temporally-structured multimodal
+\caption{\textbf{Overview of the temporally-structured
 prediction framework.}
 \textbf{a,}~The three parallel timelines: feature acquisition
 (Day~0--46, $\mathcal{F}_1$–$\mathcal{F}_{7}$), prediction targets
@@ -2023,22 +1385,6 @@ cytometry), Day~5 (early response), Day~7--10
 (cytogenetics), Day~46 (MRD, $\mathcal{F}_7$).
 Open symbols: internal cohort. Filled symbols: External cohort.}
 \label{fig:ablation}
-\end{figure}
-
-\begin{figure}[ht]
-\caption{\textbf{Bone marrow morphology pipeline and its predictive
-contribution.}
-\textbf{a,}~Pipeline schematic: SAM~3 cell segmentation
-$\rightarrow$ nucleated-cell filtering $\rightarrow$ per-cell
-morphological feature extraction $\rightarrow$ per-patient morphology
-profile (17 descriptors).
-\textbf{b,}~Representative retained nucleated-cell patches with their
-segmentation masks.
-\textbf{c,}~Change from base to $+$morph across feature levels
-$\mathcal{F}_3$--$\mathcal{F}_7$ for the Phase~1 LLMs (Relapse BA,
-EFS C-index; Table~\ref{tab:imgmorph_int}) and the Phase~2 RF/RSF
-(internal and external; Table~\ref{tab:phase2_morph}).}
-\label{fig:morph}
 \end{figure}
 
 \begin{figure}[ht]
@@ -2159,18 +1505,6 @@ Rudin, C.
 Stop explaining black box machine learning models for high stakes
 decisions and use interpretable models instead.
 \textit{Nat. Mach. Intell.} \textbf{1}, 206--215 (2019).
-
-\bibitem{[CITE:SAM]}
-Carion, N. et al.
-SAM~3: Segment anything with concepts.
-\textit{Proc. Int. Conf. Learn. Represent. (ICLR)} (2026);
-preprint at arXiv:2511.16719 (2025).
-
-\bibitem{[CITE:BiomedCLIP]}
-Zhang, S. et al.
-BiomedCLIP: a multimodal biomedical foundation model pretrained from
-fifteen million scientific image-text pairs.
-\textit{arXiv} 2303.00915 (2023).
 
 \bibitem{[CITE:vLLM]}
 Kwon, W. et al.
