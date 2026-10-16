@@ -11,6 +11,7 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{tabularx}
+\graphicspath{{figures/}{sn-article-template/figures/}}
 
 \raggedbottom
 
@@ -19,9 +20,10 @@
 %%==============================================================%%
 %% Title
 %%==============================================================%%
-\title[Temporal ALL prediction]{%
-  Temporally-structured prediction across six clinical
-  targets in paediatric acute lymphoblastic leukaemia}
+\title[LLMs versus local data in paediatric ALL]{%
+  Zero-shot language models versus accumulating local data for
+  timeline-aligned prediction in paediatric acute lymphoblastic
+  leukaemia}
 
 %%==============================================================%%
 %% Authors
@@ -44,45 +46,35 @@
 %% Abstract
 %%==============================================================%%
 \abstract{%
-Paediatric acute lymphoblastic leukaemia (ALL) is the most common
-childhood malignancy, yet 15--20\% of patients relapse after
-apparently successful treatment.
-Existing prediction models typically target a single endpoint at a
-single decision point and are rarely validated temporally or in
-independent centres.
-Here we present a temporally-structured prediction framework
-evaluated on six clinical targets simultaneously: four classification
-tasks (Final Risk, D19MRD, D46MRD, Relapse) and two survival endpoints
-(event-free survival, EFS; overall survival, OS), whose feature sets
-are strictly aligned with the clinical data-acquisition timeline from
-hospital admission to Day~46.
-Phase~1 evaluates four large language models (LLMs) in a zero-shot
-setting; Phase~2 trains decision trees, random forests, and random
-survival forests on a temporally partitioned case database.
-In the internal cohort, Phase~2 random forests reach AUROC~0.998 for
-Final Risk once MRD is available (decision tree 0.949), and a random
-survival forest reaches a concordance index of~0.746 for EFS.
-A cosine-similarity retrieval-augmented generation (RAG) belief
-revision yields small but consistent survival gains (mean
-$\Delta$C-index $+0.006$, $p=0.001$); its largest classification gain
-(D46MRD AUROC 0.655 to 0.881) comes from a 17-patient test year with
-only three positives and is exploratory.
-External validation on a merged 41-patient cohort pooled from two
-hospitals confirms robust Final Risk transfer (LLM zero-shot balanced
-accuracy up to 0.925; Phase~2 RF AUROC up to 0.991) without
-retraining; pooling also
-makes Relapse and D19MRD two-class and evaluable, although the
-cohort remains small and, because one source hospital is a
-relapse-enriched referral series, external relapse metrics are
-exploratory.
-This framework demonstrates that temporally stratified
-learning, aligned with clinical workflows, enables consistent
-multi-target prediction that generalises to independent cohorts.
+Prediction models for paediatric acute lymphoblastic leukaemia (ALL)
+are usually trained on a hospital's own historical cases, yet a
+hospital that adopts a new protocol starts with none.
+Here we ask how much local data a zero-shot large language model (LLM)
+is worth along the clinical timeline.
+We aligned seven nested feature sets with data acquisition from
+admission to Day~46, defined six decisions—Final Risk, day-19 and
+day-46 minimal residual disease (MRD), relapse, event-free survival
+(EFS) and overall survival (OS)—and trained random forests and random
+survival forests on cases partitioned by enrolment year (301 patients,
+2015--2019), with an external cohort of 41 patients from two hospitals.
+An equal-weight ensemble of four zero-shot LLMs matched models trained
+on about 90--120 local patients for day-19 MRD and EFS, and
+outperformed locally trained random survival forests for OS in every
+evaluable test set (C-index 0.71--0.83 versus 0.61--0.64).
+Trained models were superior only for Final Risk, which a
+three-condition protocol rule reproduced in 99.3\% of patients and
+which they learned from about 30 cases.
+At the external hospitals the trained EFS model lost discrimination
+(C-index 0.75 to 0.61) whereas the LLM ensemble changed little
+(0.71 to 0.67).
+Relapse and day-46 MRD remained near chance for all methods.
+Zero-shot LLMs are therefore a credible starting point before local
+data accrue, and remain complementary afterwards.
 }
 
-\keywords{paediatric acute lymphoblastic leukaemia, temporal feature
-design, large language models, risk stratification, survival analysis,
-retrieval-augmented generation, external validation}
+\keywords{paediatric acute lymphoblastic leukaemia, large language
+models, zero-shot prediction, learning curves, temporal validation,
+survival analysis, external validation}
 
 \maketitle
 
@@ -137,42 +129,43 @@ data-acquisition workflow must support all six decision nodes.
 The third is the \emph{data-accumulation timeline}: a hospital's
 reference database grows year by year, so a model deployed in a given
 year can only have learned from patients enrolled before it.
-Random shuffled train--test splits violate this constraint and report
-performance that is not prospectively attainable.
-Aligning a dataset and a method to all three timelines simultaneously,
-rather than one at a time, is the central novelty of this work and the
-source of its clinical realism.
+Random train--test splits ignore this constraint, so they cannot show
+how a model behaves as a hospital's database grows.
 
-Building on this principle, we construct a dataset in which seven
-temporally ordered clinical feature sets (six strictly nested;
-$\mathcal{F}_4$ is a Day-1 branch of $\mathcal{F}_3$) map onto
-the feature-acquisition timeline, six prediction targets map onto the
-target timeline, and patient enrolment year defines the
-data-accumulation timeline.
-On this substrate we evaluate two complementary methods.
-Phase~1 applies large language models (LLMs) in a zero-shot setting,
-probing the predictive upper bound reachable with \emph{no} accumulated
-training data—the regime a clinician faces when a new protocol or a new
-hospital comes online~\cite{[CITE:Phaterpekar2026]}.
-Phase~2 trains decision trees, random forests, and random survival
-forests on the growing case database under temporal splits, emulating
-prospective deployment as the data-accumulation timeline advances.
-A retrieval-augmented generation (RAG) component then leverages the
-accumulated database to apply a similarity-weighted belief revision to
-model probabilities and to generate interpretable clinical narratives.
+The third timeline exposes a practical problem that the first two do
+not: a hospital that adopts a new protocol, or a centre that begins to
+collect structured data, starts with no local cases to learn from.
+Large language models (LLMs) can be queried zero-shot, drawing on
+clinical knowledge acquired during pretraining~\cite{[CITE:Phaterpekar2026]},
+but it is unclear how much local data a zero-shot LLM is worth, for
+which decisions it suffices, and whether it remains useful once a case
+database has accrued or when a model is moved to another hospital.
+We address these questions on a dataset in which seven temporally
+ordered clinical feature sets (six strictly nested; $\mathcal{F}_4$ is
+a Day-1 branch of $\mathcal{F}_3$) map onto the feature-acquisition
+timeline, six prediction targets map onto the target timeline, and
+enrolment year defines the data-accumulation timeline.
+We compare an ensemble of four zero-shot LLMs (Phase~1) with decision
+trees, random forests and random survival forests trained on the
+growing case database under temporal splits (Phase~2), test both on an
+external cohort from two hospitals without retraining, and add a
+retrieval-based belief revision that uses the accumulated cases to
+revise model probabilities and to ground LLM-generated clinical
+narratives.
 
-Our contributions are: (\textit{i})~a seven-level, three-timeline
-clinical feature-and-target hierarchy aligned with the clinical
-workflow; (\textit{ii})~Phase~1, a systematic zero-shot evaluation of
-four LLMs across all feature levels and all six prediction targets,
-establishing training-free baselines; (\textit{iii})~Phase~2, a decision
-tree, random forest, and random survival forest system trained on a
-dynamic case database partitioned by enrolment year and validated
-under three temporal splits; (\textit{iv})~a cosine-similarity RAG
-belief revision that refines model probabilities and generates
-interpretable LLM clinical narratives; and (\textit{v})~multi-site
-external validation at independent centres that received no training
-data.
+Our contributions are threefold.
+(\textit{i})~A timeline-aligned evaluation of six clinical decisions in
+paediatric ALL that shows when each becomes predictable: Final Risk
+follows a protocol rule, EFS discrimination emerges only with Day-46
+MRD, and relapse and day-46 MRD remain near chance with routine data.
+(\textit{ii})~A quantification of the value of zero-shot LLMs relative
+to accumulating local data: the LLM ensemble matched models trained on
+about 90--120 local patients for day-19 MRD and EFS, outperformed
+locally trained survival forests for OS in every evaluable test set,
+and lost less discrimination at external hospitals, whereas trained
+models were superior for the protocol-defined Final Risk.
+(\textit{iii})~A retrieval-based belief revision extended to censored
+survival outcomes, with LLM-generated narratives for physician review.
 
 %%==============================================================%%
 \section{Related work}\label{sec:related}
@@ -265,16 +258,19 @@ retrieved cases to revise the probabilities of a trained tabular model
 or extends retrieval to censored survival outcomes.
 
 \textbf{Positioning of this work.}
-Relative to these families, our contribution lies less in any single
-model than in aligning data, targets and validation with the clinical
-timeline (Table~\ref{tab:related}): features are organised into seven
-nested levels that mirror data acquisition, six classification and
-survival targets are evaluated jointly on that hierarchy, trained
-models learn from a case database partitioned by enrolment year, and
-both zero-shot LLMs and trained models are tested without retraining on
-an external cohort from two hospitals.
-To our knowledge, no previous paediatric ALL study combines these
-elements.
+None of these families asks how much local data a zero-shot LLM is
+worth along a disease's care timeline, or whether that value persists
+at another hospital.
+ClinicRealm compared prompted LLMs with conventional models trained on
+ten examples~\cite{[CITE:Zhu2026ClinicRealm]}; we instead trace full
+learning curves on a case database partitioned by enrolment year, for
+six decisions including two survival endpoints, using features
+organised into seven levels that mirror data acquisition, and repeat
+the comparison on an external cohort without retraining
+(Table~\ref{tab:related}).
+To our knowledge, no previous paediatric ALL study evaluates zero-shot
+LLMs, or combines timeline-aligned feature levels with temporal and
+external validation.
 Our cohorts are, however, smaller than the cooperative-group and
 registry studies above, and prospective
 deployment~\cite{[CITE:Jiang2023NYUTron]} remains a stronger standard
@@ -354,47 +350,45 @@ Kiermeyer 2026~\cite{[CITE:Kiermeyer2026]} & Adult cancer (3,522) & LLM features
 \section{Results}\label{sec:results}
 %%==============================================================%%
 
-\subsection{Study cohorts and temporally-structured feature design}
+\subsection{Cohorts and timeline-aligned design}
 \label{sec:cohort}
 
-The internal training cohort comprised paediatric ALL patients treated
-at [HOSPITAL NAME] between 2015 and 2019 (Table~\ref{tab:cohort};
-$n=301$).
+The internal cohort comprised 301 children with ALL treated at
+[HOSPITAL NAME] between 2015 and 2019 (Table~\ref{tab:cohort}).
 Prediction targets span the treatment timeline: Day~19 MRD positivity
-(D19MRD $\geq 1\%$), Day~46 MRD positivity (D46MRD $\geq 0.01\%$),
-final risk classification (Final Risk: LR vs IR/HR; 159 LR, 142 IR/HR),
-and relapse occurrence (44 of 301, 14.6\%).
-EFS events (relapse, induction failure, or death; 75 of 301, 24.9\%)
-and OS events (death; 24 of 301, 8.0\%) together extend the prediction
-targets to six.
+(D19 MRD $\geq 1\%$), Day~46 MRD positivity (D46 MRD $\geq 0.01\%$),
+Final Risk (LR versus IR/HR; 159 LR, 142 IR/HR), relapse (44 of 301,
+14.6\%), event-free survival (EFS; relapse, induction failure or death;
+75 events, 24.9\%) and overall survival (OS; 24 deaths, 8.0\%).
+The external cohort pooled 41 patients from two hospitals: Lianyungang
+First People's Hospital (20 patients, diagnosed 2019--2023) and
+Children's Hospital of Fudan University, Shanghai (21 patients,
+2017--2021).
+The Fudan patients form a relapse-enriched referral series in which
+every patient relapsed, so the pooled external relapse rate (23 of 41)
+is far above that of an unselected ALL population.
+No external data were used for training.
 
-External validation used a single pooled cohort of 41 patients
-collected at two hospitals: Lianyungang First People's Hospital
-(20 patients, diagnosed 2019--2023) and Children's Hospital of Fudan
-University, Shanghai (21 patients, 2017--2021) (Table~\ref{tab:cohort}).
-The Fudan sub-cohort is a relapse-enriched referral series (all 21
-patients relapsed), so the pooled external relapse rate (23 of 41,
-56.1\%) sits far above that of an unselected ALL population; external
-relapse metrics are therefore exploratory (see Limitations).
-Pooling the two hospitals resolves the single-class collapse a
-per-site split would otherwise cause for several targets: D19MRD and
-Relapse become two-class and evaluable across the full cohort,
-while D46MRD still has only one positive patient after pooling and is
-reported as accuracy.
-For external validation, all 301 internal patients were used as the
-training set and no external data were used in training.
-
-Feature sets $\mathcal{F}_1$--$\mathcal{F}_7$
-(Table~\ref{tab:expdesign}) are temporally ordered and, except for the
-$\mathcal{F}_4$ branch, strictly nested: each level adds only features
-available at the corresponding clinical timepoint.
-$\mathcal{F}_1$ contains WBC count and age (Day~0);
-$\mathcal{F}_7$ additionally includes D19MRD and D46MRD values (Day~46).
-The feature hierarchy applies identically to all six prediction
-targets, with the distinction that classification tasks (targets 1--4)
-use AUROC (Phase~2 models) or balanced accuracy (Phase~1 LLMs, which
-output hard labels) as the primary metric, while survival targets (targets 5--6:
-EFS, OS) use Harrell's C-index and time-dependent IPCW AUC.
+Figure~\ref{fig:overview} summarises the design.
+Seven feature levels $\mathcal{F}_1$--$\mathcal{F}_7$ follow the order
+in which data become available, from white blood cell count and age at
+admission to D19 and D46 MRD at the end of induction (variable list in
+Supplementary Table~\ref{tab:featurelist}).
+Each target is predicted at a pre-specified decision level, the latest
+level available before the corresponding clinical decision:
+$\mathcal{F}_6$ for D19 and D46 MRD, and $\mathcal{F}_7$ for Final Risk,
+relapse, EFS and OS.
+At each level we compare an equal-weight ensemble of four zero-shot
+LLMs (Gemini-3.1-Flash-Lite, Gemma-4-31B-it, InternVL3.5-30B-A3B and
+Qwen3.6-35B-A3B), which uses no training data, with random forests (RF)
+and random survival forests (RSF) trained on patients from earlier
+enrolment years.
+The primary internal test set is the 2018--19 enrolment cohort
+(Split~2; 186 training and 114 test patients); the other two temporal
+splits are reported in Supplementary Table~\ref{tab:supp_decision}.
+Discrimination is summarised by AUROC for classification, where the
+LLM ensemble's score is the fraction of the four models predicting the
+positive class, and by Harrell's C-index for survival.
 
 \begin{table}[ht]
 \caption{Cohort characteristics and prediction target distributions.
@@ -431,27 +425,743 @@ OS events & 24 (8.0\%) & 7 (17.1\%) \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{fig1_design}
+\caption{\textbf{Study design along three timelines.}
+\textbf{a,}~Seven nested feature levels follow the clinical order of
+data acquisition from admission (Day~0) to the end of induction
+(Day~46); each target is predicted from the latest level available
+before the corresponding decision.
+\textbf{b,}~Trained models learn from earlier enrolment years and are
+tested on later years (three temporal splits) and, without retraining,
+on an external cohort from two hospitals.
+\textbf{c,}~At each level, predictions come either from four zero-shot
+LLMs, combined by equal-weight averaging, or from decision trees,
+random forests and random survival forests trained on the accumulating
+case database; retrieval of similar past cases revises the trained
+models' probabilities and grounds an LLM-generated clinical narrative.}
+\label{fig:overview}
+\end{figure}
+
 %%--------------------------------------------------------------%%
-\subsection{Phase~1: LLM zero-shot performance across six targets}
-\label{sec:phase1}
+\subsection{What becomes predictable, and when}
+\label{sec:when}
 %%--------------------------------------------------------------%%
 
-We evaluated four LLMs in a zero-shot setting across all seven
-clinical feature levels and all six prediction targets; Table~\ref{tab:phase1_full}
-reports the complete internal per-feature-level results and
-Table~\ref{tab:phase1_ext} the merged external cohort.
-Models included Gemini-3.1-Flash-Lite (Google AI API) and three
-open-weight models deployed locally via vLLM~\cite{[CITE:vLLM]}:
-Gemma-4-31B-it, InternVL3.5-30B-A3B, and Qwen3.6-35B-A3B.
-For classification tasks (targets 1--4), each patient's feature vector
-was serialised into natural language and the model output a categorical
-label. Because this output is a hard label rather than a probability,
-we report balanced accuracy (BA, the mean of sensitivity and
-specificity; numerically identical to the AUROC of the binary
-prediction), which is not directly comparable with the
-probability-based AUROC of the Phase~2 models.
-For survival targets (5--6), the model output a continuous risk score
-(0--1) evaluated by concordance index (C-index).
+Figure~\ref{fig:when} shows discrimination for every target at every
+feature level, in the internal test set and at the external hospitals.
+Three patterns stand out.
+
+\textbf{Final Risk is largely determined before it is assigned.}
+Trained RF reached an AUROC of 0.87 from white blood cell count and age
+alone and 1.00 at $\mathcal{F}_7$; the LLM ensemble rose from 0.79 to
+0.95.
+This follows from how Final Risk is defined.
+In our cohort a three-condition rule—Initial Risk of IR or HR, D19 MRD
+$\geq 1\%$, or D46 MRD $\geq 0.01\%$—reproduced Final Risk in 299 of
+301 internal patients (99.3\%) and in 40 of 41 external patients, and
+Initial Risk alone reproduced it in 90.7\%.
+Final Risk at $\mathcal{F}_7$ therefore tests whether a model recovers
+the protocol rule rather than whether it predicts an unknown outcome.
+The clinically uncertain part is which of the 187 initially low-risk
+patients will be upgraded (28 patients, 26 of them MRD-positive), which
+is the MRD prediction problem.
+
+\textbf{Survival discrimination appears late.}
+The RSF C-index for EFS stayed between 0.53 and 0.61 up to
+$\mathcal{F}_6$ and rose to 0.75 only when D19 and D46 MRD entered at
+$\mathcal{F}_7$, consistent with the central role of MRD in risk
+stratification~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}; the LLM
+ensemble rose from 0.68 to 0.71 over the same step.
+For OS, the LLM ensemble reached 0.70--0.74 from Day~5 onwards, whereas
+the RSF never exceeded 0.63.
+
+\textbf{Relapse and D46 MRD remain close to chance.}
+Neither approach exceeded an AUROC of 0.67 for either target at any
+level.
+D19 MRD, by contrast, became predictable once immunophenotype was
+available (RF 0.42 and 0.50 at $\mathcal{F}_1$ and $\mathcal{F}_2$,
+0.74--0.81 from $\mathcal{F}_3$; LLM ensemble 0.78 from
+$\mathcal{F}_5$).
+Results for each LLM and each level are given in Supplementary
+Tables~\ref{tab:phase1_full}--\ref{tab:phase2_ext}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{fig2_when_predictable}
+\caption{\textbf{What becomes predictable, and when.}
+Discrimination of each target at each feature level ($\mathcal{F}_1$--$\mathcal{F}_7$,
+with the day on which the level becomes available) for the zero-shot
+LLM ensemble (\textbf{a}, \textbf{b}) and for trained random forests
+(classification) or random survival forests (survival)
+(\textbf{c}, \textbf{d}), in the internal 2018--19 test set
+(\textbf{a}, \textbf{c}; trained on 2015--17) and in the external
+cohort (\textbf{b}, \textbf{d}; trained on all internal patients).
+Values are AUROC for Final Risk, D19 MRD, D46 MRD and relapse, and
+Harrell's C-index for EFS and OS. --, not evaluable (MRD values are
+inputs at $\mathcal{F}_7$; only one D46 MRD-positive external patient).}
+\label{fig:when}
+\end{figure}
+
+%%--------------------------------------------------------------%%
+\subsection{How many local patients is a zero-shot LLM worth?}
+\label{sec:worth}
+%%--------------------------------------------------------------%%
+
+To quantify the value of zero-shot LLMs relative to local data, we
+retrained RF and RSF on random subsets of $m$ patients from the
+2015--17 training years and evaluated them on the same 2018--19 test
+patients as the LLM ensemble (Fig.~\ref{fig:worth}; 20 repeats per
+size).
+The LLM ensemble matched trained models built from about 33 patients
+for Final Risk, 93 for D19 MRD and 120 for EFS.
+For OS, the RSF stayed below the LLM ensemble at every training size,
+including all 186 training patients.
+
+With all training data (Table~\ref{tab:main}), trained models were
+better only for Final Risk (AUROC difference $-0.050$, 95\% CI
+$-0.097$ to $-0.010$).
+They were statistically indistinguishable from the LLM ensemble for
+D19 MRD, D46 MRD, relapse and EFS, and worse for OS (C-index 0.737
+for the LLM ensemble versus 0.629; difference $+0.109$, 0.011 to
+0.229).
+The OS result held in the earlier split trained on 2015--16
+(difference $+0.105$, 0.024 to 0.190).
+These OS training sets contained only 8 and 13 deaths, so a model that
+must learn from local events has little to learn from, whereas the
+LLMs bring prognostic knowledge from pretraining.
+
+The Final Risk gap has a different cause.
+Even when given every input of the protocol rule at $\mathcal{F}_7$,
+the LLM ensemble assigned the correct group with a balanced accuracy
+of 0.833—below that of Initial Risk alone (0.906) and of the rule
+itself (1.000)—whereas the RF reached 0.958 after learning from local
+cases.
+Zero-shot LLMs therefore do not apply the local stratification
+protocol; protocol logic is better encoded explicitly than left to the
+model.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{fig3_learning_curves}
+\caption{\textbf{How many local patients a zero-shot LLM ensemble is
+worth.}
+Random forests (AUROC) and random survival forests (C-index) were
+trained on $m$ patients drawn at random from the 2015--17 enrolment
+years (20 repeats per size; line, mean; band, 10th--90th percentile)
+and evaluated on the 2018--19 test patients at each target's decision
+level.
+The blue line and band show the zero-shot LLM ensemble on the same
+patients (95\% bootstrap CI).
+Dashed lines mark the training size at which the trained model's mean
+reaches the LLM ensemble.
+For D46 MRD and relapse both approaches are close to chance; for OS the
+trained model stays below the LLM ensemble at every size.}
+\label{fig:worth}
+\end{figure}
+
+\begin{table}[t]
+\caption{\textbf{Zero-shot LLM ensemble versus locally trained models
+at the pre-specified decision level.}
+Internal: 2018--19 enrolment test set (Split~2; models trained on
+2015--17). External: two hospitals (models trained on all internal
+patients).
+Trained, random forest (classification) or random survival forest
+(survival). $\Delta$, LLM ensemble minus trained model, with 95\%
+bootstrap CI (2,000 resamples); $^{*}p<0.05$.
+LLM-equivalent $n$, number of local training patients at which the
+trained model's mean learning curve reaches the LLM ensemble
+(Fig.~\ref{fig:worth}); n.a., both approaches near chance.
+$^{\dagger}$Four positive patients.
+$^{\ddagger}$Relapse status almost coincides with hospital of origin,
+because one hospital contributed only relapsed patients.
+Final Risk at $\mathcal{F}_7$ is reproduced by a three-condition
+protocol rule (Section~\ref{sec:when}).
+All test sets, balanced accuracies and sensitivity analyses are in
+Supplementary Table~\ref{tab:supp_decision}.}
+\label{tab:main}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
+\begin{tabular}{@{}llccccccc@{}}
+\toprule
+ & & \multicolumn{4}{c}{\textbf{Internal (2018--19; $n$=113--114)}} & \multicolumn{3}{c}{\textbf{External ($n$=29--41)}} \\
+\cmidrule(lr){3-6}\cmidrule(lr){7-9}
+\textbf{Target (level)} & \textbf{Metric} & \textbf{LLM ens.} & \textbf{Trained} & \textbf{$\Delta$ [95\% CI]} & \textbf{LLM-equiv.\ $n$} & \textbf{LLM ens.} & \textbf{Trained} & \textbf{$\Delta$ [95\% CI]} \\
+\midrule
+Final Risk ($\mathcal{F}_7$) & AUROC & 0.948 & 0.998 & $-$0.050 [$-$0.097, $-$0.010]$^{*}$ & $\approx$33 & 0.975 & 0.992 & $-$0.017 [$-$0.067, +0.000] \\
+D19 MRD ($\mathcal{F}_6$) & AUROC & 0.778 & 0.811 & $-$0.033 [$-$0.177, +0.103] & $\approx$93 & 0.440$^{\dagger}$ & 0.330$^{\dagger}$ & +0.110 [$-$0.291, +0.599] \\
+D46 MRD ($\mathcal{F}_6$) & AUROC & 0.607 & 0.674 & $-$0.067 [$-$0.270, +0.133] & n.a. & \multicolumn{3}{c}{not evaluable (1 positive)} \\
+Relapse ($\mathcal{F}_7$) & AUROC & 0.503 & 0.597 & $-$0.094 [$-$0.250, +0.068] & n.a. & 0.522$^{\ddagger}$ & 0.377$^{\ddagger}$ & +0.145 [$-$0.134, +0.400] \\
+EFS ($\mathcal{F}_7$) & C-index & 0.713 & 0.746 & $-$0.033 [$-$0.125, +0.060] & $\approx$120 & 0.670 & 0.608 & +0.062 [$-$0.089, +0.224] \\
+OS ($\mathcal{F}_7$) & C-index & 0.737 & 0.629 & +0.109 [+0.011, +0.229]$^{*}$ & $>$186 & 0.829 & 0.643 & +0.187 [+0.035, +0.385]$^{*}$ \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+%%--------------------------------------------------------------%%
+\subsection{Robustness at external hospitals}
+\label{sec:external}
+%%--------------------------------------------------------------%%
+
+Applied without retraining to the external cohort
+(Fig.~\ref{fig:external}a and Table~\ref{tab:main}), the trained RSF
+lost discrimination for EFS (C-index 0.746 internally, 0.608
+externally), whereas the LLM ensemble changed little (0.713 and
+0.670).
+For OS, the LLM ensemble reached 0.829 against 0.643 for the RSF
+(difference $+0.187$, 95\% CI 0.035 to 0.385).
+Because one source hospital contributed only relapsed patients, we
+repeated the survival comparison counting only patient pairs from the
+same hospital; the LLM ensemble remained ahead (EFS 0.702 versus 0.629;
+OS 0.842 versus 0.691), although with 41 patients neither
+within-hospital difference reached significance.
+Final Risk transferred well for both approaches (AUROC 0.975 and
+0.992).
+The external D19 MRD, D46 MRD and relapse comparisons are not
+informative: they rest on four positive patients, one positive patient,
+and a relapse label that almost coincides with hospital of origin,
+respectively.
+Kaplan--Meier curves split at the median predicted risk separated EFS
+internally for both approaches (log-rank $p=0.010$ for each) and
+pointed in the same direction externally without reaching significance
+(LLM ensemble $p=0.111$; RSF $p=0.139$; Fig.~\ref{fig:external}b--e).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{fig4_external_km}
+\caption{\textbf{Internal versus external performance.}
+\textbf{a,}~Discrimination at the decision level (95\% bootstrap CI)
+for the zero-shot LLM ensemble and trained random forests or random
+survival forests, in the internal 2018--19 test set (filled) and the
+external cohort (open). External D46 MRD (one positive patient) is
+omitted; external D19 MRD (four positives) and relapse (confounded with
+hospital of origin) should not be interpreted.
+\textbf{b--e,}~Event-free survival by predicted risk (above versus
+below the median within each cohort) for the LLM ensemble
+(\textbf{b}, \textbf{c}) and the random survival forest
+(\textbf{d}, \textbf{e}), internally (\textbf{b}, \textbf{d}) and
+externally (\textbf{c}, \textbf{e}); $p$, log-rank test; $n$, patients
+per group.}
+\label{fig:external}
+\end{figure}
+
+%%--------------------------------------------------------------%%
+\subsection{Retrieval-based belief revision and clinical narratives}
+\label{sec:rag}
+%%--------------------------------------------------------------%%
+
+Revising RF probabilities towards the outcomes of the five most similar
+training cases (Methods) changed classification AUROC by $-0.042$ to
+$+0.073$ across tasks and splits, apart from a gain of $+0.226$ for D46
+MRD in the 17-patient 2019 test set, which contains only three
+positives (Supplementary Table~\ref{tab:belief_revision}).
+For survival, a censoring-aware variant that replaces neighbour
+outcomes with a similarity-weighted Kaplan--Meier event probability
+gave small but consistent gains (mean C-index change $+0.006$ over 70
+model, split and endpoint configurations; Wilcoxon $p=0.001$),
+concentrated in weaker base models.
+For each test patient, an LLM then produced a short narrative combining
+the prediction, the decision-tree path and the retrieved cases; a
+structured physician evaluation of these narratives is under way
+(Supplementary Table~\ref{tab:narrative_eval}).
+
+%%==============================================================%%
+\section{Discussion}\label{sec:discussion}
+%%==============================================================%%
+
+Most prediction models in paediatric ALL assume that a hospital's own
+historical cases are available for training.
+By aligning six clinical decisions with the timelines along which data
+are acquired and accumulate, we found that this assumption matters
+less than expected for several of them.
+A zero-shot ensemble of four LLMs, using no local data, matched random
+forests and survival forests trained on roughly 90--120 local patients
+for D19 MRD and EFS, outperformed them for OS in every evaluable test
+set, and lost less discrimination when moved to two other hospitals.
+Trained models were clearly superior only for Final Risk, a target that
+a three-condition protocol rule reproduces almost exactly.
+
+\textbf{When a zero-shot LLM suffices.}
+These results help reconcile two apparently conflicting lines of
+evidence.
+Prompted LLMs have outperformed conventional models trained on ten
+examples~\cite{[CITE:Zhu2026ClinicRealm]} yet fallen well short of
+models trained on full datasets~\cite{[CITE:ClinicalBench2026],[CITE:Brown2025JAMIA]}.
+Our learning curves locate the crossover within a single disease: about
+30 patients for a protocol-defined target, around 100 for EFS, and
+beyond the available data for OS, where only 8 to 13 deaths were
+available for training.
+The LLMs' advantage is largest where local events are scarce and where
+the case mix shifts, the two situations in which a locally trained
+model has least to learn from or most to unlearn.
+In practice, a centre starting a new protocol could use a zero-shot LLM
+ensemble for survival risk from the first patient, and move to, or
+combine it with, locally trained models for frequent-event targets once
+around one hundred cases have accrued.
+
+\textbf{Where it does not.}
+Given every input of the protocol rule, the LLM ensemble still
+misassigned Final Risk more often than Initial Risk alone would have.
+General-purpose LLMs do not know, or do not apply, the thresholds of a
+local stratification protocol, and decisions defined by such rules
+should be implemented as explicit logic rather than delegated to a
+language model.
+The value of zero-shot LLMs lies instead in outcomes that no rule
+defines—survival and, to a lesser extent, early treatment response.
+
+\textbf{MRD and the limits of routine data.}
+Survival discrimination appeared only once D19 and D46 MRD were
+available, for trained models and LLMs alike, in line with the
+established role of MRD as the dominant prognostic
+factor~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}.
+Relapse and D46 MRD remained near chance at every level, consistent
+with the failure of computational flow cytometry at
+diagnosis~\cite{[CITE:Martinez2025]} and the modest discrimination of
+a large clinical relapse model~\cite{[CITE:Saravanan2026]}.
+Stronger relapse signal has so far come mainly from single-cell and
+molecular profiles~\cite{[CITE:Good2018],[CITE:Mosquera2024]}, which
+our routine feature set does not include; adding such data at the
+appropriate point of the timeline is a natural next step.
+
+\textbf{Retrieval-based revision.}
+Revising model probabilities with similar past cases gave small,
+consistent gains for survival but mixed results for classification.
+Retrieval helps when the feature space clusters by outcome and
+neighbours agree, and adds noise when they do not, as for relapse.
+A practical safeguard would be to revise only when neighbour outcomes
+agree beyond a calibrated threshold.
+
+\textbf{Limitations.}
+The internal cohort comes from a single institution and was analysed
+retrospectively.
+The external cohort is small (41 patients) and includes a
+relapse-enriched referral series, so external relapse and MRD results
+are not interpretable and the within-hospital survival differences did
+not reach significance; larger, prospectively collected external cohorts
+are needed to confirm the robustness of the LLM ensemble.
+Learning curves were estimated on one temporal split, the 2019 test set
+contains only 17 patients, and no correction was made for multiple
+comparisons.
+The LLMs were used zero-shot with fixed prompts; their outputs may
+change with model versions, and fine-tuning or few-shot prompting might
+narrow the Final Risk gap.
+Because each LLM returns a hard label for classification, the
+ensemble's classification score has only five levels, which limits its
+AUROC.
+Finally, physician evaluation of the LLM narratives is in progress and
+will determine whether they are useful beyond illustrative case
+studies.
+
+%%==============================================================%%
+\section{Methods}\label{sec:methods}
+%%==============================================================%%
+
+\subsection{Datasets and ethics}\label{sec:dataset}
+
+The internal training cohort comprised $n=301$ patients diagnosed with
+ALL at [HOSPITAL NAME] between 2015 and 2019.
+All patients were treated with risk-stratified chemotherapy protocols
+consistent with contemporary Chinese paediatric oncology guidelines.
+Ethics approval was obtained from [ETHICS NUMBER]; all data were
+de-identified prior to analysis.
+Each patient record includes structured clinical data (demographics,
+haematological indices, immunophenotype, 51-marker flow cytometry panel,
+cytogenetics, MRD values).
+
+The external validation cohort ($n=41$) was supplied as a single
+merged file spanning two source hospitals, distinguished by the
+recorded hospital field: Lianyungang First People's Hospital (20
+patients, 2019--2023) and Children's Hospital of Fudan University,
+Shanghai (21 patients, 2017--2021, a relapse-enriched referral cohort
+in which all patients relapsed); ethics approval: [ETHICS NUMBERS,
+external cohort]. We pool the two hospitals and evaluate the external
+cohort as a single group throughout (Section~\ref{sec:ood}).
+No external data were used in any model training.
+
+\subsection{Temporally-structured feature hierarchy}\label{sec:features}
+
+Feature sets are temporally ordered and, except for the
+$\mathcal{F}_4$ branch, form a strictly nested sequence
+$\mathcal{F}_1 \subseteq \mathcal{F}_2 \subseteq \mathcal{F}_3
+\subseteq \mathcal{F}_5 \subseteq \mathcal{F}_6 \subseteq \mathcal{F}_{7}$
+($\mathcal{F}_4$ branches from $\mathcal{F}_3$; Table~\ref{tab:featurelist}),
+where each level contains exactly the features available at the
+corresponding clinical timepoint.
+Boundaries: $\mathcal{F}_1$~(Day~0): WBC count and age;
+$\mathcal{F}_2$~(Day~1): adds blast percentage;
+$\mathcal{F}_3$~(Day~1): adds immunophenotype and 51 flow cytometry markers;
+$\mathcal{F}_4$~(Day~1): adds non-risk clinical factors;
+$\mathcal{F}_5$~(Day~5): adds CNS status, Day~5 blast, and Initial Risk;
+$\mathcal{F}_6$~(Day~7--10): adds Fusion gene, Karyotype, FISH;
+$\mathcal{F}_7$~(Day~46): adds D19MRD and D46MRD.
+The complete variable list for every level is given in
+Table~\ref{tab:featurelist}.
+All six prediction targets are evaluated on the same feature hierarchy.
+
+For Phase~2, categorical features were one-hot encoded and numerical
+features z-score normalised using training-split statistics only:
+\begin{equation}
+z_{ij}^{(\text{test})} =
+\frac{x_{ij}^{(\text{test})} - \mu_j^{(\text{train})}}
+     {\sigma_j^{(\text{train})}},
+\label{eq:zscore}
+\end{equation}
+with missing values imputed by training-split medians.
+
+\subsection{Phase~1: LLM zero-shot inference}\label{sec:llm_inference}
+
+For classification tasks, each patient's features were serialised into a
+key--value list and presented with a task-specific system prompt
+requesting a bracketed label (e.g., \texttt{[[IR]]}/\texttt{[[LR]]}).
+For survival risk scoring, the same serialised features were presented
+with a prompt requesting a continuous event probability (0.0--1.0).
+All experiments used temperature~$=0$ (greedy decoding); open-weight
+models were served with vLLM~\cite{[CITE:vLLM]}.
+Because each classification output is a single hard label,
+classification performance is summarised by balanced accuracy,
+$\mathrm{BA}=\tfrac{1}{2}(\mathrm{TPR}+\mathrm{TNR})$, which equals
+the AUROC of the binary prediction.
+The four LLMs were combined into an ensemble with equal weights and no
+tuning.
+For classification, the ensemble score is the fraction of models
+predicting the positive class (patients without a valid answer from
+any model were excluded), and the ensemble label is positive when at
+least two of the four models agree.
+For survival, the ensemble score is the mean of the four predicted
+event probabilities; the mean within-cohort rank of the four scores
+was used as a sensitivity analysis (Supplementary
+Table~\ref{tab:supp_decision}).
+Per-patient outputs were cached; the cohort was scored for every
+combination of feature level ($\times 7$), task ($\times 6$), and
+model ($\times 4$).
+
+\subsection{Phase~2: Decision tree and random forest}\label{sec:dt}
+
+A decision tree (DT; \texttt{max\_depth}=4, \texttt{class\_weight}=%
+`balanced', \texttt{criterion}=`gini', \texttt{random\_state}=42)
+and a random forest (RF; $n_\text{estimators}=100$,
+\texttt{class\_weight}=`balanced') were trained for each feature level
+and temporal split.
+Three temporal splits defined by enrolment year threshold $\mathcal{T}_s$
+(Eq.~\ref{eq:splits}) ensure strict temporal non-leakage.
+\begin{equation}
+\mathcal{D}_s^{\text{train}} = \{i : \tau_i \leq \mathcal{T}_s\},
+\quad
+\mathcal{D}_s^{\text{test}} = \{i : \tau_i > \mathcal{T}_s\}.
+\label{eq:splits}
+\end{equation}
+Enrolment year $\tau_i$ is taken from the diagnostic smear date; one
+patient whose date could not be parsed is excluded from all splits.
+Patients with a missing label for a task are excluded from that task's
+training and test sets.
+Primary metric: AUROC; secondary: F1-macro and balanced accuracy.
+
+\subsection{Phase~2: Random survival forest}\label{sec:rsf}
+
+A random survival forest (RSF;~\cite{[CITE:Ishwaran2008]};
+$n_\text{estimators}=100$, \texttt{random\_state}=42) was trained on
+the same temporal splits as the classification experiments; a single
+survival decision tree (survival-tree analogue of the classification DT)
+was trained under the same protocol as its tree-based counterpart.
+EFS was defined as time from diagnosis to first of: relapse, induction
+failure, or death; OS was time to death.
+Censoring was at last follow-up.
+Evaluation used Harrell's C-index (Eq.~\ref{eq:cindex}), IPCW
+time-dependent AUC (Eq.~\ref{eq:itauc}) at $t^*\in\{12,24,36\}$
+months, and the log-rank test on Kaplan-Meier curves dichotomised at
+the median risk score.
+
+\subsection{External OOD evaluation}\label{sec:ood}
+
+For external validation, all $n=301$ internal patients served as the
+training set and external patients served as the test set; no
+site-specific fine-tuning was performed.
+DT and RF were trained on the full internal set using the same
+preprocessing pipeline (Eq.~\ref{eq:zscore}).
+RSF was trained identically.
+For Phase~1 LLM evaluation, no training was involved; the same
+zero-shot prompts were applied to external patient feature vectors.
+
+\subsection{Decision levels, learning curves and protocol baseline}\label{sec:comparison}
+
+Before comparing methods, we fixed one decision level per target:
+$\mathcal{F}_6$ for D19 and D46 MRD, the last level before the Day-19
+assessment, and $\mathcal{F}_7$ for Final Risk, relapse, EFS and OS,
+which are assigned or predicted after induction.
+All comparisons between the LLM ensemble and trained models use this
+level and the same test patients.
+For balanced accuracy, RF probabilities were thresholded at the
+training-set prevalence.
+Learning curves were computed on Split~2: for
+$m \in \{10, 20, 40, 60, 80, 120, 160\}$ and for the full training set,
+RF or RSF models with the settings above were trained on $m$ patients
+drawn without replacement from the 2015--17 enrolment years (20 repeats
+per $m$) and evaluated on the 2018--19 test patients with a valid LLM
+prediction.
+The LLM-equivalent training size is the value of $m$ at which the mean
+learning curve first reaches the LLM ensemble, obtained by linear
+interpolation between adjacent sizes.
+As a reference for Final Risk, a protocol rule assigned IR/HR when
+Initial Risk was IR or HR, D19 MRD was $\geq 1\%$, or D46 MRD was
+$\geq 0.01\%$.
+
+\subsection{RAG belief revision and LLM narration}\label{sec:rag_methods}
+
+For test patient $i$, the $K=5$ most similar training cases were
+retrieved by cosine similarity in the standardised feature space:
+\begin{equation}
+\mathcal{N}(i) = \underset{j \in \mathcal{D}^{\text{train}}}
+  {\arg\text{top-}K}\
+  \frac{\mathbf{z}_i \cdot \mathbf{z}_j}
+       {\|\mathbf{z}_i\|_2 \|\mathbf{z}_j\|_2}, \quad K = 5.
+\label{eq:rag}
+\end{equation}
+The RAG evidence probability is
+\begin{equation}
+p_{\text{rag}} =
+  \frac{\sum_{j \in \mathcal{N}(i)} s_j\, y_j}
+       {\sum_{j \in \mathcal{N}(i)} s_j},
+\label{eq:prag}
+\end{equation}
+where $s_j$ is the cosine similarity to neighbour $j$ and
+$y_j \in \{0,1\}$ is the binary task outcome (or event indicator
+for survival).
+The revised probability is
+\begin{equation}
+p_{\text{rev}} = \alpha\, p_0 + (1-\alpha)\, p_{\text{rag}},
+\qquad
+\alpha = 1 - (1-\alpha_{\text{base}})\sqrt{\bar{s}},
+\label{eq:prev}
+\end{equation}
+where $\alpha_\text{base}=0.6$ and
+$\bar{s} = \frac{1}{K}\sum_{j \in \mathcal{N}(i)} s_j$.
+For survival, $p_0$ is the min-max normalised RSF risk score.
+
+After belief revision, an LLM prompt containing the patient's features,
+the human-readable DT decision path~\cite{[CITE:Rudin2019]}, top-6 salient features (ranked by
+$\text{importance}_j \times |z_{ij}|$), and top-5 retrieved case
+profiles was submitted to Gemini-3.1-Flash-Lite to generate a 3--5
+sentence clinical narrative.
+
+\subsection{Survival metrics}\label{sec:surv_methods}
+
+Harrell's concordance index:
+\begin{equation}
+\hat{C} =
+\frac{
+  \sum_{i \neq j}
+  \mathbf{1}[T_i < T_j]\,
+  \mathbf{1}[\delta_i = 1]\,
+  \mathbf{1}[\hat{r}_i > \hat{r}_j]
+}{
+  \sum_{i \neq j}
+  \mathbf{1}[T_i < T_j]\,
+  \mathbf{1}[\delta_i = 1]
+}.
+\label{eq:cindex}
+\end{equation}
+IPCW time-dependent AUC:
+\begin{equation}
+\widehat{\text{AUC}}(t^*) =
+\frac{
+  \sum_{i:\,T_i \leq t^*,\,\delta_i=1}
+  \sum_{j:\,T_j > t^*}
+  \mathbf{1}[\hat{r}_i > \hat{r}_j]\,\hat{w}_i
+}{
+  \sum_{i:\,T_i \leq t^*,\,\delta_i=1}
+  \sum_{j:\,T_j > t^*}
+  \hat{w}_i
+},
+\label{eq:itauc}
+\end{equation}
+where $\hat{w}_i = 1/\hat{G}(T_i)^2$ and $\hat{G}(\cdot)$ is the
+Kaplan-Meier censoring estimator~\cite{[CITE:Uno2011]}.
+
+\subsection{Statistical analysis}
+
+AUROC and balanced accuracy were computed with
+\texttt{scikit-learn}~\cite{[CITE:sklearn]}, and C-index and IPCW AUC
+with \texttt{scikit-survival}~\cite{[CITE:sksurv]}.
+Confidence intervals are percentile intervals from 2,000 patient-level
+bootstrap resamples.
+Differences between the LLM ensemble and trained models were computed
+on the same resamples, with two-sided $p$-values given by twice the
+smaller tail of the bootstrap distribution of the difference.
+In the external cohort we also computed a within-hospital C-index that
+counts only patient pairs from the same hospital, with bootstrap
+resampling stratified by hospital.
+Kaplan--Meier curves were compared by the log-rank test after splitting
+patients at the median predicted risk within each cohort.
+Split~3 contains only 17 test patients (8 IR/HR, and 3 positives each
+for D19 MRD, D46 MRD and relapse), so its estimates are indicative
+only.
+No correction was made for multiple comparisons; all $p$-values are
+two-sided.
+
+%%==============================================================%%
+\section*{Data availability}
+%%==============================================================%%
+
+The clinical dataset contains patient health information and cannot be
+made publicly available due to privacy regulations.
+De-identified data may be available through a data access agreement
+with [HOSPITAL NAME]; requests to the corresponding author.
+
+%%==============================================================%%
+\section*{Code availability}
+%%==============================================================%%
+
+Analysis code and LLM prompts will be made available at
+\url{https://github.com/YanbeiJiang/ALL_prediction_NCS}
+upon acceptance.
+
+%%==============================================================%%
+\section*{Acknowledgements}
+%%==============================================================%%
+
+[To be completed — funding sources, clinical collaborators]
+
+%%==============================================================%%
+\section*{Author contributions}
+%%==============================================================%%
+
+[To be completed]
+
+%%==============================================================%%
+\section*{Competing interests}
+%%==============================================================%%
+
+The authors declare no competing interests.
+
+%%==============================================================%%
+%% Supplementary information
+%%==============================================================%%
+\begin{appendices}
+
+\section{Supplementary tables}\label{sec:supp}
+\renewcommand{\thetable}{S\arabic{table}}
+\setcounter{table}{0}
+
+\begin{table}[ht]
+\caption{Feature set design aligned with the clinical data-acquisition
+timeline. All six prediction targets are evaluated at every feature
+level; $\dagger$~at $\mathcal{F}_7$, D19MRD and
+D46MRD are used as \emph{input features}, so only Final Risk and
+Relapse are predicted. EFS/OS are evaluated at all levels using
+the same feature vector as classification tasks.}
+\label{tab:expdesign}
+\centering
+\small
+\begin{tabular}{lllc}
+\toprule
+\textbf{Level} & \textbf{Timepoint} & \textbf{Cumulative features added} & \textbf{Class. targets} \\
+\midrule
+$\mathcal{F}_1$     & Day 0     & WBC count, Age & 4 \\
+$\mathcal{F}_2$     & Day 1     & + Blast\% & 4 \\
+$\mathcal{F}_3$     & Day 1     & + Immunophenotype + 51 flow cytometry markers & 4 \\
+$\mathcal{F}_4$     & Day 1     & $\mathcal{F}_3$ + non-risk clinical factors & 4 \\
+$\mathcal{F}_5$     & Day 5     & $\mathcal{F}_3$ + CNS status + Day~5 blast\% + Initial Risk & 4 \\
+$\mathcal{F}_6$     & Day 7--10 & $\mathcal{F}_5$ + Fusion gene + Karyotype + FISH & 4 \\
+$\mathcal{F}_7$     & Day 46    & $\mathcal{F}_6$ + D19MRD + D46MRD (as inputs) & 2$^\dagger$ \\
+\bottomrule
+\multicolumn{4}{l}{Survival targets (EFS, OS) evaluated at all levels using the same feature vector.}
+\end{tabular}
+\end{table}
+
+\clearpage
+
+\begin{table}[ht]
+\caption{\textbf{Complete variable specification for each feature level}
+(Supplementary Table). Each level adds the listed variables to its base
+set; $\mathcal{F}_4$ branches from $\mathcal{F}_3$,
+while the main clinical chain is
+$\mathcal{F}_1\!\subseteq\!\mathcal{F}_2\!\subseteq\!\mathcal{F}_3\!
+\subseteq\!\mathcal{F}_5\!\subseteq\!\mathcal{F}_6\!\subseteq\!\mathcal{F}_7$.}
+\label{tab:featurelist}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l p{0.80\linewidth}@{}}
+\toprule
+\textbf{Level} & \textbf{Variables added (base set)} \\
+\midrule
+$\mathcal{F}_1$ & WBC count; Age \\
+$\mathcal{F}_2$ & $+$ Blast\% \\
+$\mathcal{F}_3$ & $+$ Immunophenotype (B/T lineage); 42 CD markers (CD1a, CD2, CD3, cCD3, CD4, CD5, CD7, CD8, CD9, CD10, CD11b, CD11c, CD13, CD14, CD15, CD19, CD20, CD22, cCD22, CD24, CD33, CD34, CD38, CD41, CD44, CD45, CD58, CD61, CD64, CD65, CD66c, CD71, CD73, cCD79a, CD86, CD90, CD97, CD99, CD117, CD123, CD133, CD200); 9 additional markers (GPA, cMPO, NG2, TdT, c$\mu$, sIgM, TCR$\alpha\beta$, TCR$\gamma\delta$, HLA-DR) \\
+$\mathcal{F}_4$ & (base $\mathcal{F}_3$) $+$ non-risk clinical factors: chief-complaint category, pregnancy number, birth order, term/preterm status, delivery mode, birth weight, feeding type, admission weight, liver span, spleen span, haemoglobin, platelet count \\
+$\mathcal{F}_5$ & (base $\mathcal{F}_3$) $+$ CNS status (CNSL); Day-5 peripheral blast\%; Initial Risk \\
+$\mathcal{F}_6$ & (base $\mathcal{F}_5$) $+$ Fusion gene; Karyotype; FISH \\
+$\mathcal{F}_7$ & (base $\mathcal{F}_6$) $+$ D19MRD; D46MRD (as input features) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+
+\begin{table}[p]
+\caption{\textbf{Zero-shot LLM ensemble versus trained models at the
+decision level in every test set.}
+AUROC (classification) or Harrell's C-index (survival) with 95\%
+bootstrap CI (2,000 resamples), followed by balanced accuracy (BA; LLM
+ensemble: majority of the four models; trained: threshold at the
+training-set prevalence). Trained, random forest (classification) or
+random survival forest (survival). Notes: for Final Risk, BA of the
+three-condition protocol rule and of Initial Risk alone; for survival,
+C-index of the rank-mean ensemble (sensitivity analysis) and, in the
+external cohort, within-hospital C-index (LLM ensemble vs trained).
+($n$, patients and positives or events.)}
+\label{tab:supp_decision}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
+\begin{tabular}{@{}llllll@{}}
+\toprule
+\textbf{Test set} & \textbf{LLM ensemble} & \textbf{Trained} & \textbf{BA LLM} & \textbf{BA trained} & \textbf{Notes} \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{Final Risk (F7)}} \\
+\quad Split 1 (2017--19) ($n$=200, 100) & 0.950 [0.919, 0.979] & 0.996 [0.990, 0.999] & 0.850 & 0.950 & rule 1.000; Initial Risk 0.895 \\
+\quad Split 2 (2018--19) ($n$=113, 48) & 0.948 [0.900, 0.988] & 0.998 [0.992, 1.000] & 0.833 & 0.958 & rule 1.000; Initial Risk 0.906 \\
+\quad Split 3 (2019) ($n$=17, 8) & 1.000 [1.000, 1.000] & 1.000 [1.000, 1.000] & 1.000 & 1.000 & rule 1.000; Initial Risk 0.813 \\
+\quad External ($n$=29, 20) & 0.975 [0.917, 1.000] & 0.992 [0.961, 1.000] & 0.900 & 0.919 & rule 0.975; Initial Risk 0.900 \\
+\addlinespace[2pt]
+\multicolumn{6}{@{}l}{\textit{D19 MRD (F6)}} \\
+\quad Split 1 (2017--19) ($n$=200, 31) & 0.668 [0.563, 0.773] & 0.684 [0.562, 0.797] & 0.647 & 0.642 &  \\
+\quad Split 2 (2018--19) ($n$=113, 13) & 0.778 [0.627, 0.903] & 0.811 [0.685, 0.916] & 0.720 & 0.725 &  \\
+\quad Split 3 (2019) ($n$=17, 3) & 0.500 [0.167, 0.844] & 0.631 [0.333, 0.933] & 0.452 & 0.524 &  \\
+\quad External ($n$=29, 4) & 0.440 [0.107, 0.946] & 0.330 [0.120, 0.577] & 0.365 & 0.345 &  \\
+\addlinespace[2pt]
+\multicolumn{6}{@{}l}{\textit{D46 MRD (F6)}} \\
+\quad Split 1 (2017--19) ($n$=200, 21) & 0.539 [0.413, 0.664] & 0.586 [0.465, 0.706] & 0.594 & 0.559 &  \\
+\quad Split 2 (2018--19) ($n$=113, 11) & 0.607 [0.409, 0.801] & 0.674 [0.481, 0.842] & 0.616 & 0.663 &  \\
+\quad Split 3 (2019) ($n$=17, 3) & 0.631 [0.369, 0.867] & 0.429 [0.067, 0.867] & 0.488 & 0.452 &  \\
+\quad External & \multicolumn{5}{l}{not evaluable} \\
+\addlinespace[2pt]
+\multicolumn{6}{@{}l}{\textit{Relapse (F7)}} \\
+\quad Split 1 (2017--19) ($n$=200, 28) & 0.572 [0.487, 0.658] & 0.590 [0.487, 0.688] & 0.572 & 0.525 &  \\
+\quad Split 2 (2018--19) ($n$=113, 17) & 0.503 [0.431, 0.602] & 0.597 [0.443, 0.737] & 0.517 & 0.567 &  \\
+\quad Split 3 (2019) ($n$=17, 3) & 0.357 [0.231, 0.464] & 0.429 [0.000, 0.813] & 0.393 & 0.619 &  \\
+\quad External ($n$=29, 23) & 0.522 [0.500, 0.569] & 0.377 [0.116, 0.661] & 0.522 & 0.384 &  \\
+\addlinespace[2pt]
+\multicolumn{6}{@{}l}{\textit{EFS (F7)}} \\
+\quad Split 1 (2017--19) ($n$=201, 43) & 0.672 [0.592, 0.752] & 0.684 [0.605, 0.766] & -- & -- & rank mean 0.680 \\
+\quad Split 2 (2018--19) ($n$=114, 25) & 0.713 [0.611, 0.813] & 0.746 [0.639, 0.841] & -- & -- & rank mean 0.705 \\
+\quad Split 3 (2019) ($n$=17, 5) & 0.684 [0.437, 0.894] & 0.691 [0.327, 0.982] & -- & -- & rank mean 0.684 \\
+\quad External ($n$=41, 24) & 0.670 [0.558, 0.776] & 0.608 [0.472, 0.734] & -- & -- & rank mean 0.688; within hospital 0.702 vs 0.629 \\
+\addlinespace[2pt]
+\multicolumn{6}{@{}l}{\textit{OS (F7)}} \\
+\quad Split 1 (2017--19) ($n$=201, 15) & 0.712 [0.553, 0.852] & 0.607 [0.447, 0.757] & -- & -- & rank mean 0.722 \\
+\quad Split 2 (2018--19) ($n$=114, 10) & 0.737 [0.584, 0.876] & 0.629 [0.457, 0.794] & -- & -- & rank mean 0.737 \\
+\quad Split 3 (2019) & \multicolumn{5}{l}{not evaluable} \\
+\quad External ($n$=41, 7) & 0.829 [0.704, 0.934] & 0.643 [0.418, 0.848] & -- & -- & rank mean 0.788; within hospital 0.842 vs 0.691 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\clearpage
 
 \begin{table}[!t]
 \caption{\textbf{Phase~1 LLM zero-shot performance across all seven clinical feature levels and six prediction targets (internal cohort; classification $n=298$ patients with all four labels, survival $n=301$).} Each cell is the balanced accuracy (BA; classification targets) or Harrell's concordance index (survival targets) for one LLM at one feature level; \textbf{bold} marks each model's best feature level for that target (column maximum). BA is computed from the parsed categorical prediction (equivalently, the AUROC of the binary prediction). \textemdash{}~indicates a target not evaluated at that level: D19/D46MRD are used as \emph{input} features at $\mathcal{F}_7$ (see Table~\ref{tab:expdesign}).}
@@ -493,55 +1203,7 @@ $\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash & $\math
 \end{tabular}
 \end{table}
 
-\textbf{Classification performance on the internal cohort.}
-Final Risk was the easiest target for all models.
-At Day~0 features ($\mathcal{F}_1$: WBC and age), all four models
-already achieved BA~$\approx 0.73$--$0.79$, reflecting the known
-prognostic importance of WBC count.
-Performance increased incrementally and peaked at the cytogenetics
-panel $\mathcal{F}_6$ (Gemini~0.834, Gemma~0.891, InternVL~0.848,
-Qwen~0.882), which was the best level for the three open-weight models;
-supplying the D19/D46 MRD values as inputs at $\mathcal{F}_7$ raised
-Gemini to 0.849 but did not further improve the others.
-Best-level Final Risk BAs were thus 0.849 (Gemini,~$\mathcal{F}_7$),
-0.891 (Gemma,~$\mathcal{F}_6$), 0.848 (InternVL,~$\mathcal{F}_6$), and
-0.882 (Qwen,~$\mathcal{F}_6$).
-Relapse prediction was substantially harder: best BAs were
-0.643 (InternVL,~$\mathcal{F}_6$), 0.599 (Gemini,~$\mathcal{F}_6$),
-0.586 (Gemma,~$\mathcal{F}_7$), and 0.557 (Qwen,~$\mathcal{F}_7$),
-with no consistent improvement as features accumulated.
-D19MRD and D46MRD showed moderate performance (BA~0.55--0.65),
-suggesting that LLMs can partially infer early treatment response from
-immunophenotypic and cytogenetic profiles but that these tasks remain
-harder without direct MRD measurement.
-
-\textbf{Survival performance on the internal cohort.}
-For EFS, best-level C-indices were all attained at $\mathcal{F}_7$:
-0.716 (Gemma), 0.687 (Gemini), 0.662 (Qwen), and 0.642 (InternVL).
-The inclusion of the D19/D46 MRD values at $\mathcal{F}_7$ was
-consistently optimal for EFS, confirming that residual disease burden
-encodes strong prognostic information accessible to LLMs without
-labelled training data.
-For OS—with only 24 events—C-indices also peaked at $\mathcal{F}_7$:
-InternVL reached 0.764, Gemini 0.725, and Gemma and Qwen both 0.718.
-Log-rank tests were significant ($p < 0.05$) at $\mathcal{F}_7$
-for EFS for all four LLMs.
-
-\textbf{External validation (merged cohort).}
-Final Risk transferred well on the pooled 41-patient external cohort:
-LLM zero-shot BA ranged 0.450--0.925 across models and feature
-levels, peaking at $\mathcal{F}_7$ (0.750--0.925 across the four
-LLMs), close to the internal range and obtained without any
-cohort-specific retraining (Table~\ref{tab:phase1_ext}).
-Pooling the two source hospitals resolves the single-class collapse
-that a per-site split would otherwise produce for Relapse and D19MRD:
-both targets are now two-class across the full external cohort and
-evaluable by BA (Relapse 0.482--0.717; D19MRD close to chance,
-0.340--0.550); only D46MRD still has a single positive patient after
-pooling (1 of 29 labelled patients) and is reported with accuracy
-(0.035--0.724) rather than BA.
-For survival, the pooled cohort (24 EFS events, 7 deaths) gave LLM EFS
-C-indices of 0.542--0.715 and OS 0.548--0.859.
+\clearpage
 
 \begin{table}[p]
 \caption{\textbf{Phase~1 LLM zero-shot on the pooled external cohort,
@@ -616,101 +1278,11 @@ $\mathcal{F}_7$ & 0.802 & 0.615 & \textbf{0.859} & 0.665 \\
 \end{tabular}
 \end{table}
 
-%%--------------------------------------------------------------%%
-\subsection{Phase~2: Temporal validation and classification+survival
-results}
-\label{sec:phase2}
-%%--------------------------------------------------------------%%
-
-Phase~2 evaluates DT and RF models on three temporal splits
-($\mathcal{T}_1=2016$: $n_\text{train}=99$, $n_\text{test}=201$;
-$\mathcal{T}_2=2017$: $n_\text{train}=186$, $n_\text{test}=114$;
-$\mathcal{T}_3=2018$: $n_\text{train}=283$, $n_\text{test}=17$)
-and a random survival forest (RSF) on the same splits for the EFS
-and OS targets (internal results in Table~\ref{tab:phase2_int},
-external in Table~\ref{tab:phase2_ext}).
-One patient whose diagnostic smear date could not be parsed has no
-enrolment year and is excluded from all temporal splits (300 of 301
-patients), and patients without a recorded D19MRD (2) or D46MRD (3)
-value are excluded from that task.
-
-\textbf{Classification on the internal cohort (Split~2).}
-Final Risk DT AUROC rose from 0.810 at $\mathcal{F}_1$ to
-0.912 at $\mathcal{F}_6$, with the largest single gain at $\mathcal{F}_5$
-(+0.127, introduction of Initial Risk and Day~5 blast percentage).
-Including MRD at $\mathcal{F}_7$ further raised DT AUROC to
-\textbf{0.949} (RF:~0.998), the highest classification result across
-all conditions.
-On Split~2, D19MRD reached RF~0.811 (DT~0.705) and D46MRD RF~0.674
-(DT~0.549).
-Relapse prediction remained difficult for Phase~2 as for Phase~1
-(Split~2: best DT AUROC~0.529, RF~0.630), mirroring the broader literature
-on relapse biology~\cite{[CITE:Martinez2025]}.
-
-\textbf{Survival on the internal cohort (Split~2).}
-RSF at $\mathcal{F}_7$ achieved C-index~\textbf{0.746} and
-time-AUC at 24~months~0.775 for EFS (log-rank $p=0.010$),
-outperforming the best LLM zero-shot EFS C-index (0.716) obtained
-without any training data.
-For OS, RSF C-index was 0.629 ($p=0.489$; not significant), reflecting
-the low event rate (8.0\%) and limited statistical power.
-
-\begin{table}[t]
-\caption{\textbf{Method comparison on the internal cohort, per temporal
-split.} Rows are methods: LLM zero-shot (Gemini, best feature level,
-evaluated on each split's test set); decision tree (DT, a survival tree
-for EFS/OS) and random forest (RF, a random survival forest RSF for
-EFS/OS), our Phase~2 models; DT/RF rows show the best feature level
-in each split. Classification: AUROC for DT/RF; survival (EFS, OS):
-C-index. $^\dagger$LLM classification values are the balanced accuracy
-of the parsed hard label, not a probability-based AUROC, and are
-therefore not directly comparable with the DT/RF rows. \textbf{Bold}
-marks the best value in each split. Test sets by enrolment year:
-Split~1 (2017--19, $n$=201), Split~2 (2018--19, $n$=114), Split~3 (2019,
-$n$=17); D19/D46MRD exclude patients without a recorded MRD value
-($n$=200, 113, 17). \textemdash{}: no OS events in the 2019 test set. Full
-per-feature-level detail in Table~\ref{tab:phase2_int_full}.}
-\label{tab:phase2_int}
-\centering
-\small
-\setlength{\tabcolsep}{6pt}
-\begin{tabular}{@{}l ccc@{}}
-\toprule
-\textbf{Method} & \textbf{Split~1} & \textbf{Split~2} & \textbf{Split~3} \\
- & \footnotesize $n$=201 & \footnotesize $n$=114 & \footnotesize $n$=17 \\
-\midrule
-\multicolumn{4}{l}{\textit{Final Risk (AUROC)}} \\
-LLM (Gemini)$^\dagger$ & 0.860 & 0.856 & \textbf{1.000} \\
-DT & 0.893 & 0.949 & 0.979 \\
-RF & \textbf{0.996} & \textbf{0.998} & \textbf{1.000} \\
-\multicolumn{4}{l}{\textit{D19 MRD (AUROC)}} \\
-LLM (Gemini)$^\dagger$ & 0.651 & 0.745 & 0.560 \\
-DT & 0.560 & 0.705 & \textbf{0.893} \\
-RF & \textbf{0.684} & \textbf{0.811} & 0.845 \\
-\multicolumn{4}{l}{\textit{D46 MRD (AUROC)}} \\
-LLM (Gemini)$^\dagger$ & \textbf{0.614} & 0.632 & 0.560 \\
-DT & 0.545 & 0.549 & 0.464 \\
-RF & 0.601 & \textbf{0.674} & \textbf{0.655} \\
-\multicolumn{4}{l}{\textit{Relapse (AUROC)}} \\
-LLM (Gemini)$^\dagger$ & \textbf{0.593} & 0.589 & \textbf{0.786} \\
-DT & 0.550 & 0.529 & 0.500 \\
-RF & 0.591 & \textbf{0.630} & 0.500 \\
-\multicolumn{4}{l}{\textit{EFS (C-index)}} \\
-LLM (Gemini) & 0.661 & 0.674 & \textbf{0.772} \\
-DT & 0.674 & 0.718 & 0.691 \\
-RSF & \textbf{0.684} & \textbf{0.746} & 0.706 \\
-\multicolumn{4}{l}{\textit{OS (C-index)}} \\
-LLM (Gemini) & 0.682 & \textbf{0.665} & \textemdash \\
-DT & 0.562 & 0.562 & \textemdash \\
-RSF & \textbf{0.688} & 0.628 & \textemdash \\
-\bottomrule
-\end{tabular}
-\end{table}
+\clearpage
 
 \begin{table}[p]
 \caption{\textbf{Phase~2 internal results across all feature levels and
-the three temporal splits} (full detail behind the summary in
-Table~\ref{tab:phase2_int}). Classification: DT / RF AUROC; survival
+the three temporal splits} (Split-2 values at the decision level are compared with the LLM ensemble in Table~\ref{tab:main}). Classification: DT / RF AUROC; survival
 (EFS, OS): survival-tree (DT) / RSF C-index. \textbf{Bold} marks
 the best feature level in each column. Splits by enrolment year: S1
 train~$\leq$16/test~17--19; S2 $\leq$17/18--19; S3 $\leq$18/19.
@@ -780,25 +1352,7 @@ $\mathcal{F}_7$ & 0.562 & 0.607 & 0.505 & \textbf{0.628} & \textemdash & \textem
 \end{tabular}
 \end{table}
 
-\textbf{External validation (merged cohort, OOD).}
-With all 301 internal patients as training, RF and DT retained strong
-Final Risk discrimination on the pooled external cohort (best DT
-AUROC~0.968, RF~0.991 at $\mathcal{F}_7$; Table~\ref{tab:phase2_ext}),
-confirming transfer to an independent patient population.
-Pooling the two source hospitals also resolves the single-class
-collapse seen when they were evaluated separately: Relapse and D19MRD
-are now two-class across the full external cohort and AUROC-evaluable
-— best Relapse~0.583 (DT) / 0.528 (RF) and best D19MRD~0.630 (DT) /
-0.650 (RF; 29 patients with a recorded D19MRD value;
-Table~\ref{tab:phase2_ext_summary}) — while D46MRD still has only one
-positive case among the 31 patients with a recorded value and is
-reported as accuracy (DT~0.742; RF~0.968, which equals predicting
-every patient negative).
-For survival, the pooled cohort (24 EFS events, 7 deaths) gave best
-RSF C-indices of 0.608 (EFS, $\mathcal{F}_7$) and 0.718 (OS,
-$\mathcal{F}_1$/$\mathcal{F}_2$; log-rank $p=0.036$ at
-$\mathcal{F}_2$), with DT reaching 0.603 (EFS,
-$\mathcal{F}_1$) and 0.710 (OS, $\mathcal{F}_7$).
+\clearpage
 
 \begin{table}[p]
 \caption{\textbf{Phase~2 out-of-distribution results on the pooled
@@ -873,119 +1427,7 @@ $\mathcal{F}_7$ & \textbf{0.710} & 0.643 \\
 \end{tabular}
 \end{table}
 
-\begin{table}[t]
-\caption{\textbf{Method comparison on the pooled external cohort}
-(out-of-distribution; no temporal split; the two source hospitals
-pooled into a single cohort, $n$=41). Rows are methods: LLM zero-shot
-(Gemini, best feature level); decision tree (DT, a survival tree for
-EFS/OS) and random forest (RF, RSF for EFS/OS), trained on all 301
-internal patients. Classification: AUROC for DT/RF ($^*$~= accuracy;
-D46MRD has only one positive case after pooling, so accuracy is
-reported instead); survival (EFS, OS): C-index. $^\dagger$LLM
-classification values are balanced accuracy of the parsed hard label
-and are not directly comparable with the DT/RF AUROC. D19MRD and
-D46MRD use the 29 and 31 patients with a recorded value (LLM: the
-29-patient complete-label subset). \textbf{Bold} marks the best value
-for each task. Pooled external cohort; small, indicative only. Full
-per-feature-level detail in Table~\ref{tab:phase2_ext}.}
-\label{tab:phase2_ext_summary}
-\centering
-\small
-\setlength{\tabcolsep}{7pt}
-\begin{tabular}{@{}l c@{}}
-\toprule
-\textbf{Method} & \textbf{External} \\
- & \footnotesize $n$=41 \\
-\midrule
-\multicolumn{2}{l}{\textit{Final Risk (AUROC)}} \\
-LLM (Gemini)$^\dagger$ & 0.925 \\
-DT & 0.968 \\
-RF & \textbf{0.991} \\
-\multicolumn{2}{l}{\textit{D19 MRD (AUROC)}} \\
-LLM (Gemini)$^\dagger$ & 0.550 \\
-DT & 0.630 \\
-RF & \textbf{0.650} \\
-\multicolumn{2}{l}{\textit{D46 MRD (accuracy)}} \\
-LLM (Gemini) & 0.690$^*$ \\
-DT & 0.742$^*$ \\
-RF & \textbf{0.968$^*$} \\
-\multicolumn{2}{l}{\textit{Relapse (AUROC)}} \\
-LLM (Gemini)$^\dagger$ & \textbf{0.717} \\
-DT & 0.583 \\
-RF & 0.528 \\
-\multicolumn{2}{l}{\textit{EFS (C-index)}} \\
-LLM (Gemini) & \textbf{0.715} \\
-DT & 0.603 \\
-RSF & 0.608 \\
-\multicolumn{2}{l}{\textit{OS (C-index)}} \\
-LLM (Gemini) & \textbf{0.810} \\
-DT & 0.710 \\
-RSF & 0.718 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-%%--------------------------------------------------------------%%
-\subsection{Cosine RAG belief revision}
-\label{sec:rag}
-%%--------------------------------------------------------------%%
-
-For each test patient $i$, the $K=5$ most similar training cases were
-retrieved by cosine similarity in the standardised feature space and
-used to compute a similarity-weighted RAG evidence probability
-$p_\text{rag}$ (Eq.~\ref{eq:prag}).
-The revised probability is
-$p_\text{rev} = \alpha\,p_0 + (1-\alpha)\,p_\text{rag}$, where
-$\alpha = 1-(1-\alpha_\text{base})\sqrt{\bar{s}}$ and
-$\alpha_\text{base}=0.6$.
-
-\textbf{Internal cohort.}
-Table~\ref{tab:belief_revision} reports AUROC before and after belief
-revision.
-Belief revision improved performance on Final Risk (Split~2:
-$+0.002$) and D46MRD (Split~2: $0.527 \to 0.600$, $+0.073$; Split~3:
-$0.655 \to 0.881$, $\Delta=+0.226$), and was close to neutral for
-D19MRD (Splits~1--2: $-0.003$ and $-0.004$; Split~3: $+0.024$).
-The large D46MRD gain on Split~3 reflects high retrieval quality: with
-280 labelled training cases, the five nearest neighbours share strong
-phenotypic similarity (mean cosine $\bar{s} \approx 0.91$) and
-concordant D46MRD outcomes. However, this test year contains only
-17 patients (3 D46MRD-positive), so the estimate is highly uncertain.
-Belief revision degraded Relapse performance (Split~2:
-$0.630 \to 0.588$, $\Delta=-0.042$): because relapse prediction is
-intrinsically noisy, retrieved neighbours have mixed outcomes, and
-RAG evidence acts as a noise source rather than a corrective signal.
-
-\textbf{External (pooled across sites).}
-On the pooled external cohort, belief revision improved Final Risk
-($0.991 \to 1.000$, $+0.009$).
-D19MRD AUROC degraded ($0.265 \to 0.230$, $-0.035$) because the
-external set has very few D19MRD-positive patients ($n_\text{pos}=4$
-of 29), making retrieved neighbour outcomes uninformative.
-D46MRD belief revision could not be computed ($n_\text{pos}=1$).
-These results confirm the internal boundary condition: belief revision
-benefits tasks where the feature space clusters meaningfully by label,
-but is counter-productive when class representation is too sparse to
-yield informative neighbours.
-
-\textbf{Survival belief revision.}
-Extending belief revision to EFS and OS requires handling censored
-neighbour outcomes.
-A naive adaptation that treats the event indicator as a binary outcome
-(ignoring censoring) is near-neutral to slightly negative
-(EFS mean $\Delta$C-index $-0.003$, OS $-0.007$).
-Replacing that evidence with a censoring-aware similarity-weighted
-Kaplan--Meier neighbourhood event probability at 24 months
-(Table~\ref{tab:belief_revision}, survival rows) instead applies the
-revision to the normalised RSF risk score and yields small but
-consistent gains: mean $\Delta$C-index $+0.006$ over all 70
-experiment$\times$split$\times$endpoint cells (Wilcoxon $p=0.001$),
-significant for internal EFS ($+0.006$, $p=0.004$), internal OS
-($+0.006$, $p=0.016$) and external OS ($+0.014$, $p=0.045$); external
-EFS was neutral.
-The gains are modest and concentrated in mid-ranked configurations—the
-best RSF models are already near-optimal and change little—consistent
-with belief revision helping most where the base model is imperfect.
+\clearpage
 
 \begin{table}[ht]
 \caption{Cosine RAG belief revision: RF AUROC before ($p_\text{RF}$) and
@@ -1044,40 +1486,7 @@ OS & --- & 0.643 & 0.659 & $+0.016$ \\
 \end{tabular}
 \end{table}
 
-%%--------------------------------------------------------------%%
-\subsection{LLM clinical narratives and qualitative evaluation}
-\label{sec:narratives}
-%%--------------------------------------------------------------%%
-
-After belief revision, an LLM prompt was constructed for each test
-patient containing: (i) the patient's serialised feature vector;
-(ii) the RF-predicted label, revised probability $p_\text{rev}$, and
-the human-readable DT decision path from root to
-leaf~\cite{[CITE:Rudin2019]};
-(iii) the six patient-salient features ranked by
-$\text{importance}_j \times |z_{ij}|$;
-and (iv) the structured profiles and outcomes of the top-5 retrieved
-historical cases.
-Gemini-3.1-Flash-Lite produced 3--5-sentence narratives for each
-prediction; all narratives from the $\mathcal{F}_7$/Split~3 experiment
-($n=17$ test patients) are available for physician review.
-
-Two representative cases from the $\mathcal{F}_7$/Split~3 experiment
-illustrate the range of narrative quality (Fig.~\ref{fig:rag}).
-In Case~1 (correctly classified IR, persistent MRD), the top-5
-retrieved neighbours all share elevated MRD and cytogenetic
-abnormalities, and the narrative coherently attributes the high-risk
-classification to MRD non-clearance corroborated by historical
-precedent.
-In Case~2 (borderline case), the narrative highlights conflicting
-signals between MRD clearance and cytogenetic risk, suggesting
-next-generation sequencing as a way to resolve ambiguity.
-
-Quantitative physician evaluation of narrative quality is planned
-and will follow the protocol in Table~\ref{tab:narrative_eval}.
-Evaluation will cover: factual consistency with the patient's features,
-relevance of historical case comparisons, clinical plausibility of the
-interpretation, and overall helpfulness for clinical decision-making.
+\clearpage
 
 \begin{table}[ht]
 \caption{Planned physician evaluation of LLM clinical narratives.
@@ -1109,515 +1518,7 @@ Inter-rater $\kappa$ & — & — & — & — & — \\
 \end{tabular}
 \end{table}
 
-%%==============================================================%%
-\section{Discussion}\label{sec:discussion}
-%%==============================================================%%
-
-This study presents a temporally-structured prediction framework
-evaluated jointly across six ALL prediction targets—four classification
-tasks and two survival endpoints—and validated on an external cohort
-pooled from two independent hospitals.
-Several findings warrant discussion.
-
-\textbf{MRD as the dominant signal across all targets.}
-The largest single performance gain in Phase~2—DT AUROC for Final Risk
-from 0.912 ($\mathcal{F}_6$, cytogenetics) to 0.949 ($\mathcal{F}_7$,
-plus D19/D46 MRD)—quantitatively confirms the central role of MRD
-in clinical risk stratification~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}.
-The same pattern holds for LLM EFS C-index, which peaked at feature
-levels including MRD (Gemma: 0.716 at $\mathcal{F}_7$), and for
-Phase~2 RSF EFS (C-index~0.746, $p=0.010$).
-These convergent results from four LLMs, decision trees, and a survival
-forest provide multi-method evidence that residual disease burden at
-Day~46 is the strongest prognostic signal accessible before relapse.
-
-\textbf{LLM zero-shot as a competitive baseline.}
-Phase~1 Final Risk balanced accuracies of 0.848--0.891 without
-labelled training data approach the Phase~2 DT AUROC at
-$\mathcal{F}_6$ (0.912) and its peak (0.949 at $\mathcal{F}_7$); the
-metrics differ (BA from a single hard decision versus threshold-free
-AUROC), so this comparison is indicative only.
-This indicates that clinical knowledge encoded during LLM pretraining
-includes a meaningful understanding of paediatric ALL risk factors, and
-that LLMs may serve as strong priors when historical case databases are
-small or absent—for example, at the time a new treatment protocol is
-introduced.
-This conclusion is conditional on the comparator: with serialised
-structured data, prompted LLMs have often outperformed conventional
-models trained on few examples~\cite{[CITE:Zhu2026ClinicRealm]} but fallen
-well short of fully trained ones~\cite{[CITE:ClinicalBench2026],[CITE:Brown2025JAMIA]},
-and in our temporal splits the trained Phase~2 models outperform the
-zero-shot LLMs for most targets once a case database has accrued
-(Table~\ref{tab:phase2_int}).
-On the merged external cohort, LLM Final Risk BAs at the best
-feature level ($\mathcal{F}_7$) ranged 0.750--0.925 across models,
-surpassing the internal zero-shot values for some models, likely due
-to differences in class distribution (larger IR/HR proportion in the
-external cohort) rather than genuine improvement in discriminative
-ability.
-
-\textbf{External validation: generalisation and limitations.}
-Phase~2 RF Final Risk AUROC of 0.991 on the merged external cohort
-(versus 0.998 internally) demonstrates strong generalisation across
-independent institutions.
-However, D19MRD AUROC dropped from 0.811 (internal RF at
-$\mathcal{F}_6$, Split~2, Table~\ref{tab:phase2_int_full}) to 0.650
-(external), indicating feature-distribution shift that partly limits
-generalisation for this target.
-The single D46MRD-positive patient remaining after pooling ($n=1$ of
-31 patients with a recorded value) precluded belief revision and produced unstable
-AUC estimates, highlighting the need for larger external cohorts with
-balanced outcome distributions.
-The pooled external cohort remains small (41 patients from two
-hospitals of 20 and 21) and includes a relapse-enriched referral
-sub-cohort (see Limitations), so some targets remain
-event-sparse even after pooling (e.g., D46MRD, $n=1$ positive);
-larger, prospectively balanced external cohorts remain necessary for
-a definitive test of cross-institution robustness.
-
-\textbf{Integrating six targets in a unified framework.}
-Treating EFS and OS as targets~5--6 of the same feature hierarchy—rather
-than studying them in a separate survival analysis—reveals a coherent
-picture: the same feature level ($\mathcal{F}_7$) that maximises
-Final Risk classification also maximises EFS survival discrimination
-(RSF C-index~0.746), while Relapse and OS remain challenging regardless
-of feature set.
-This joint view avoids the selective reporting that can arise when
-survival and classification tasks are presented in separate papers or
-using different patient subsets.
-
-\textbf{Boundary conditions for RAG belief revision.}
-Belief revision delivers quantitative gains specifically when the feature
-space clusters meaningfully by label.
-For D46MRD at Split~3 (mean similarity $\bar{s}\approx 0.91$), the
-$\Delta+0.226$ AUROC gain is the largest observed, but it rests on
-17 test patients with three positives and needs confirmation.
-For Relapse ($\Delta-0.042$ internally; the external $+0.016$ starts
-from a below-chance base AUROC of 0.267), retrieved neighbours are too
-heterogeneous to provide reliable evidence.
-For survival, a naive binary-outcome revision is near-neutral (mean
-$\Delta$C-index $-0.003$ for EFS and $-0.007$ for OS), whereas the
-censoring-aware Kaplan--Meier variant yields small but consistent
-gains (mean $\Delta$C-index $+0.006$), again largest where the base
-model is imperfect.
-A practical deployment criterion would be to apply belief revision
-only when inter-neighbour outcome agreement exceeds a calibrated
-threshold—for example, Fleiss $\kappa > 0.4$ over the top-$K$
-retrieved labels.
-
-\textbf{Relapse remains an open problem.}
-Relapse prediction was intractable for all Phase~1 and Phase~2 models
-(Split~2: best RF AUROC~0.630, DT~0.529; best LLM BA~0.643),
-consistent with the failure of computational flow cytometry at
-diagnosis~\cite{[CITE:Martinez2025]} and the modest discrimination of
-a large clinical relapse model~\cite{[CITE:Saravanan2026]}; stronger
-relapse signal has so far come mainly from single-cell and molecular
-profiles~\cite{[CITE:Good2018],[CITE:Mosquera2024]}.
-Our feature set does not include genomic or epigenomic data (e.g.,
-copy-number variation, DNA methylation), which have shown modest
-incremental utility~\cite{[CITE:Mosquera2024]}.
-Future multi-omics integration within the temporal feature hierarchy
-may improve relapse prediction.
-
-\textbf{Limitations.}
-The internal cohort is a single-institution retrospective study, and
-the external cohort—though pooled across two hospitals—remains small;
-multi-centre prospective validation at greater scale is required
-before clinical deployment.
-The internal cohort ($n=301$) limits statistical power for OS
-(24 events) and Split~3 ($n_\text{test}=17$).
-The external cohort pools two hospitals, one of which (Fudan) is a
-relapse-enriched referral cohort in which all patients relapsed;
-the pooled external relapse rate is therefore far above that of an
-unselected ALL population, so external metrics—particularly for
-relapse—are exploratory rather than representative estimates;
-moreover, the complete-label subset used for the Phase~1
-classification metrics ($n{=}29$) is more skewed still (23 of 29
-relapsed, 79\%), because joint-label completeness retained all
-relapse-positive patients.
-Phase~1 LLMs were evaluated zero-shot; fine-tuning on labelled clinical
-data may yield further improvements.
-Physician evaluation of LLM narratives (Table~\ref{tab:narrative_eval})
-is ongoing and will determine whether the narratives are clinically
-actionable beyond proof-of-concept case studies.
-
-%%==============================================================%%
-\section{Methods}\label{sec:methods}
-%%==============================================================%%
-
-\subsection{Datasets and ethics}\label{sec:dataset}
-
-The internal training cohort comprised $n=301$ patients diagnosed with
-ALL at [HOSPITAL NAME] between 2015 and 2019.
-All patients were treated with risk-stratified chemotherapy protocols
-consistent with contemporary Chinese paediatric oncology guidelines.
-Ethics approval was obtained from [ETHICS NUMBER]; all data were
-de-identified prior to analysis.
-Each patient record includes structured clinical data (demographics,
-haematological indices, immunophenotype, 51-marker flow cytometry panel,
-cytogenetics, MRD values).
-
-The external validation cohort ($n=41$) was supplied as a single
-merged file spanning two source hospitals, distinguished by the
-recorded hospital field: Lianyungang First People's Hospital (20
-patients, 2019--2023) and Children's Hospital of Fudan University,
-Shanghai (21 patients, 2017--2021, a relapse-enriched referral cohort
-in which all patients relapsed); ethics approval: [ETHICS NUMBERS,
-external cohort]. We pool the two hospitals and evaluate the external
-cohort as a single group throughout (Section~\ref{sec:ood}).
-No external data were used in any model training.
-
-\subsection{Temporally-structured feature hierarchy}\label{sec:features}
-
-Feature sets are temporally ordered and, except for the
-$\mathcal{F}_4$ branch, form a strictly nested sequence
-$\mathcal{F}_1 \subseteq \mathcal{F}_2 \subseteq \mathcal{F}_3
-\subseteq \mathcal{F}_5 \subseteq \mathcal{F}_6 \subseteq \mathcal{F}_{7}$
-($\mathcal{F}_4$ branches from $\mathcal{F}_3$; Table~\ref{tab:featurelist}),
-where each level contains exactly the features available at the
-corresponding clinical timepoint.
-Boundaries: $\mathcal{F}_1$~(Day~0): WBC count and age;
-$\mathcal{F}_2$~(Day~1): adds blast percentage;
-$\mathcal{F}_3$~(Day~1): adds immunophenotype and 51 flow cytometry markers;
-$\mathcal{F}_4$~(Day~1): adds non-risk clinical factors;
-$\mathcal{F}_5$~(Day~5): adds CNS status, Day~5 blast, and Initial Risk;
-$\mathcal{F}_6$~(Day~7--10): adds Fusion gene, Karyotype, FISH;
-$\mathcal{F}_7$~(Day~46): adds D19MRD and D46MRD.
-The complete variable list for every level is given in
-Table~\ref{tab:featurelist}.
-All six prediction targets are evaluated on the same feature hierarchy.
-
-For Phase~2, categorical features were one-hot encoded and numerical
-features z-score normalised using training-split statistics only:
-\begin{equation}
-z_{ij}^{(\text{test})} =
-\frac{x_{ij}^{(\text{test})} - \mu_j^{(\text{train})}}
-     {\sigma_j^{(\text{train})}},
-\label{eq:zscore}
-\end{equation}
-with missing values imputed by training-split medians.
-
-\subsection{Phase~1: LLM zero-shot inference}\label{sec:llm_inference}
-
-For classification tasks, each patient's features were serialised into a
-key--value list and presented with a task-specific system prompt
-requesting a bracketed label (e.g., \texttt{[[IR]]}/\texttt{[[LR]]}).
-For survival risk scoring, the same serialised features were presented
-with a prompt requesting a continuous event probability (0.0--1.0).
-All experiments used temperature~$=0$ (greedy decoding); open-weight
-models were served with vLLM~\cite{[CITE:vLLM]}.
-Because each classification output is a single hard label,
-classification performance is summarised by balanced accuracy,
-$\mathrm{BA}=\tfrac{1}{2}(\mathrm{TPR}+\mathrm{TNR})$, which equals
-the AUROC of the binary prediction.
-Per-patient outputs were cached; the cohort was scored for every
-combination of feature level ($\times 7$), task ($\times 6$), and
-model ($\times 4$).
-
-\subsection{Phase~2: Decision tree and random forest}\label{sec:dt}
-
-A decision tree (DT; \texttt{max\_depth}=4, \texttt{class\_weight}=%
-`balanced', \texttt{criterion}=`gini', \texttt{random\_state}=42)
-and a random forest (RF; $n_\text{estimators}=100$,
-\texttt{class\_weight}=`balanced') were trained for each feature level
-and temporal split.
-Three temporal splits defined by enrolment year threshold $\mathcal{T}_s$
-(Eq.~\ref{eq:splits}) ensure strict temporal non-leakage.
-\begin{equation}
-\mathcal{D}_s^{\text{train}} = \{i : \tau_i \leq \mathcal{T}_s\},
-\quad
-\mathcal{D}_s^{\text{test}} = \{i : \tau_i > \mathcal{T}_s\}.
-\label{eq:splits}
-\end{equation}
-Enrolment year $\tau_i$ is taken from the diagnostic smear date; one
-patient whose date could not be parsed is excluded from all splits.
-Patients with a missing label for a task are excluded from that task's
-training and test sets.
-Primary metric: AUROC; secondary: F1-macro and balanced accuracy.
-
-\subsection{Phase~2: Random survival forest}\label{sec:rsf}
-
-A random survival forest (RSF;~\cite{[CITE:Ishwaran2008]};
-$n_\text{estimators}=100$, \texttt{random\_state}=42) was trained on
-the same temporal splits as the classification experiments; a single
-survival decision tree (survival-tree analogue of the classification DT)
-was trained under the same protocol as its tree-based counterpart.
-EFS was defined as time from diagnosis to first of: relapse, induction
-failure, or death; OS was time to death.
-Censoring was at last follow-up.
-Evaluation used Harrell's C-index (Eq.~\ref{eq:cindex}), IPCW
-time-dependent AUC (Eq.~\ref{eq:itauc}) at $t^*\in\{12,24,36\}$
-months, and the log-rank test on Kaplan-Meier curves dichotomised at
-the median risk score.
-
-\subsection{External OOD evaluation}\label{sec:ood}
-
-For external validation, all $n=301$ internal patients served as the
-training set and external patients served as the test set; no
-site-specific fine-tuning was performed.
-DT and RF were trained on the full internal set using the same
-preprocessing pipeline (Eq.~\ref{eq:zscore}).
-RSF was trained identically.
-For Phase~1 LLM evaluation, no training was involved; the same
-zero-shot prompts were applied to external patient feature vectors.
-
-\subsection{RAG belief revision and LLM narration}\label{sec:rag_methods}
-
-For test patient $i$, the $K=5$ most similar training cases were
-retrieved by cosine similarity in the standardised feature space:
-\begin{equation}
-\mathcal{N}(i) = \underset{j \in \mathcal{D}^{\text{train}}}
-  {\arg\text{top-}K}\
-  \frac{\mathbf{z}_i \cdot \mathbf{z}_j}
-       {\|\mathbf{z}_i\|_2 \|\mathbf{z}_j\|_2}, \quad K = 5.
-\label{eq:rag}
-\end{equation}
-The RAG evidence probability is
-\begin{equation}
-p_{\text{rag}} =
-  \frac{\sum_{j \in \mathcal{N}(i)} s_j\, y_j}
-       {\sum_{j \in \mathcal{N}(i)} s_j},
-\label{eq:prag}
-\end{equation}
-where $s_j$ is the cosine similarity to neighbour $j$ and
-$y_j \in \{0,1\}$ is the binary task outcome (or event indicator
-for survival).
-The revised probability is
-\begin{equation}
-p_{\text{rev}} = \alpha\, p_0 + (1-\alpha)\, p_{\text{rag}},
-\qquad
-\alpha = 1 - (1-\alpha_{\text{base}})\sqrt{\bar{s}},
-\label{eq:prev}
-\end{equation}
-where $\alpha_\text{base}=0.6$ and
-$\bar{s} = \frac{1}{K}\sum_{j \in \mathcal{N}(i)} s_j$.
-For survival, $p_0$ is the min-max normalised RSF risk score.
-
-After belief revision, an LLM prompt containing the patient's features,
-DT decision path, top-6 salient features (ranked by
-$\text{importance}_j \times |z_{ij}|$), and top-5 retrieved case
-profiles was submitted to Gemini-3.1-Flash-Lite to generate a 3--5
-sentence clinical narrative.
-
-\subsection{Survival metrics}\label{sec:surv_methods}
-
-Harrell's concordance index:
-\begin{equation}
-\hat{C} =
-\frac{
-  \sum_{i \neq j}
-  \mathbf{1}[T_i < T_j]\,
-  \mathbf{1}[\delta_i = 1]\,
-  \mathbf{1}[\hat{r}_i > \hat{r}_j]
-}{
-  \sum_{i \neq j}
-  \mathbf{1}[T_i < T_j]\,
-  \mathbf{1}[\delta_i = 1]
-}.
-\label{eq:cindex}
-\end{equation}
-IPCW time-dependent AUC:
-\begin{equation}
-\widehat{\text{AUC}}(t^*) =
-\frac{
-  \sum_{i:\,T_i \leq t^*,\,\delta_i=1}
-  \sum_{j:\,T_j > t^*}
-  \mathbf{1}[\hat{r}_i > \hat{r}_j]\,\hat{w}_i
-}{
-  \sum_{i:\,T_i \leq t^*,\,\delta_i=1}
-  \sum_{j:\,T_j > t^*}
-  \hat{w}_i
-},
-\label{eq:itauc}
-\end{equation}
-where $\hat{w}_i = 1/\hat{G}(T_i)^2$ and $\hat{G}(\cdot)$ is the
-Kaplan-Meier censoring estimator~\cite{[CITE:Uno2011]}.
-
-\subsection{Statistical analysis}
-
-AUROC and BA were computed with \texttt{scikit-learn}~\cite{[CITE:sklearn]};
-C-index and IPCW AUC with
-\texttt{scikit-survival}~\cite{[CITE:sksurv]}.
-Because Split~3 contains only 17 test patients (8 IR/HR, and 3
-positives each for D19MRD, D46MRD and Relapse), we computed bootstrap
-95\% confidence intervals (1000 resamples) for its decision-tree
-AUROCs; they are wide (e.g., Final Risk at $\mathcal{F}_7$: 0.979
-[0.903, 1.000]; D46MRD at $\mathcal{F}_2$: 0.321 [0.067, 0.751]), and
-all Split~3 estimates should be regarded as indicative.
-No multiple-testing correction was applied given the exploratory nature
-of this study; all reported $p$-values are two-sided.
-
-%%==============================================================%%
-\section*{Data availability}
-%%==============================================================%%
-
-The clinical dataset contains patient health information and cannot be
-made publicly available due to privacy regulations.
-De-identified data may be available through a data access agreement
-with [HOSPITAL NAME]; requests to the corresponding author.
-
-%%==============================================================%%
-\section*{Code availability}
-%%==============================================================%%
-
-Analysis code and LLM prompts will be made available at
-\url{https://github.com/YanbeiJiang/ALL_prediction_NCS}
-upon acceptance.
-
-%%==============================================================%%
-\section*{Acknowledgements}
-%%==============================================================%%
-
-[To be completed — funding sources, clinical collaborators]
-
-%%==============================================================%%
-\section*{Author contributions}
-%%==============================================================%%
-
-[To be completed]
-
-%%==============================================================%%
-\section*{Competing interests}
-%%==============================================================%%
-
-The authors declare no competing interests.
-
-%%==============================================================%%
-%% Main tables
-%%==============================================================%%
-
-\begin{table}[ht]
-\caption{Feature set design aligned with the clinical data-acquisition
-timeline. All six prediction targets are evaluated at every feature
-level; $\dagger$~at $\mathcal{F}_7$, D19MRD and
-D46MRD are used as \emph{input features}, so only Final Risk and
-Relapse are predicted. EFS/OS are evaluated at all levels using
-the same feature vector as classification tasks.}
-\label{tab:expdesign}
-\centering
-\small
-\begin{tabular}{lllc}
-\toprule
-\textbf{Level} & \textbf{Timepoint} & \textbf{Cumulative features added} & \textbf{Class. targets} \\
-\midrule
-$\mathcal{F}_1$     & Day 0     & WBC count, Age & 4 \\
-$\mathcal{F}_2$     & Day 1     & + Blast\% & 4 \\
-$\mathcal{F}_3$     & Day 1     & + Immunophenotype + 51 flow cytometry markers & 4 \\
-$\mathcal{F}_4$     & Day 1     & $\mathcal{F}_3$ + non-risk clinical factors & 4 \\
-$\mathcal{F}_5$     & Day 5     & $\mathcal{F}_3$ + CNS status + Day~5 blast\% + Initial Risk & 4 \\
-$\mathcal{F}_6$     & Day 7--10 & $\mathcal{F}_5$ + Fusion gene + Karyotype + FISH & 4 \\
-$\mathcal{F}_7$     & Day 46    & $\mathcal{F}_6$ + D19MRD + D46MRD (as inputs) & 2$^\dagger$ \\
-\bottomrule
-\multicolumn{4}{l}{Survival targets (EFS, OS) evaluated at all levels using the same feature vector.}
-\end{tabular}
-\end{table}
-
-\begin{table}[ht]
-\caption{\textbf{Complete variable specification for each feature level}
-(Supplementary Table). Each level adds the listed variables to its base
-set; $\mathcal{F}_4$ branches from $\mathcal{F}_3$,
-while the main clinical chain is
-$\mathcal{F}_1\!\subseteq\!\mathcal{F}_2\!\subseteq\!\mathcal{F}_3\!
-\subseteq\!\mathcal{F}_5\!\subseteq\!\mathcal{F}_6\!\subseteq\!\mathcal{F}_7$.}
-\label{tab:featurelist}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}l p{0.80\linewidth}@{}}
-\toprule
-\textbf{Level} & \textbf{Variables added (base set)} \\
-\midrule
-$\mathcal{F}_1$ & WBC count; Age \\
-$\mathcal{F}_2$ & $+$ Blast\% \\
-$\mathcal{F}_3$ & $+$ Immunophenotype (B/T lineage); 42 CD markers (CD1a, CD2, CD3, cCD3, CD4, CD5, CD7, CD8, CD9, CD10, CD11b, CD11c, CD13, CD14, CD15, CD19, CD20, CD22, cCD22, CD24, CD33, CD34, CD38, CD41, CD44, CD45, CD58, CD61, CD64, CD65, CD66c, CD71, CD73, cCD79a, CD86, CD90, CD97, CD99, CD117, CD123, CD133, CD200); 9 additional markers (GPA, cMPO, NG2, TdT, c$\mu$, sIgM, TCR$\alpha\beta$, TCR$\gamma\delta$, HLA-DR) \\
-$\mathcal{F}_4$ & (base $\mathcal{F}_3$) $+$ non-risk clinical factors: chief-complaint category, pregnancy number, birth order, term/preterm status, delivery mode, birth weight, feeding type, admission weight, liver span, spleen span, haemoglobin, platelet count \\
-$\mathcal{F}_5$ & (base $\mathcal{F}_3$) $+$ CNS status (CNSL); Day-5 peripheral blast\%; Initial Risk \\
-$\mathcal{F}_6$ & (base $\mathcal{F}_5$) $+$ Fusion gene; Karyotype; FISH \\
-$\mathcal{F}_7$ & (base $\mathcal{F}_6$) $+$ D19MRD; D46MRD (as input features) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-%%==============================================================%%
-%% Figure captions
-%%==============================================================%%
-
-\begin{figure}[ht]
-\caption{\textbf{Overview of the temporally-structured
-prediction framework.}
-\textbf{a,}~The three parallel timelines: feature acquisition
-(Day~0--46, $\mathcal{F}_1$–$\mathcal{F}_{7}$), prediction targets
-(six tasks: Final Risk, D19MRD, D46MRD, Relapse, EFS, OS), and the
-dynamic case database (patient enrolment year 2015--2019, temporal
-splits).
-\textbf{b,}~Phase~1 architecture: four LLMs receive serialised patient
-features and output class labels or risk scores without task-specific
-training.
-\textbf{c,}~Phase~2 architecture: a decision tree trained on historical
-cases generates predictions and decision paths; RAG retrieves the
-$K=5$ most similar cases; LLM synthesises a clinical narrative.
-\textbf{d,}~Evaluation scope: internal temporal splits (three splits) and
-external OOD validation (merged external cohort).}
-\label{fig:overview}
-\end{figure}
-
-\begin{figure}[ht]
-\caption{\textbf{Phase~1 feature-level ablation across six prediction
-targets.}
-\textbf{a,}~Final Risk balanced accuracy (BA) vs feature level for four LLMs.
-\textbf{b,}~Relapse BA. \textbf{c,}~D19MRD BA.
-\textbf{d,}~D46MRD BA. \textbf{e,}~EFS C-index.
-\textbf{f,}~OS C-index.
-Vertical dashed lines indicate clinical timepoints: Day~1 (flow
-cytometry), Day~5 (early response), Day~7--10
-(cytogenetics), Day~46 (MRD, $\mathcal{F}_7$).
-Open symbols: internal cohort. Filled symbols: External cohort.}
-\label{fig:ablation}
-\end{figure}
-
-\begin{figure}[ht]
-\caption{\textbf{Phase~2 temporal learning curves and classification
-results.}
-\textbf{a,}~Final Risk DT AUROC across feature levels for three
-temporal splits; shaded band: 95\% bootstrap CI for Split~3
-($n_\text{test}=17$).
-\textbf{b,}~Training-set size vs AUROC for Final Risk and Relapse
-(DT and RF) at $\mathcal{F}_7$.
-\textbf{c,}~External cohort RF AUROC comparison with internal
-Split~2 RF AUROC across all four classification tasks.}
-\label{fig:p2ablation}
-\end{figure}
-
-\begin{figure}[ht]
-\caption{\textbf{Survival prediction: Kaplan-Meier curves and
-C-index summary.}
-\textbf{a,}~EFS Kaplan-Meier curves (high vs low risk, median split)
-for the best Phase~1 model (Gemma, $\mathcal{F}_7$, internal cohort).
-\textbf{b,}~EFS KM curves for Phase~2 RSF (Split~2, $\mathcal{F}_7$,
-log-rank $p=0.010$).
-\textbf{c,}~OS KM curves for Phase~2 RSF on the external cohort
-($\mathcal{F}_2$, log-rank $p=0.036$).
-\textbf{d,}~C-index heatmap: all LLMs $\times$ all feature levels
-for EFS (internal, left; external cohort, right).
-Numbers at risk and 95\% CI shown.}
-\label{fig:km}
-\end{figure}
-
-\begin{figure}[ht]
-\caption{\textbf{RAG belief revision and representative case narratives.}
-\textbf{a,}~AUROC before vs after belief revision across four tasks
-and three splits; point size proportional to training-set size.
-Filled points: internal; open points: External cohort.
-\textbf{b--c,}~Two representative cases from $\mathcal{F}_7$/Split~3.
-For each case: patient feature summary, DT decision path, top-3
-retrieved similar historical cases with outcomes, and LLM-generated
-clinical narrative.
-Case~b: correctly classified IR patient with persistent MRD and
-concordant historical neighbours.
-Case~c: borderline case with conflicting MRD clearance vs cytogenetic
-risk signals.}
-\label{fig:rag}
-\end{figure}
+\end{appendices}
 
 %%==============================================================%%
 %% References
@@ -1875,16 +1776,16 @@ Efficient memory management for large language model serving with
 PagedAttention.
 \textit{Proc. ACM SOSP} (2023).
 
+\bibitem{[CITE:Ishwaran2008]}
+Ishwaran, H. et al.
+Random survival forests.
+\textit{Ann. Appl. Stat.} \textbf{2}, 841--860 (2008).
+
 \bibitem{[CITE:Rudin2019]}
 Rudin, C.
 Stop explaining black box machine learning models for high stakes
 decisions and use interpretable models instead.
 \textit{Nat. Mach. Intell.} \textbf{1}, 206--215 (2019).
-
-\bibitem{[CITE:Ishwaran2008]}
-Ishwaran, H. et al.
-Random survival forests.
-\textit{Ann. Appl. Stat.} \textbf{2}, 841--860 (2008).
 
 \bibitem{[CITE:Uno2011]}
 Uno, H. et al.
