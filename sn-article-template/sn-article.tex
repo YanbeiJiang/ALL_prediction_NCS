@@ -211,24 +211,23 @@ individual studies are characterised in Supplementary
 Table~\ref{tab:related_full}.
 $\checkmark$, addressed; ($\checkmark$), addressed partly or by some
 studies in the family; --, not addressed.
-Timeline-ordered features: predictors organised by the time at which
+Time-ordered features: predictors organised by the time at which
 they become available.
 Classification + survival: classification and time-to-event targets
 evaluated on the same features.
-Temporal: training and test sets separated by calendar time.
-External: outcome prediction evaluated on a cohort from other
+Temporal split: training and test sets separated by calendar time.
+External cohort: outcome prediction evaluated on a cohort from other
 institutions.
-Value vs local data: performance compared with models trained on
+Learning curve: performance compared with models trained on
 different amounts of local data.
 Retrieval: retrieval of similar cases or external knowledge.}
 \label{tab:related}
 \centering
 \footnotesize
-\setlength{\tabcolsep}{2.5pt}
-\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.9cm}*{8}{>{\centering\arraybackslash}p{1.12cm}}@{}}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{6.0cm}*{8}{c}@{}}
 \toprule
-\textbf{Family of prior work} & \textbf{Paed.\ ALL} & \textbf{Timeline-ordered features} & \textbf{Classif.\ + survival} & \textbf{Temporal validation} & \textbf{External validation} & \textbf{Zero-shot LLM} & \textbf{Value vs local data} & \textbf{Retrieval} \\
+\textbf{Family of prior work} & \rotatebox{90}{\textbf{Paediatric ALL}} & \rotatebox{90}{\textbf{Time-ordered features}} & \rotatebox{90}{\textbf{Classif.\ + survival}} & \rotatebox{90}{\textbf{Temporal split}} & \rotatebox{90}{\textbf{External cohort}} & \rotatebox{90}{\textbf{Zero-shot LLM}} & \rotatebox{90}{\textbf{Learning curve}} & \rotatebox{90}{\textbf{Retrieval}} \\
 \midrule
 Protocol risk rules and MRD studies~\cite{[CITE:Schultz2007],[CITE:Borowitz2008],[CITE:Conter2010]} & $\checkmark$ & ($\checkmark$) & -- & -- & -- & -- & -- & -- \\
 Cox nomograms and risk scores~\cite{[CITE:Mao2020],[CITE:Zhang2020],[CITE:He2022],[CITE:Sang2026],[CITE:Liu2022TALL],[CITE:Chen2025FrontPediatr]} & $\checkmark$ & -- & -- & -- & -- & -- & -- & -- \\
@@ -241,7 +240,7 @@ Retrieval-augmented clinical prediction~\cite{[CITE:ChenPSB2026],[CITE:Datta2026
 \midrule
 \textbf{This work} & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 %%==============================================================%%
@@ -465,10 +464,12 @@ at the pre-specified decision level.}
 Internal: 2018--19 enrolment test set (Split~2; models trained on
 2015--17). External: two hospitals (models trained on all internal
 patients).
-Trained, random forest (classification) or random survival forest
-(survival). $\Delta$, LLM ensemble minus trained model, with 95\%
+LLM, equal-weight ensemble of four zero-shot LLMs; trained, random
+forest (classification) or random survival forest (survival).
+AUROC for Final Risk, D19 MRD, D46 MRD and relapse; Harrell's C-index
+for EFS and OS. $\Delta$, LLM ensemble minus trained model, with 95\%
 bootstrap CI (2,000 resamples); $^{*}p<0.05$.
-LLM-equivalent $n$, number of local training patients at which the
+Equiv.\ $n$, number of local training patients at which the
 trained model's mean learning curve reaches the LLM ensemble
 (Fig.~\ref{fig:worth}); n.a., both approaches near chance.
 $^{\dagger}$Four positive patients.
@@ -481,22 +482,30 @@ Supplementary Table~\ref{tab:supp_decision}.}
 \label{tab:main}
 \centering
 \footnotesize
-\setlength{\tabcolsep}{3pt}
-\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}llccccccc@{}}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llcccc@{}}
 \toprule
- & & \multicolumn{4}{c}{\textbf{Internal (2018--19; $n$=113--114)}} & \multicolumn{3}{c}{\textbf{External ($n$=29--41)}} \\
-\cmidrule(lr){3-6}\cmidrule(lr){7-9}
-\textbf{Target (level)} & \textbf{Metric} & \textbf{LLM ens.} & \textbf{Trained} & \textbf{$\Delta$ [95\% CI]} & \textbf{LLM-equiv.\ $n$} & \textbf{LLM ens.} & \textbf{Trained} & \textbf{$\Delta$ [95\% CI]} \\
+\textbf{Target (level)} & \textbf{Test set} & \textbf{LLM} & \textbf{Trained} & \textbf{$\Delta$ [95\% CI]} & \textbf{Equiv.\ $n$} \\
 \midrule
-Final Risk ($\mathcal{F}_7$) & AUROC & 0.948 & 0.998 & $-$0.050 [$-$0.097, $-$0.010]$^{*}$ & $\approx$33 & 0.975 & 0.992 & $-$0.017 [$-$0.067, +0.000] \\
-D19 MRD ($\mathcal{F}_6$) & AUROC & 0.778 & 0.811 & $-$0.033 [$-$0.177, +0.103] & $\approx$93 & 0.440$^{\dagger}$ & 0.330$^{\dagger}$ & +0.110 [$-$0.291, +0.599] \\
-D46 MRD ($\mathcal{F}_6$) & AUROC & 0.607 & 0.674 & $-$0.067 [$-$0.270, +0.133] & n.a. & \multicolumn{3}{c}{not evaluable (1 positive)} \\
-Relapse ($\mathcal{F}_7$) & AUROC & 0.503 & 0.597 & $-$0.094 [$-$0.250, +0.068] & n.a. & 0.522$^{\ddagger}$ & 0.377$^{\ddagger}$ & +0.145 [$-$0.134, +0.400] \\
-EFS ($\mathcal{F}_7$) & C-index & 0.713 & 0.746 & $-$0.033 [$-$0.125, +0.060] & $\approx$120 & 0.670 & 0.608 & +0.062 [$-$0.089, +0.224] \\
-OS ($\mathcal{F}_7$) & C-index & 0.737 & 0.629 & +0.109 [+0.011, +0.229]$^{*}$ & $>$186 & 0.829 & 0.643 & +0.187 [+0.035, +0.385]$^{*}$ \\
+Final Risk ($\mathcal{F}_7$) & Internal & 0.948 & 0.998 & $-$0.050 [$-$0.097, $-$0.010]$^{*}$ & $\approx$33 \\
+ & External & 0.975 & 0.992 & $-$0.017 [$-$0.067, +0.000] & \\
+\addlinespace[2pt]
+D19 MRD ($\mathcal{F}_6$) & Internal & 0.778 & 0.811 & $-$0.033 [$-$0.177, +0.103] & $\approx$93 \\
+ & External & 0.440$^{\dagger}$ & 0.330$^{\dagger}$ & +0.110 [$-$0.291, +0.599] & \\
+\addlinespace[2pt]
+D46 MRD ($\mathcal{F}_6$) & Internal & 0.607 & 0.674 & $-$0.067 [$-$0.270, +0.133] & n.a. \\
+ & External & \multicolumn{3}{l}{not evaluable (1 positive)} & \\
+\addlinespace[2pt]
+Relapse ($\mathcal{F}_7$) & Internal & 0.503 & 0.597 & $-$0.094 [$-$0.250, +0.068] & n.a. \\
+ & External & 0.522$^{\ddagger}$ & 0.377$^{\ddagger}$ & +0.145 [$-$0.134, +0.400] & \\
+\addlinespace[2pt]
+EFS ($\mathcal{F}_7$) & Internal & 0.713 & 0.746 & $-$0.033 [$-$0.125, +0.060] & $\approx$120 \\
+ & External & 0.670 & 0.608 & +0.062 [$-$0.089, +0.224] & \\
+\addlinespace[2pt]
+OS ($\mathcal{F}_7$) & Internal & 0.737 & 0.629 & +0.109 [+0.011, +0.229]$^{*}$ & $>$186 \\
+ & External & 0.829 & 0.643 & +0.187 [+0.035, +0.385]$^{*}$ & \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 %%--------------------------------------------------------------%%
@@ -948,7 +957,7 @@ The authors declare no competing interests.
 \renewcommand{\thetable}{S\arabic{table}}
 \setcounter{table}{0}
 
-\begin{table}[p]
+\begin{sidewaystable}
 \caption{\textbf{Characteristics of individual prior outcome-prediction
 studies, grouped by family and compared with this work}
 (summary by dimension in Table~\ref{tab:related}).
@@ -972,9 +981,8 @@ LLM: ZS~zero-shot prompting or generation; FT~domain-pretrained or
 fine-tuned language model; RAG~retrieval augmentation.}
 \label{tab:related_full}
 \centering
-\scriptsize
+\tiny
 \setlength{\tabcolsep}{2.5pt}
-\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}llllllll@{}}
 \toprule
 \textbf{Study} & \textbf{Population ($n$)} & \textbf{Model} & \textbf{Data} & \textbf{Endpoints} & \textbf{TL} & \textbf{Validation} & \textbf{LLM} \\
@@ -1014,8 +1022,8 @@ Kiermeyer 2026~\cite{[CITE:Kiermeyer2026]} & Adult cancer (3,522) & LLM features
 \midrule
 \textbf{This work} & Paed.\ ALL (301 + 41) & LLMs; DT/RF/RSF; RAG & Clin, Flow, Cyto, MRD & 6 targets$^\star$ & nested & Temp. + Ext. & ZS, RAG \\
 \bottomrule
-\end{tabular}}
-\end{table}
+\end{tabular}
+\end{sidewaystable}
 
 \clearpage
 
@@ -1029,7 +1037,7 @@ the same feature vector as classification tasks.}
 \label{tab:expdesign}
 \centering
 \small
-\begin{tabular}{lllc}
+\begin{tabular}{ll>{\raggedright\arraybackslash}p{6.0cm}c}
 \toprule
 \textbf{Level} & \textbf{Timepoint} & \textbf{Cumulative features added} & \textbf{Class. targets} \\
 \midrule
@@ -1075,7 +1083,7 @@ $\mathcal{F}_7$ & (base $\mathcal{F}_6$) $+$ D19MRD; D46MRD (as input features) 
 
 \clearpage
 
-\begin{table}[p]
+\begin{sidewaystable}
 \caption{\textbf{Zero-shot LLM ensemble versus trained models at the
 decision level in every test set.}
 AUROC (classification) or Harrell's C-index (survival) with 95\%
@@ -1091,8 +1099,7 @@ external cohort, within-hospital C-index (LLM ensemble vs trained).
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}llllll@{}}
+\begin{tabular}{@{}lllll>{\raggedright\arraybackslash}p{4.7cm}@{}}
 \toprule
 \textbf{Test set} & \textbf{LLM ensemble} & \textbf{Trained} & \textbf{BA LLM} & \textbf{BA trained} & \textbf{Notes} \\
 \midrule
@@ -1132,8 +1139,8 @@ external cohort, within-hospital C-index (LLM ensemble vs trained).
 \quad Split 3 (2019) & \multicolumn{5}{l}{not evaluable} \\
 \quad External ($n$=41, 7) & 0.829 [0.704, 0.934] & 0.643 [0.418, 0.848] & -- & -- & rank mean 0.788; within hospital 0.842 vs 0.691 \\
 \bottomrule
-\end{tabular}}
-\end{table}
+\end{tabular}
+\end{sidewaystable}
 
 \clearpage
 
@@ -1469,8 +1476,9 @@ clinicians using a 5-point Likert scale.
 Results to be filled following structured review.}
 \label{tab:narrative_eval}
 \centering
-\small
-\begin{tabular}{lccccc}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l*{5}{>{\centering\arraybackslash}p{1.75cm}}}
 \toprule
 \textbf{Case ID}
   & \textbf{Factual accuracy}
