@@ -51,23 +51,28 @@ are usually trained on a hospital's own historical cases, yet a
 hospital that adopts a new protocol starts with none.
 Here we ask how much local data a zero-shot large language model (LLM)
 is worth along the clinical timeline.
-We aligned seven nested feature sets with data acquisition from
-admission to Day~46, defined six decisions—Final Risk, day-19 and
-day-46 minimal residual disease (MRD), relapse, event-free survival
-(EFS) and overall survival (OS)—and trained random forests and random
-survival forests on cases partitioned by enrolment year (301 patients,
-2015--2019), with an external cohort of 41 patients from two hospitals.
-An equal-weight ensemble of four zero-shot LLMs matched models trained
-on about 90--120 local patients for day-19 MRD and EFS, and
-outperformed locally trained random survival forests for OS in every
-evaluable test set (C-index 0.71--0.83 versus 0.61--0.64).
-Trained models were superior only for Final Risk, which a
-three-condition protocol rule reproduced in 99.3\% of patients and
-which they learned from about 30 cases.
-At the external hospitals the trained EFS model lost discrimination
-(C-index 0.75 to 0.61) whereas the LLM ensemble changed little
-(0.71 to 0.67).
-Relapse and day-46 MRD remained near chance for all methods.
+We aligned six nested feature sets with data acquisition from
+admission to the completion of diagnostic work-up (Day~7--10), before
+any assessment of minimal residual disease (MRD), and predicted six
+decisions from the last of them—Final Risk, day-19 and day-46 MRD,
+relapse, event-free survival (EFS) and overall survival (OS).
+Random forests and random survival forests were trained on cases
+partitioned by enrolment year (301 patients, 2015--2019), with an
+external cohort of 41 patients from two hospitals.
+An equal-weight ensemble of five zero-shot LLMs matched random forests
+trained on about 50 local patients for Final Risk and 100 for day-19
+MRD (AUROC 0.93 and 0.78; differences from fully trained forests not
+significant).
+For EFS and OS, locally trained random survival forests did not reach
+the ensemble at any training size (C-index 0.59 and 0.62 with all 186
+training patients, versus 0.68 and 0.71).
+At the external hospitals the survival forests lost discrimination
+(EFS 0.44, OS 0.51) whereas the LLM ensemble did not (0.69 and 0.84;
+$P<0.01$ for both, and $P<0.05$ when only patients from the same
+hospital were compared).
+Final Risk was largely fixed by Initial Risk, which alone reproduced it
+in 90.7\% of patients, and relapse and day-46 MRD remained near chance
+for all methods.
 Zero-shot LLMs are therefore a credible starting point before local
 data accrue, and remain complementary afterwards.
 }
@@ -137,8 +142,8 @@ paediatric ALL models address them at most partially.
 The first is the \emph{feature-acquisition timeline}: a patient's data
 do not arrive at once but in a fixed clinical order—white blood cell
 count and age at admission (Day~0), immunophenotype (Day~1),
-fusion genes, karyotype and FISH (Day~7--10), and
-MRD (Day~19--46).
+fusion genes, karyotype and FISH (Day~7--10), after which treatment
+response is measured as MRD on Days~19 and 46.
 A model trained on features pooled across all timepoints implicitly
 uses information unavailable at the moment of decision, producing
 optimistic but non-deployable estimates~\cite{[CITE:Steyerberg2019]}.
@@ -177,12 +182,15 @@ It therefore remains unclear how much local data a zero-shot LLM is
 worth, for which decisions it suffices, and whether it remains useful
 once a case database has accrued or when a model is moved to another
 hospital.
-We address these questions on a dataset in which seven temporally
-ordered clinical feature sets (six strictly nested; $\mathcal{F}_4$ is
+We address these questions on a dataset in which six temporally
+ordered clinical feature sets (five strictly nested; $\mathcal{F}_4$ is
 a Day-1 branch of $\mathcal{F}_3$) map onto the feature-acquisition
-timeline, six prediction targets map onto the target timeline, and
-enrolment year defines the data-accumulation timeline.
-We compare an ensemble of four zero-shot LLMs (Phase~1) with decision
+timeline up to the completion of diagnostic work-up, six prediction
+targets map onto the target timeline, and enrolment year defines the
+data-accumulation timeline.
+Every target is predicted before the first MRD assessment, so MRD is
+always an outcome and never an input.
+We compare an ensemble of five zero-shot LLMs (Phase~1) with decision
 trees, random forests and random survival forests trained on the
 growing case database under temporal splits (Phase~2), test both on an
 external cohort from two hospitals without retraining, and add a
@@ -192,15 +200,17 @@ narratives.
 
 Our contributions are threefold.
 (\textit{i})~A timeline-aligned evaluation of six clinical decisions in
-paediatric ALL that shows when each becomes predictable: Final Risk
-follows a protocol rule, EFS discrimination emerges only with Day-46
-MRD, and relapse and day-46 MRD remain near chance with routine data.
+paediatric ALL that shows when each becomes predictable before
+treatment response is known: Final Risk is largely fixed by Initial
+Risk at Day~5, day-19 MRD becomes predictable once immunophenotype is
+available, and relapse and day-46 MRD remain near chance with routine
+data.
 (\textit{ii})~A quantification of the value of zero-shot LLMs relative
-to accumulating local data: the LLM ensemble matched models trained on
-about 90--120 local patients for day-19 MRD and EFS, outperformed
-locally trained survival forests for OS in every evaluable test set,
-and lost less discrimination at external hospitals, whereas trained
-models were superior for the protocol-defined Final Risk.
+to accumulating local data: the LLM ensemble matched random forests
+trained on about 50 and 100 local patients for Final Risk and day-19
+MRD, was not reached by locally trained survival forests at any
+training size for EFS and OS, and kept its survival discrimination at
+two external hospitals where the trained models lost theirs.
 (\textit{iii})~A retrieval-based belief revision extended to censored
 survival outcomes, with LLM-generated narratives for physician review.
 
@@ -268,24 +278,26 @@ is far above that of an unselected ALL population.
 No external data were used for training.
 
 Figure~\ref{fig:overview} summarises the design.
-Seven feature levels $\mathcal{F}_1$--$\mathcal{F}_7$ follow the order
+Six feature levels $\mathcal{F}_1$--$\mathcal{F}_6$ follow the order
 in which data become available, from white blood cell count and age at
-admission to D19 and D46 MRD at the end of induction (variable list in
-Supplementary Table~\ref{tab:featurelist}).
-Each target is predicted at a pre-specified decision level, the latest
-level available before the corresponding clinical decision:
-$\mathcal{F}_6$ for D19 and D46 MRD, and $\mathcal{F}_7$ for Final Risk,
-relapse, EFS and OS.
-At each level we compare an equal-weight ensemble of four zero-shot
-LLMs (Gemini-3.1-Flash-Lite, Gemma-4-31B-it, InternVL3.5-30B-A3B and
-Qwen3.6-35B-A3B), which uses no training data, with random forests (RF)
-and random survival forests (RSF) trained on patients from earlier
+admission to fusion genes, karyotype and FISH at Day~7--10 (variable
+list in Supplementary Table~\ref{tab:featurelist}).
+All six targets are predicted at the pre-specified decision level
+$\mathcal{F}_6$, the last level available before the Day-19 MRD
+assessment.
+MRD values are therefore never used as inputs, and every prediction is
+made before treatment response is known, when therapy could still be
+adapted.
+At each level we compare an equal-weight ensemble of five zero-shot
+LLMs (GPT-6.1-Sol, Gemini-4-Argon, Gemma-4-31B-it, InternVL3.5-30B-A3B
+and Qwen3.6-35B-A3B), which uses no training data, with random forests
+(RF) and random survival forests (RSF) trained on patients from earlier
 enrolment years.
 The primary internal test set is the 2018--19 enrolment cohort
 (Split~2; 186 training and 114 test patients); the other two temporal
 splits are reported in Supplementary Table~\ref{tab:supp_decision}.
 Discrimination is summarised by AUROC for classification, where the
-LLM ensemble's score is the fraction of the four models predicting the
+LLM ensemble's score is the fraction of the five models predicting the
 positive class, and by Harrell's C-index for survival.
 
 \begin{table}[ht]
@@ -327,14 +339,15 @@ OS events & 24 (8.0\%) & 7 (17.1\%) \\
 \centering
 \includegraphics[width=\textwidth]{fig1_design}
 \caption{\textbf{Study design along three timelines.}
-\textbf{a,}~Seven nested feature levels follow the clinical order of
-data acquisition from admission (Day~0) to the end of induction
-(Day~46); each target is predicted from the latest level available
-before the corresponding decision.
+\textbf{a,}~Six nested feature levels follow the clinical order of
+data acquisition from admission (Day~0) to the completion of diagnostic
+work-up (Day~7--10); all six targets are predicted from
+$\mathcal{F}_6$, before the first MRD assessment, so MRD is never an
+input.
 \textbf{b,}~Trained models learn from earlier enrolment years and are
 tested on later years (three temporal splits) and, without retraining,
 on an external cohort from two hospitals.
-\textbf{c,}~At each level, predictions come either from four zero-shot
+\textbf{c,}~At each level, predictions come either from five zero-shot
 LLMs, combined by equal-weight averaging, or from decision trees,
 random forests and random survival forests trained on the accumulating
 case database; retrieval of similar past cases revises the trained
@@ -351,37 +364,44 @@ Figure~\ref{fig:when} shows discrimination for every target at every
 feature level, in the internal test set and at the external hospitals.
 Three patterns stand out.
 
-\textbf{Final Risk is largely determined before it is assigned.}
+\textbf{Final Risk is largely fixed by Initial Risk.}
 Trained RF reached an AUROC of 0.87 from white blood cell count and age
-alone and 1.00 at $\mathcal{F}_7$; the LLM ensemble rose from 0.79 to
-0.95.
+alone and 0.94--0.95 once Initial Risk entered at $\mathcal{F}_5$; the
+LLM ensemble rose from 0.79 to 0.93 over the same levels.
 This follows from how Final Risk is defined.
-In our cohort a three-condition rule—Initial Risk of IR or HR, D19 MRD
-$\geq 1\%$, or D46 MRD $\geq 0.01\%$—reproduced Final Risk in 299 of
-301 internal patients (99.3\%) and in 40 of 41 external patients, and
-Initial Risk alone reproduced it in 90.7\%.
-Final Risk at $\mathcal{F}_7$ therefore tests whether a model recovers
-the protocol rule rather than whether it predicts an unknown outcome.
-The clinically uncertain part is which of the 187 initially low-risk
+In our cohort Initial Risk alone reproduced Final Risk in 90.7\% of
+internal patients, and a three-condition rule—Initial Risk of IR or HR,
+D19 MRD $\geq 1\%$, or D46 MRD $\geq 0.01\%$—reproduced it in 299 of
+301 internal patients (99.3\%) and in 40 of 41 external patients.
+At $\mathcal{F}_6$ both approaches performed close to Initial Risk
+alone (balanced accuracy 0.901 for the LLM ensemble and 0.891 for the
+RF, versus 0.906 in the 2018--19 test set).
+The remaining uncertainty is which of the 187 initially low-risk
 patients will be upgraded (28 patients, 26 of them MRD-positive), which
 is the MRD prediction problem.
 
-\textbf{Survival discrimination appears late.}
-The RSF C-index for EFS stayed between 0.53 and 0.61 up to
-$\mathcal{F}_6$ and rose to 0.75 only when D19 and D46 MRD entered at
-$\mathcal{F}_7$, consistent with the central role of MRD in risk
-stratification~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}; the LLM
-ensemble rose from 0.68 to 0.71 over the same step.
-For OS, the LLM ensemble reached 0.70--0.74 from Day~5 onwards, whereas
-the RSF never exceeded 0.63.
+\textbf{D19 MRD becomes predictable with immunophenotype.}
+RF AUROC was 0.42 and 0.51 at $\mathcal{F}_1$ and $\mathcal{F}_2$ and
+0.74--0.81 from $\mathcal{F}_3$, when immunophenotype and flow
+cytometry markers entered; the LLM ensemble reached 0.68--0.69 at
+$\mathcal{F}_3$ and $\mathcal{F}_4$ and 0.78--0.79 from
+$\mathcal{F}_5$.
+
+\textbf{Before MRD, survival discrimination comes mainly from the LLMs.}
+The RSF C-index stayed between 0.53 and 0.61 for EFS and between 0.50
+and 0.62 for OS at every level.
+The LLM ensemble reached 0.71 for OS from Day~5, once Initial Risk was
+available, and 0.68 for EFS at $\mathcal{F}_6$, when cytogenetics
+entered.
+Without MRD, which dominates prognosis in contemporary
+protocols~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}, the trained
+models had little signal to learn from local events, whereas the LLMs
+could draw on prior knowledge of how the diagnostic features relate to
+outcome.
 
 \textbf{Relapse and D46 MRD remain close to chance.}
-Neither approach exceeded an AUROC of 0.67 for either target at any
+Neither approach exceeded an AUROC of 0.68 for either target at any
 level.
-D19 MRD, by contrast, became predictable once immunophenotype was
-available (RF 0.42 and 0.50 at $\mathcal{F}_1$ and $\mathcal{F}_2$,
-0.74--0.81 from $\mathcal{F}_3$; LLM ensemble 0.78 from
-$\mathcal{F}_5$).
 Results for each LLM and each level are given in Supplementary
 Tables~\ref{tab:phase1_full}--\ref{tab:phase2_ext}.
 
@@ -389,7 +409,7 @@ Tables~\ref{tab:phase1_full}--\ref{tab:phase2_ext}.
 \centering
 \includegraphics[width=\textwidth]{fig2_when_predictable}
 \caption{\textbf{What becomes predictable, and when.}
-Discrimination of each target at each feature level ($\mathcal{F}_1$--$\mathcal{F}_7$,
+Discrimination of each target at each feature level ($\mathcal{F}_1$--$\mathcal{F}_6$,
 with the day on which the level becomes available) for the zero-shot
 LLM ensemble (\textbf{a}, \textbf{b}) and for trained random forests
 (classification) or random survival forests (survival)
@@ -397,8 +417,8 @@ LLM ensemble (\textbf{a}, \textbf{b}) and for trained random forests
 (\textbf{a}, \textbf{c}; trained on 2015--17) and in the external
 cohort (\textbf{b}, \textbf{d}; trained on all internal patients).
 Values are AUROC for Final Risk, D19 MRD, D46 MRD and relapse, and
-Harrell's C-index for EFS and OS. --, not evaluable (MRD values are
-inputs at $\mathcal{F}_7$; only one D46 MRD-positive external patient).}
+Harrell's C-index for EFS and OS. --, not evaluable (only one D46
+MRD-positive external patient).}
 \label{fig:when}
 \end{figure}
 
@@ -412,33 +432,34 @@ retrained RF and RSF on random subsets of $m$ patients from the
 2015--17 training years and evaluated them on the same 2018--19 test
 patients as the LLM ensemble (Fig.~\ref{fig:worth}; 20 repeats per
 size).
-The LLM ensemble matched trained models built from about 33 patients
-for Final Risk, 93 for D19 MRD and 120 for EFS.
-For OS, the RSF stayed below the LLM ensemble at every training size,
-including all 186 training patients.
+The LLM ensemble matched trained models built from about 49 patients
+for Final Risk and 101 for D19 MRD.
+For EFS and OS, the RSF stayed below the LLM ensemble at every training
+size, including all 186 training patients (mean C-index at most 0.61
+for EFS and 0.62 for OS, against 0.68 and 0.71).
 
-With all training data (Table~\ref{tab:main}), trained models were
-better only for Final Risk (AUROC difference $-0.050$, 95\% CI
-$-0.097$ to $-0.010$).
-They were statistically indistinguishable from the LLM ensemble for
-D19 MRD, D46 MRD, relapse and EFS, and worse for OS (C-index 0.737
-for the LLM ensemble versus 0.629; difference $+0.109$, 0.011 to
-0.229).
-The OS result held in the earlier split trained on 2015--16
-(difference $+0.105$, 0.024 to 0.190).
-These OS training sets contained only 8 and 13 deaths, so a model that
+With all training data (Table~\ref{tab:main}), no internal difference
+between the LLM ensemble and trained models was statistically
+significant.
+Trained RF had slightly higher AUROC for Final Risk (0.950 versus
+0.932; difference $-0.017$, 95\% CI $-0.066$ to $0.024$) and D19 MRD
+(0.811 versus 0.784), whereas the LLM ensemble had higher C-indices for
+EFS (0.682 versus 0.592; $+0.090$, $-0.008$ to $0.191$; $p=0.071$) and
+OS (0.713 versus 0.620; $+0.093$, $-0.043$ to $0.245$).
+The survival advantage pointed the same way in the earlier split
+trained on 2015--16 (EFS $+0.049$, OS $+0.059$) and, for EFS, in the
+2019 test set ($+0.066$; Supplementary Table~\ref{tab:supp_decision}).
+The OS training sets contained only 8 and 13 deaths, so a model that
 must learn from local events has little to learn from, whereas the
 LLMs bring prognostic knowledge from pretraining.
 
-The Final Risk gap has a different cause.
-Even when given every input of the protocol rule at $\mathcal{F}_7$,
-the LLM ensemble assigned the correct group with a balanced accuracy
-of 0.833—below that of Initial Risk alone (0.906) and of the rule
-itself (1.000)—whereas the RF reached 0.958 after learning from local
-cases.
-Zero-shot LLMs therefore do not apply the local stratification
-protocol; protocol logic is better encoded explicitly than left to the
-model.
+For Final Risk, neither approach went beyond Initial Risk.
+The LLM ensemble and the RF assigned the correct group with balanced
+accuracies of 0.901 and 0.891, against 0.906 for Initial Risk alone;
+the remaining errors are patients upgraded on the basis of MRD, which
+no model can know at $\mathcal{F}_6$.
+The protocol rule reaches 1.000 only because it uses the Day-19 and
+Day-46 MRD results.
 
 \begin{figure}[t]
 \centering
@@ -448,36 +469,39 @@ worth.}
 Random forests (AUROC) and random survival forests (C-index) were
 trained on $m$ patients drawn at random from the 2015--17 enrolment
 years (20 repeats per size; line, mean; band, 10th--90th percentile)
-and evaluated on the 2018--19 test patients at each target's decision
-level.
+and evaluated on the 2018--19 test patients at the decision level
+$\mathcal{F}_6$.
 The blue line and band show the zero-shot LLM ensemble on the same
 patients (95\% bootstrap CI).
 Dashed lines mark the training size at which the trained model's mean
 reaches the LLM ensemble.
-For D46 MRD and relapse both approaches are close to chance; for OS the
-trained model stays below the LLM ensemble at every size.}
+For D46 MRD and relapse both approaches are close to chance; for EFS
+and OS the trained model stays below the LLM ensemble at every size.}
 \label{fig:worth}
 \end{figure}
 
 \begin{table}[t]
 \caption{\textbf{Zero-shot LLM ensemble versus locally trained models
 at the pre-specified decision level.}
+All targets are predicted from $\mathcal{F}_6$ (Day~7--10), before any
+MRD assessment.
 Internal: 2018--19 enrolment test set (Split~2; models trained on
 2015--17). External: two hospitals (models trained on all internal
 patients).
-LLM, equal-weight ensemble of four zero-shot LLMs; trained, random
+LLM, equal-weight ensemble of five zero-shot LLMs; trained, random
 forest (classification) or random survival forest (survival).
 AUROC for Final Risk, D19 MRD, D46 MRD and relapse; Harrell's C-index
 for EFS and OS. $\Delta$, LLM ensemble minus trained model, with 95\%
 bootstrap CI (2,000 resamples); $^{*}p<0.05$.
 Equiv.\ $n$, number of local training patients at which the
 trained model's mean learning curve reaches the LLM ensemble
-(Fig.~\ref{fig:worth}); n.a., both approaches near chance.
+(Fig.~\ref{fig:worth}); $>$186, not reached with all 186 training
+patients; n.a., both approaches near chance.
 $^{\dagger}$Four positive patients.
 $^{\ddagger}$Relapse status almost coincides with hospital of origin,
 because one hospital contributed only relapsed patients.
-Final Risk at $\mathcal{F}_7$ is reproduced by a three-condition
-protocol rule (Section~\ref{sec:when}).
+Initial Risk alone reproduces Final Risk in 90.7\% of patients
+(Section~\ref{sec:when}).
 All test sets, balanced accuracies and sensitivity analyses are in
 Supplementary Table~\ref{tab:supp_decision}.}
 \label{tab:main}
@@ -486,25 +510,25 @@ Supplementary Table~\ref{tab:supp_decision}.}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}llcccc@{}}
 \toprule
-\textbf{Target (level)} & \textbf{Test set} & \textbf{LLM} & \textbf{Trained} & \textbf{$\Delta$ [95\% CI]} & \textbf{Equiv.\ $n$} \\
+\textbf{Target} & \textbf{Test set} & \textbf{LLM} & \textbf{Trained} & \textbf{$\Delta$ [95\% CI]} & \textbf{Equiv.\ $n$} \\
 \midrule
-Final Risk ($\mathcal{F}_7$) & Internal & 0.948 & 0.998 & $-$0.050 [$-$0.097, $-$0.010]$^{*}$ & $\approx$33 \\
- & External & 0.975 & 0.992 & $-$0.017 [$-$0.067, +0.000] & \\
+Final Risk & Internal & 0.932 & 0.950 & $-$0.017 [$-$0.066, +0.024] & $\approx$49 \\
+ & External & 0.842 & 0.925 & $-$0.083 [$-$0.247, +0.037] & \\
 \addlinespace[2pt]
-D19 MRD ($\mathcal{F}_6$) & Internal & 0.778 & 0.811 & $-$0.033 [$-$0.177, +0.103] & $\approx$93 \\
- & External & 0.440$^{\dagger}$ & 0.330$^{\dagger}$ & +0.110 [$-$0.291, +0.599] & \\
+D19 MRD & Internal & 0.784 & 0.811 & $-$0.027 [$-$0.174, +0.110] & $\approx$101 \\
+ & External & 0.455$^{\dagger}$ & 0.330$^{\dagger}$ & +0.125 [$-$0.278, +0.617] & \\
 \addlinespace[2pt]
-D46 MRD ($\mathcal{F}_6$) & Internal & 0.607 & 0.674 & $-$0.067 [$-$0.270, +0.133] & n.a. \\
+D46 MRD & Internal & 0.599 & 0.674 & $-$0.076 [$-$0.250, +0.081] & n.a. \\
  & External & \multicolumn{3}{l}{not evaluable (1 positive)} & \\
 \addlinespace[2pt]
-Relapse ($\mathcal{F}_7$) & Internal & 0.503 & 0.597 & $-$0.094 [$-$0.250, +0.068] & n.a. \\
- & External & 0.522$^{\ddagger}$ & 0.377$^{\ddagger}$ & +0.145 [$-$0.134, +0.400] & \\
+Relapse & Internal & 0.631 & 0.629 & +0.003 [$-$0.199, +0.198] & n.a. \\
+ & External & 0.652$^{\ddagger}$ & 0.279$^{\ddagger}$ & +0.373 [+0.058, +0.667]$^{*}$ & \\
 \addlinespace[2pt]
-EFS ($\mathcal{F}_7$) & Internal & 0.713 & 0.746 & $-$0.033 [$-$0.125, +0.060] & $\approx$120 \\
- & External & 0.670 & 0.608 & +0.062 [$-$0.089, +0.224] & \\
+EFS & Internal & 0.682 & 0.592 & +0.090 [$-$0.008, +0.191] & $>$186 \\
+ & External & 0.692 & 0.439 & +0.253 [+0.135, +0.401]$^{*}$ & \\
 \addlinespace[2pt]
-OS ($\mathcal{F}_7$) & Internal & 0.737 & 0.629 & +0.109 [+0.011, +0.229]$^{*}$ & $>$186 \\
- & External & 0.829 & 0.643 & +0.187 [+0.035, +0.385]$^{*}$ & \\
+OS & Internal & 0.713 & 0.620 & +0.093 [$-$0.043, +0.245] & $>$186 \\
+ & External & 0.843 & 0.512 & +0.331 [+0.114, +0.588]$^{*}$ & \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -516,26 +540,27 @@ OS ($\mathcal{F}_7$) & Internal & 0.737 & 0.629 & +0.109 [+0.011, +0.229]$^{*}$ 
 
 Applied without retraining to the external cohort
 (Fig.~\ref{fig:external}a and Table~\ref{tab:main}), the trained RSF
-lost discrimination for EFS (C-index 0.746 internally, 0.608
-externally), whereas the LLM ensemble changed little (0.713 and
-0.670).
-For OS, the LLM ensemble reached 0.829 against 0.643 for the RSF
-(difference $+0.187$, 95\% CI 0.035 to 0.385).
+lost discrimination for EFS (C-index 0.592 internally, 0.439
+externally) and OS (0.620 and 0.512), whereas the LLM ensemble did not
+(EFS 0.682 and 0.692; OS 0.713 and 0.843).
+The external differences were $+0.253$ (95\% CI 0.135 to 0.401) for
+EFS and $+0.331$ (0.114 to 0.588) for OS.
 Because one source hospital contributed only relapsed patients, we
 repeated the survival comparison counting only patient pairs from the
-same hospital; the LLM ensemble remained ahead (EFS 0.702 versus 0.629;
-OS 0.842 versus 0.691), although with 41 patients neither
-within-hospital difference reached significance.
-Final Risk transferred well for both approaches (AUROC 0.975 and
-0.992).
+same hospital; the LLM ensemble remained ahead (EFS 0.686 versus 0.498,
+difference $+0.188$, 0.036 to 0.378; OS 0.850 versus 0.626, $+0.224$,
+0.028 to 0.492).
+Final Risk transferred for both approaches (AUROC 0.842 for the LLM
+ensemble and 0.925 for the RF; difference not significant).
 The external D19 MRD, D46 MRD and relapse comparisons are not
 informative: they rest on four positive patients, one positive patient,
 and a relapse label that almost coincides with hospital of origin,
-respectively.
+respectively; the significant relapse difference (0.652 versus 0.279)
+therefore reflects the hospital mix rather than relapse prediction.
 Kaplan--Meier curves split at the median predicted risk separated EFS
-internally for both approaches (log-rank $p=0.010$ for each) and
-pointed in the same direction externally without reaching significance
-(LLM ensemble $p=0.111$; RSF $p=0.139$; Fig.~\ref{fig:external}b--e).
+for the LLM ensemble internally (log-rank $p=0.008$) and externally
+($p=0.010$), but not for the RSF ($p=0.262$ and $p=0.694$;
+Fig.~\ref{fig:external}b--e).
 
 \begin{figure}[t]
 \centering
@@ -562,15 +587,15 @@ per group.}
 %%--------------------------------------------------------------%%
 
 Revising RF probabilities towards the outcomes of the five most similar
-training cases (Methods) changed classification AUROC by $-0.042$ to
+training cases (Methods) changed classification AUROC by $-0.049$ to
 $+0.073$ across tasks and splits, apart from a gain of $+0.226$ for D46
 MRD in the 17-patient 2019 test set, which contains only three
 positives (Supplementary Table~\ref{tab:belief_revision}).
 For survival, a censoring-aware variant that replaces neighbour
 outcomes with a similarity-weighted Kaplan--Meier event probability
-gave small but consistent gains (mean C-index change $+0.006$ over 70
-model, split and endpoint configurations; Wilcoxon $p=0.001$),
-concentrated in weaker base models.
+gave small but consistent gains (mean C-index change $+0.007$ over 42
+combinations of feature level $\mathcal{F}_1$--$\mathcal{F}_6$, test
+set and endpoint, 26 of them positive; Wilcoxon $p=0.003$).
 For each test patient, an LLM then produced a short narrative combining
 the prediction, the decision-tree path and the retrieved cases; a
 structured physician evaluation of these narratives is under way
@@ -585,12 +610,14 @@ historical cases are available for training.
 By aligning six clinical decisions with the timelines along which data
 are acquired and accumulate, we found that this assumption matters
 less than expected for several of them.
-A zero-shot ensemble of four LLMs, using no local data, matched random
-forests and survival forests trained on roughly 90--120 local patients
-for D19 MRD and EFS, outperformed them for OS in every evaluable test
-set, and lost less discrimination when moved to two other hospitals.
-Trained models were clearly superior only for Final Risk, a target that
-a three-condition protocol rule reproduces almost exactly.
+Predicting every decision at the end of diagnostic work-up, before any
+MRD result, a zero-shot ensemble of five LLMs using no local data
+matched random forests trained on about 50 and 100 local patients for
+Final Risk and D19 MRD.
+For EFS and OS it was not reached by survival forests trained on any
+available number of local patients, and it kept its discrimination at
+two other hospitals, where the trained survival models fell to or below
+chance.
 
 \textbf{When a zero-shot LLM suffices.}
 These results help reconcile two apparently conflicting lines of
@@ -599,32 +626,36 @@ Prompted LLMs have outperformed conventional models trained on ten
 examples~\cite{[CITE:Zhu2026ClinicRealm]} yet fallen well short of
 models trained on full datasets~\cite{[CITE:ClinicalBench2026],[CITE:Brown2025JAMIA]}.
 Our learning curves locate the crossover within a single disease: about
-30 patients for a protocol-defined target, around 100 for EFS, and
-beyond the available data for OS, where only 8 to 13 deaths were
+50 patients for Final Risk, around 100 for D19 MRD, and beyond the
+available data for EFS and OS, where only 8 to 13 deaths were
 available for training.
 The LLMs' advantage is largest where local events are scarce and where
 the case mix shifts, the two situations in which a locally trained
 model has least to learn from or most to unlearn.
 In practice, a centre starting a new protocol could use a zero-shot LLM
 ensemble for survival risk from the first patient, and move to, or
-combine it with, locally trained models for frequent-event targets once
-around one hundred cases have accrued.
+combine it with, locally trained models for the classification targets
+once 50 to 100 cases have accrued.
 
 \textbf{Where it does not.}
-Given every input of the protocol rule, the LLM ensemble still
-misassigned Final Risk more often than Initial Risk alone would have.
-General-purpose LLMs do not know, or do not apply, the thresholds of a
-local stratification protocol, and decisions defined by such rules
-should be implemented as explicit logic rather than delegated to a
-language model.
+For the classification targets, the LLM ensemble offered no advantage
+over trained models once a modest case database existed, and for Final
+Risk neither approach went beyond Initial Risk alone.
+Decisions that are defined by a stratification protocol are better
+implemented as explicit logic than predicted by a language model.
 The value of zero-shot LLMs lies instead in outcomes that no rule
 defines—survival and, to a lesser extent, early treatment response.
 
 \textbf{MRD and the limits of routine data.}
-Survival discrimination appeared only once D19 and D46 MRD were
-available, for trained models and LLMs alike, in line with the
-established role of MRD as the dominant prognostic
-factor~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}.
+Because all predictions were made before treatment response was
+measured, they test what can be anticipated from diagnostic data alone.
+In this setting the trained survival forests stayed at C-indices of
+0.50 to 0.62, consistent with the established role of MRD, which our
+design withholds, as the dominant prognostic
+factor~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}; the LLM ensemble
+reached 0.68 to 0.71, suggesting that prior knowledge of how Initial
+Risk and cytogenetics relate to outcome can partly substitute for
+local events.
 Relapse and D46 MRD remained near chance at every level, consistent
 with the failure of computational flow cytometry at
 diagnosis~\cite{[CITE:Martinez2025]} and the modest discrimination of
@@ -652,17 +683,23 @@ remains a stronger standard of validation than our temporal and
 external evaluation.
 The external cohort is small (41 patients) and includes a
 relapse-enriched referral series, so external relapse and MRD results
-are not interpretable and the within-hospital survival differences did
-not reach significance; larger, prospectively collected external cohorts
+are not interpretable and the confidence intervals of the survival
+differences are wide; larger, prospectively collected external cohorts
 are needed to confirm the robustness of the LLM ensemble.
+Internally, the survival advantage of the LLM ensemble did not reach
+statistical significance in any single test set.
 Learning curves were estimated on one temporal split, the 2019 test set
 contains only 17 patients, and no correction was made for multiple
 comparisons.
+All predictions were made before MRD assessment; we did not study how
+they should be updated once MRD results become available.
 The LLMs were used zero-shot with fixed prompts; their outputs may
-change with model versions, and fine-tuning or few-shot prompting might
-narrow the Final Risk gap.
+change with model versions, the two proprietary models were queried
+with their providers' default decoding settings and are therefore not
+strictly deterministic, and fine-tuning or few-shot prompting might
+improve the classification targets.
 Because each LLM returns a hard label for classification, the
-ensemble's classification score has only five levels, which limits its
+ensemble's classification score has only six levels, which limits its
 AUROC.
 Finally, physician evaluation of the LLM narratives is in progress and
 will determine whether they are useful beyond illustrative case
@@ -699,7 +736,7 @@ No external data were used in any model training.
 Feature sets are temporally ordered and, except for the
 $\mathcal{F}_4$ branch, form a strictly nested sequence
 $\mathcal{F}_1 \subseteq \mathcal{F}_2 \subseteq \mathcal{F}_3
-\subseteq \mathcal{F}_5 \subseteq \mathcal{F}_6 \subseteq \mathcal{F}_{7}$
+\subseteq \mathcal{F}_5 \subseteq \mathcal{F}_6$
 ($\mathcal{F}_4$ branches from $\mathcal{F}_3$; Table~\ref{tab:featurelist}),
 where each level contains exactly the features available at the
 corresponding clinical timepoint.
@@ -708,10 +745,11 @@ $\mathcal{F}_2$~(Day~1): adds blast percentage;
 $\mathcal{F}_3$~(Day~1): adds immunophenotype and 51 flow cytometry markers;
 $\mathcal{F}_4$~(Day~1): adds non-risk clinical factors;
 $\mathcal{F}_5$~(Day~5): adds CNS status, Day~5 blast, and Initial Risk;
-$\mathcal{F}_6$~(Day~7--10): adds Fusion gene, Karyotype, FISH;
-$\mathcal{F}_7$~(Day~46): adds D19MRD and D46MRD.
+$\mathcal{F}_6$~(Day~7--10): adds Fusion gene, Karyotype, FISH.
 The complete variable list for every level is given in
 Table~\ref{tab:featurelist}.
+D19 and D46 MRD are prediction targets and are not used as input
+features at any level.
 All six prediction targets are evaluated on the same feature hierarchy.
 
 For Phase~2, categorical features were one-hot encoded and numerical
@@ -731,25 +769,33 @@ key--value list and presented with a task-specific system prompt
 requesting a bracketed label (e.g., \texttt{[[IR]]}/\texttt{[[LR]]}).
 For survival risk scoring, the same serialised features were presented
 with a prompt requesting a continuous event probability (0.0--1.0).
-All experiments used temperature~$=0$ (greedy decoding); open-weight
-models were served with vLLM~\cite{[CITE:vLLM]}.
+Five LLMs were used: two proprietary models accessed through their
+providers' APIs, GPT-6.1-Sol (OpenAI) and Gemini-4-Argon (Google), and
+three open-weight models, Gemma-4-31B-it, InternVL3.5-30B-A3B and
+Qwen3.6-35B-A3B.
+The open-weight models were served with vLLM~\cite{[CITE:vLLM]} at
+temperature~$0$ (greedy decoding; Qwen3.6 with its thinking mode
+disabled).
+The proprietary models were queried with the providers' default
+decoding settings (Gemini-4-Argon on 30--31 October 2026 and
+GPT-6.1-Sol on 31 October 2026).
 Because each classification output is a single hard label,
 classification performance is summarised by balanced accuracy,
 $\mathrm{BA}=\tfrac{1}{2}(\mathrm{TPR}+\mathrm{TNR})$, which equals
 the AUROC of the binary prediction.
-The four LLMs were combined into an ensemble with equal weights and no
+The five LLMs were combined into an ensemble with equal weights and no
 tuning.
 For classification, the ensemble score is the fraction of models
 predicting the positive class (patients without a valid answer from
 any model were excluded), and the ensemble label is positive when at
-least two of the four models agree.
-For survival, the ensemble score is the mean of the four predicted
-event probabilities; the mean within-cohort rank of the four scores
+least three of the five models agree.
+For survival, the ensemble score is the mean of the five predicted
+event probabilities; the mean within-cohort rank of the five scores
 was used as a sensitivity analysis (Supplementary
 Table~\ref{tab:supp_decision}).
 Per-patient outputs were cached; the cohort was scored for every
-combination of feature level ($\times 7$), task ($\times 6$), and
-model ($\times 4$).
+combination of feature level ($\times 6$), task ($\times 6$), and
+model ($\times 5$).
 
 \subsection{Phase~2: Decision tree and random forest}\label{sec:dt}
 
@@ -800,10 +846,12 @@ zero-shot prompts were applied to external patient feature vectors.
 
 \subsection{Decision levels, learning curves and protocol baseline}\label{sec:comparison}
 
-Before comparing methods, we fixed one decision level per target:
-$\mathcal{F}_6$ for D19 and D46 MRD, the last level before the Day-19
-assessment, and $\mathcal{F}_7$ for Final Risk, relapse, EFS and OS,
-which are assigned or predicted after induction.
+Before comparing methods, we fixed a single decision level for all
+targets: $\mathcal{F}_6$, the last level before the Day-19 MRD
+assessment.
+D19 and D46 MRD are thus predicted before they are measured, and Final
+Risk, relapse, EFS and OS are predicted before treatment response is
+known, when the intensity of subsequent therapy could still be adapted.
 All comparisons between the LLM ensemble and trained models use this
 level and the same test patients.
 For balanced accuracy, RF probabilities were thresholded at the
@@ -817,9 +865,12 @@ prediction.
 The LLM-equivalent training size is the value of $m$ at which the mean
 learning curve first reaches the LLM ensemble, obtained by linear
 interpolation between adjacent sizes.
-As a reference for Final Risk, a protocol rule assigned IR/HR when
-Initial Risk was IR or HR, D19 MRD was $\geq 1\%$, or D46 MRD was
-$\geq 0.01\%$.
+As references for Final Risk we used Initial Risk alone (LR versus
+IR/HR), which is available at $\mathcal{F}_5$, and a protocol rule that
+assigned IR/HR when Initial Risk was IR or HR, D19 MRD was $\geq 1\%$,
+or D46 MRD was $\geq 0.01\%$; because the rule requires MRD, it is not
+available at the decision level and serves only to show how Final Risk
+is defined.
 
 \subsection{RAG belief revision and LLM narration}\label{sec:rag_methods}
 
@@ -1021,7 +1072,7 @@ Datta 2026~\cite{[CITE:Datta2026]} & Adult ICU (MIMIC-III) & LLM + ML (KAMELEON)
 Zhu 2024~\cite{[CITE:Zhu2024EMERGE]} & Adult ICU (MIMIC) & LLM + fusion (EMERGE) & EHR, Notes, KG & 2 tasks & $\checkmark$ & Rand. & RAG \\
 Kiermeyer 2026~\cite{[CITE:Kiermeyer2026]} & Adult cancer (3,522) & LLM features + RSF & Notes, TNM & OS & $\checkmark$ & CV & ZS \\
 \midrule
-\textbf{This work} & Paed.\ ALL (301 + 41) & LLMs; DT/RF/RSF; RAG & Clin, Flow, Cyto, MRD & 6 targets$^\star$ & nested & Temp. + Ext. & ZS, RAG \\
+\textbf{This work} & Paed.\ ALL (301 + 41) & LLMs; DT/RF/RSF; RAG & Clin, Flow, Cyto & 6 targets$^\star$ & nested & Temp. + Ext. & ZS, RAG \\
 \bottomrule
 \end{tabular}
 \end{sidewaystable}
@@ -1030,27 +1081,25 @@ Kiermeyer 2026~\cite{[CITE:Kiermeyer2026]} & Adult cancer (3,522) & LLM features
 
 \begin{table}[ht]
 \caption{Feature set design aligned with the clinical data-acquisition
-timeline. All six prediction targets are evaluated at every feature
-level; $\dagger$~at $\mathcal{F}_7$, D19MRD and
-D46MRD are used as \emph{input features}, so only Final Risk and
-Relapse are predicted. EFS/OS are evaluated at all levels using
-the same feature vector as classification tasks.}
+timeline. All six prediction targets (Final Risk, D19 MRD, D46 MRD,
+relapse, EFS and OS) are evaluated at every feature level with the same
+feature vector; $\mathcal{F}_6$ is the decision level for all of them.
+D19 and D46 MRD are measured after $\mathcal{F}_6$ and are never used
+as inputs.}
 \label{tab:expdesign}
 \centering
 \small
-\begin{tabular}{ll>{\raggedright\arraybackslash}p{6.0cm}c}
+\begin{tabular}{ll>{\raggedright\arraybackslash}p{7.0cm}}
 \toprule
-\textbf{Level} & \textbf{Timepoint} & \textbf{Cumulative features added} & \textbf{Class. targets} \\
+\textbf{Level} & \textbf{Timepoint} & \textbf{Cumulative features added} \\
 \midrule
-$\mathcal{F}_1$     & Day 0     & WBC count, Age & 4 \\
-$\mathcal{F}_2$     & Day 1     & + Blast\% & 4 \\
-$\mathcal{F}_3$     & Day 1     & + Immunophenotype + 51 flow cytometry markers & 4 \\
-$\mathcal{F}_4$     & Day 1     & $\mathcal{F}_3$ + non-risk clinical factors & 4 \\
-$\mathcal{F}_5$     & Day 5     & $\mathcal{F}_3$ + CNS status + Day~5 blast\% + Initial Risk & 4 \\
-$\mathcal{F}_6$     & Day 7--10 & $\mathcal{F}_5$ + Fusion gene + Karyotype + FISH & 4 \\
-$\mathcal{F}_7$     & Day 46    & $\mathcal{F}_6$ + D19MRD + D46MRD (as inputs) & 2$^\dagger$ \\
+$\mathcal{F}_1$     & Day 0     & WBC count, Age \\
+$\mathcal{F}_2$     & Day 1     & + Blast\% \\
+$\mathcal{F}_3$     & Day 1     & + Immunophenotype + 51 flow cytometry markers \\
+$\mathcal{F}_4$     & Day 1     & $\mathcal{F}_3$ + non-risk clinical factors \\
+$\mathcal{F}_5$     & Day 5     & $\mathcal{F}_3$ + CNS status + Day~5 blast\% + Initial Risk \\
+$\mathcal{F}_6$     & Day 7--10 & $\mathcal{F}_5$ + Fusion gene + Karyotype + FISH \\
 \bottomrule
-\multicolumn{4}{l}{Survival targets (EFS, OS) evaluated at all levels using the same feature vector.}
 \end{tabular}
 \end{table}
 
@@ -1062,7 +1111,7 @@ $\mathcal{F}_7$     & Day 46    & $\mathcal{F}_6$ + D19MRD + D46MRD (as inputs) 
 set; $\mathcal{F}_4$ branches from $\mathcal{F}_3$,
 while the main clinical chain is
 $\mathcal{F}_1\!\subseteq\!\mathcal{F}_2\!\subseteq\!\mathcal{F}_3\!
-\subseteq\!\mathcal{F}_5\!\subseteq\!\mathcal{F}_6\!\subseteq\!\mathcal{F}_7$.}
+\subseteq\!\mathcal{F}_5\!\subseteq\!\mathcal{F}_6$.}
 \label{tab:featurelist}
 \centering
 \footnotesize
@@ -1077,7 +1126,6 @@ $\mathcal{F}_3$ & $+$ Immunophenotype (B/T lineage); 42 CD markers (CD1a, CD2, C
 $\mathcal{F}_4$ & (base $\mathcal{F}_3$) $+$ non-risk clinical factors: chief-complaint category, pregnancy number, birth order, term/preterm status, delivery mode, birth weight, feeding type, admission weight, liver span, spleen span, haemoglobin, platelet count \\
 $\mathcal{F}_5$ & (base $\mathcal{F}_3$) $+$ CNS status (CNSL); Day-5 peripheral blast\%; Initial Risk \\
 $\mathcal{F}_6$ & (base $\mathcal{F}_5$) $+$ Fusion gene; Karyotype; FISH \\
-$\mathcal{F}_7$ & (base $\mathcal{F}_6$) $+$ D19MRD; D46MRD (as input features) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1086,13 +1134,12 @@ $\mathcal{F}_7$ & (base $\mathcal{F}_6$) $+$ D19MRD; D46MRD (as input features) 
 
 \begin{sidewaystable}
 \caption{\textbf{Zero-shot LLM ensemble versus trained models at the
-decision level in every test set.}
+decision level $\mathcal{F}_6$ in every test set.}
 AUROC (classification) or Harrell's C-index (survival) with 95\%
 bootstrap CI (2,000 resamples), followed by balanced accuracy (BA; LLM
-ensemble: majority of the four models; trained: threshold at the
+ensemble: majority of the five models, i.e.\ at least three; trained: threshold at the
 training-set prevalence). Trained, random forest (classification) or
-random survival forest (survival). Notes: for Final Risk, BA of the
-three-condition protocol rule and of Initial Risk alone; for survival,
+random survival forest (survival). Notes: for Final Risk, BA of Initial Risk alone; for survival,
 C-index of the rank-mean ensemble (sensitivity analysis) and, in the
 external cohort, within-hospital C-index (LLM ensemble vs trained).
 ($n$, patients and positives or events.)}
@@ -1104,41 +1151,41 @@ external cohort, within-hospital C-index (LLM ensemble vs trained).
 \toprule
 \textbf{Test set} & \textbf{LLM ensemble} & \textbf{Trained} & \textbf{BA LLM} & \textbf{BA trained} & \textbf{Notes} \\
 \midrule
-\multicolumn{6}{@{}l}{\textit{Final Risk (F7)}} \\
-\quad Split 1 (2017--19) ($n$=200, 100) & 0.950 [0.919, 0.979] & 0.996 [0.990, 0.999] & 0.850 & 0.950 & rule 1.000; Initial Risk 0.895 \\
-\quad Split 2 (2018--19) ($n$=113, 48) & 0.948 [0.900, 0.988] & 0.998 [0.992, 1.000] & 0.833 & 0.958 & rule 1.000; Initial Risk 0.906 \\
-\quad Split 3 (2019) ($n$=17, 8) & 1.000 [1.000, 1.000] & 1.000 [1.000, 1.000] & 1.000 & 1.000 & rule 1.000; Initial Risk 0.813 \\
-\quad External ($n$=29, 20) & 0.975 [0.917, 1.000] & 0.992 [0.961, 1.000] & 0.900 & 0.919 & rule 0.975; Initial Risk 0.900 \\
+\multicolumn{6}{@{}l}{\textit{Final Risk ($\mathcal{F}_6$)}} \\
+\quad Split 1 (2017--19) ($n$=200, 100) & 0.910 [0.865, 0.951] & 0.921 [0.876, 0.959] & 0.890 & 0.895 & Initial Risk 0.895 \\
+\quad Split 2 (2018--19) ($n$=113, 48) & 0.932 [0.876, 0.981] & 0.950 [0.900, 0.988] & 0.901 & 0.891 & Initial Risk 0.906 \\
+\quad Split 3 (2019) ($n$=17, 8) & 0.896 [0.727, 1.000] & 0.882 [0.686, 1.000] & 0.819 & 0.757 & Initial Risk 0.812 \\
+\quad External ($n$=29, 20) & 0.842 [0.672, 0.967] & 0.925 [0.816, 1.000] & 0.844 & 0.783 & Initial Risk 0.900 \\
 \addlinespace[2pt]
-\multicolumn{6}{@{}l}{\textit{D19 MRD (F6)}} \\
-\quad Split 1 (2017--19) ($n$=200, 31) & 0.668 [0.563, 0.773] & 0.684 [0.562, 0.797] & 0.647 & 0.642 &  \\
-\quad Split 2 (2018--19) ($n$=113, 13) & 0.778 [0.627, 0.903] & 0.811 [0.685, 0.916] & 0.720 & 0.725 &  \\
-\quad Split 3 (2019) ($n$=17, 3) & 0.500 [0.167, 0.844] & 0.631 [0.333, 0.933] & 0.452 & 0.524 &  \\
-\quad External ($n$=29, 4) & 0.440 [0.107, 0.946] & 0.330 [0.120, 0.577] & 0.365 & 0.345 &  \\
+\multicolumn{6}{@{}l}{\textit{D19 MRD ($\mathcal{F}_6$)}} \\
+\quad Split 1 (2017--19) ($n$=200, 31) & 0.710 [0.607, 0.810] & 0.684 [0.561, 0.797] & 0.639 & 0.642 &  \\
+\quad Split 2 (2018--19) ($n$=113, 13) & 0.784 [0.622, 0.915] & 0.811 [0.685, 0.916] & 0.733 & 0.725 &  \\
+\quad Split 3 (2019) ($n$=17, 3) & 0.548 [0.183, 0.906] & 0.631 [0.333, 0.933] & 0.524 & 0.524 &  \\
+\quad External ($n$=29, 4) & 0.455 [0.107, 1.000] & 0.330 [0.120, 0.577] & 0.465 & 0.345 &  \\
 \addlinespace[2pt]
-\multicolumn{6}{@{}l}{\textit{D46 MRD (F6)}} \\
-\quad Split 1 (2017--19) ($n$=200, 21) & 0.539 [0.413, 0.664] & 0.586 [0.465, 0.706] & 0.594 & 0.559 &  \\
-\quad Split 2 (2018--19) ($n$=113, 11) & 0.607 [0.409, 0.801] & 0.674 [0.481, 0.842] & 0.616 & 0.663 &  \\
-\quad Split 3 (2019) ($n$=17, 3) & 0.631 [0.369, 0.867] & 0.429 [0.067, 0.867] & 0.488 & 0.452 &  \\
+\multicolumn{6}{@{}l}{\textit{D46 MRD ($\mathcal{F}_6$)}} \\
+\quad Split 1 (2017--19) ($n$=200, 21) & 0.504 [0.380, 0.629] & 0.586 [0.465, 0.706] & 0.517 & 0.559 &  \\
+\quad Split 2 (2018--19) ($n$=113, 11) & 0.599 [0.400, 0.792] & 0.674 [0.481, 0.842] & 0.618 & 0.663 &  \\
+\quad Split 3 (2019) ($n$=17, 3) & 0.607 [0.375, 0.821] & 0.429 [0.067, 0.867] & 0.357 & 0.452 &  \\
 \quad External & \multicolumn{5}{l}{not evaluable} \\
 \addlinespace[2pt]
-\multicolumn{6}{@{}l}{\textit{Relapse (F7)}} \\
-\quad Split 1 (2017--19) ($n$=200, 28) & 0.572 [0.487, 0.658] & 0.590 [0.487, 0.688] & 0.572 & 0.525 &  \\
-\quad Split 2 (2018--19) ($n$=113, 17) & 0.503 [0.431, 0.602] & 0.597 [0.443, 0.737] & 0.517 & 0.567 &  \\
-\quad Split 3 (2019) ($n$=17, 3) & 0.357 [0.231, 0.464] & 0.429 [0.000, 0.813] & 0.393 & 0.619 &  \\
-\quad External ($n$=29, 23) & 0.522 [0.500, 0.569] & 0.377 [0.116, 0.661] & 0.522 & 0.384 &  \\
+\multicolumn{6}{@{}l}{\textit{Relapse ($\mathcal{F}_6$)}} \\
+\quad Split 1 (2017--19) ($n$=200, 28) & 0.652 [0.552, 0.749] & 0.548 [0.430, 0.667] & 0.516 & 0.516 &  \\
+\quad Split 2 (2018--19) ($n$=113, 17) & 0.631 [0.495, 0.759] & 0.629 [0.463, 0.771] & 0.560 & 0.574 &  \\
+\quad Split 3 (2019) ($n$=17, 3) & 0.798 [0.575, 1.000] & 0.500 [0.000, 0.906] & 0.631 & 0.512 &  \\
+\quad External ($n$=29, 23) & 0.652 [0.414, 0.860] & 0.279 [0.104, 0.474] & 0.569 & 0.323 &  \\
 \addlinespace[2pt]
-\multicolumn{6}{@{}l}{\textit{EFS (F7)}} \\
-\quad Split 1 (2017--19) ($n$=201, 43) & 0.672 [0.592, 0.752] & 0.684 [0.605, 0.766] & -- & -- & rank mean 0.680 \\
-\quad Split 2 (2018--19) ($n$=114, 25) & 0.713 [0.611, 0.813] & 0.746 [0.639, 0.841] & -- & -- & rank mean 0.705 \\
-\quad Split 3 (2019) ($n$=17, 5) & 0.684 [0.437, 0.894] & 0.691 [0.327, 0.982] & -- & -- & rank mean 0.684 \\
-\quad External ($n$=41, 24) & 0.670 [0.558, 0.776] & 0.608 [0.472, 0.734] & -- & -- & rank mean 0.688; within hospital 0.702 vs 0.629 \\
+\multicolumn{6}{@{}l}{\textit{EFS ($\mathcal{F}_6$)}} \\
+\quad Split 1 (2017--19) ($n$=201, 43) & 0.609 [0.529, 0.694] & 0.560 [0.480, 0.645] & -- & -- & rank mean 0.608 \\
+\quad Split 2 (2018--19) ($n$=114, 25) & 0.682 [0.579, 0.782] & 0.592 [0.472, 0.716] & -- & -- & rank mean 0.673 \\
+\quad Split 3 (2019) ($n$=17, 5) & 0.728 [0.476, 0.927] & 0.662 [0.404, 0.884] & -- & -- & rank mean 0.706 \\
+\quad External ($n$=41, 24) & 0.692 [0.573, 0.809] & 0.439 [0.304, 0.570] & -- & -- & rank mean 0.693; within hospital 0.686 vs 0.498 \\
 \addlinespace[2pt]
-\multicolumn{6}{@{}l}{\textit{OS (F7)}} \\
-\quad Split 1 (2017--19) ($n$=201, 15) & 0.712 [0.553, 0.852] & 0.607 [0.447, 0.757] & -- & -- & rank mean 0.722 \\
-\quad Split 2 (2018--19) ($n$=114, 10) & 0.737 [0.584, 0.876] & 0.629 [0.457, 0.794] & -- & -- & rank mean 0.737 \\
+\multicolumn{6}{@{}l}{\textit{OS ($\mathcal{F}_6$)}} \\
+\quad Split 1 (2017--19) ($n$=201, 15) & 0.680 [0.532, 0.816] & 0.621 [0.471, 0.765] & -- & -- & rank mean 0.682 \\
+\quad Split 2 (2018--19) ($n$=114, 10) & 0.713 [0.555, 0.858] & 0.620 [0.426, 0.797] & -- & -- & rank mean 0.713 \\
 \quad Split 3 (2019) & \multicolumn{5}{l}{not evaluable} \\
-\quad External ($n$=41, 7) & 0.829 [0.704, 0.934] & 0.643 [0.418, 0.848] & -- & -- & rank mean 0.788; within hospital 0.842 vs 0.691 \\
+\quad External ($n$=41, 7) & 0.843 [0.722, 0.947] & 0.512 [0.237, 0.782] & -- & -- & rank mean 0.845; within hospital 0.850 vs 0.626 \\
 \bottomrule
 \end{tabular}
 \end{sidewaystable}
@@ -1146,41 +1193,38 @@ external cohort, within-hospital C-index (LLM ensemble vs trained).
 \clearpage
 
 \begin{table}[!t]
-\caption{\textbf{Phase~1 LLM zero-shot performance across all seven clinical feature levels and six prediction targets (internal cohort; classification $n=298$ patients with all four labels, survival $n=301$).} Each cell is the balanced accuracy (BA; classification targets) or Harrell's concordance index (survival targets) for one LLM at one feature level; \textbf{bold} marks each model's best feature level for that target (column maximum). BA is computed from the parsed categorical prediction (equivalently, the AUROC of the binary prediction). \textemdash{}~indicates a target not evaluated at that level: D19/D46MRD are used as \emph{input} features at $\mathcal{F}_7$ (see Table~\ref{tab:expdesign}).}
+\caption{\textbf{Phase~1 LLM zero-shot performance across all six clinical feature levels and six prediction targets (internal cohort; classification $n=298$ patients with all four labels, survival $n=301$).} Each cell is the balanced accuracy (BA; classification targets) or Harrell's concordance index (survival targets) for one LLM at one feature level; \textbf{bold} marks each model's best feature level for that target (column maximum; ties all bolded). BA is computed from the parsed categorical prediction (equivalently, the AUROC of the binary prediction); patients without a valid answer from a model (at most 20) are excluded from that model's estimate. GPT, GPT-6.1-Sol; Arg., Gemini-4-Argon; Gma., Gemma-4-31B-it; Int., InternVL3.5-30B-A3B; Qw., Qwen3.6-35B-A3B.}
 \label{tab:phase1_full}
 \centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{l cccc @{\hskip 1.6em} l cccc}
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}l ccccc @{\hskip 1.2em} l ccccc@{}}
 \toprule
- & \multicolumn{4}{c}{\textbf{Model}} & & \multicolumn{4}{c}{\textbf{Model}} \\
-\cmidrule(lr){2-5}\cmidrule(lr){7-10}
-\textbf{Lv.} & Gem. & Gma. & Int. & Qw. & \textbf{Lv.} & Gem. & Gma. & Int. & Qw. \\
+ & \multicolumn{5}{c}{\textbf{Model}} & & \multicolumn{5}{c}{\textbf{Model}} \\
+\cmidrule(lr){2-6}\cmidrule(lr){8-12}
+\textbf{Lv.} & GPT & Arg. & Gma. & Int. & Qw. & \textbf{Lv.} & GPT & Arg. & Gma. & Int. & Qw. \\
 \midrule
-\multicolumn{5}{l}{\textit{Final Risk (BA)}} & \multicolumn{5}{l}{\textit{Relapse (BA)}} \\
-$\mathcal{F}_1$ & 0.788 & 0.785 & 0.729 & 0.792 & $\mathcal{F}_1$ & 0.514 & 0.572 & 0.566 & 0.530 \\
-$\mathcal{F}_2$ & 0.782 & 0.796 & 0.539 & 0.789 & $\mathcal{F}_2$ & 0.557 & 0.564 & 0.519 & 0.526 \\
-$\mathcal{F}_3$ & 0.812 & 0.842 & 0.583 & 0.831 & $\mathcal{F}_3$ & 0.577 & 0.572 & 0.503 & 0.503 \\
-$\mathcal{F}_4$ & 0.826 & 0.835 & 0.591 & 0.837 & $\mathcal{F}_4$ & 0.575 & 0.555 & 0.500 & 0.552 \\
-$\mathcal{F}_5$ & 0.791 & 0.854 & 0.823 & 0.845 & $\mathcal{F}_5$ & 0.596 & 0.558 & 0.554 & 0.504 \\
-$\mathcal{F}_6$ & 0.834 & \textbf{0.891} & \textbf{0.848} & \textbf{0.882} & $\mathcal{F}_6$ & \textbf{0.599} & 0.552 & \textbf{0.643} & 0.546 \\
-$\mathcal{F}_7$ & \textbf{0.849} & 0.788 & 0.716 & 0.856 & $\mathcal{F}_7$ & 0.567 & \textbf{0.586} & 0.540 & \textbf{0.557} \\
-\multicolumn{5}{l}{\textit{D19 MRD (BA)}} & \multicolumn{5}{l}{\textit{EFS (C-index)}} \\
-$\mathcal{F}_1$ & 0.571 & 0.543 & 0.564 & 0.531 & $\mathcal{F}_1$ & 0.577 & 0.591 & 0.584 & 0.573 \\
-$\mathcal{F}_2$ & 0.543 & 0.555 & 0.479 & 0.521 & $\mathcal{F}_2$ & 0.607 & 0.598 & 0.522 & 0.561 \\
-$\mathcal{F}_3$ & 0.631 & 0.599 & 0.484 & 0.557 & $\mathcal{F}_3$ & 0.587 & 0.614 & 0.545 & 0.537 \\
-$\mathcal{F}_4$ & 0.583 & 0.597 & 0.488 & 0.520 & $\mathcal{F}_4$ & 0.598 & 0.614 & 0.526 & 0.561 \\
-$\mathcal{F}_5$ & 0.603 & 0.620 & \textbf{0.567} & \textbf{0.605} & $\mathcal{F}_5$ & 0.624 & 0.583 & 0.604 & 0.542 \\
-$\mathcal{F}_6$ & \textbf{0.651} & \textbf{0.652} & 0.548 & 0.581 & $\mathcal{F}_6$ & 0.643 & 0.630 & 0.621 & 0.581 \\
-$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash & $\mathcal{F}_7$ & \textbf{0.687} & \textbf{0.716} & \textbf{0.642} & \textbf{0.662} \\
-\multicolumn{5}{l}{\textit{D46 MRD (BA)}} & \multicolumn{5}{l}{\textit{OS (C-index)}} \\
-$\mathcal{F}_1$ & 0.505 & 0.486 & \textbf{0.542} & 0.501 & $\mathcal{F}_1$ & 0.689 & 0.648 & 0.652 & 0.661 \\
-$\mathcal{F}_2$ & 0.492 & 0.475 & 0.501 & 0.495 & $\mathcal{F}_2$ & 0.647 & 0.702 & 0.550 & 0.634 \\
-$\mathcal{F}_3$ & 0.502 & 0.509 & 0.503 & 0.500 & $\mathcal{F}_3$ & 0.682 & 0.678 & 0.537 & 0.634 \\
-$\mathcal{F}_4$ & 0.505 & 0.539 & 0.505 & 0.533 & $\mathcal{F}_4$ & 0.687 & 0.691 & 0.497 & 0.660 \\
-$\mathcal{F}_5$ & 0.549 & \textbf{0.577} & 0.518 & \textbf{0.552} & $\mathcal{F}_5$ & 0.701 & 0.704 & 0.734 & 0.619 \\
-$\mathcal{F}_6$ & \textbf{0.610} & 0.539 & 0.523 & 0.510 & $\mathcal{F}_6$ & 0.667 & 0.693 & 0.755 & 0.687 \\
-$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash & $\mathcal{F}_7$ & \textbf{0.725} & \textbf{0.718} & \textbf{0.764} & \textbf{0.718} \\
+\multicolumn{6}{l}{\textit{Final Risk (BA)}} & \multicolumn{6}{l}{\textit{Relapse (BA)}} \\
+$\mathcal{F}_1$ & 0.799 & 0.792 & 0.785 & 0.729 & 0.792 & $\mathcal{F}_1$ & 0.509 & 0.555 & \textbf{0.572} & 0.566 & 0.530 \\
+$\mathcal{F}_2$ & 0.795 & 0.785 & 0.796 & 0.539 & 0.789 & $\mathcal{F}_2$ & 0.515 & \textbf{0.566} & 0.564 & 0.519 & 0.526 \\
+$\mathcal{F}_3$ & 0.842 & 0.839 & 0.842 & 0.583 & 0.831 & $\mathcal{F}_3$ & 0.515 & 0.546 & \textbf{0.572} & 0.503 & 0.503 \\
+$\mathcal{F}_4$ & 0.835 & 0.831 & 0.835 & 0.591 & 0.837 & $\mathcal{F}_4$ & \textbf{0.549} & 0.548 & 0.555 & 0.500 & \textbf{0.552} \\
+$\mathcal{F}_5$ & 0.888 & 0.834 & 0.854 & 0.823 & 0.845 & $\mathcal{F}_5$ & 0.526 & 0.532 & 0.558 & 0.554 & 0.504 \\
+$\mathcal{F}_6$ & \textbf{0.895} & \textbf{0.874} & \textbf{0.891} & \textbf{0.848} & \textbf{0.882} & $\mathcal{F}_6$ & 0.539 & 0.547 & 0.552 & \textbf{0.643} & 0.546 \\
+\multicolumn{6}{l}{\textit{D19 MRD (BA)}} & \multicolumn{6}{l}{\textit{EFS (C-index)}} \\
+$\mathcal{F}_1$ & 0.514 & 0.548 & 0.543 & 0.564 & 0.531 & $\mathcal{F}_1$ & 0.595 & 0.606 & 0.591 & 0.584 & 0.573 \\
+$\mathcal{F}_2$ & 0.544 & 0.536 & 0.555 & 0.479 & 0.521 & $\mathcal{F}_2$ & 0.614 & 0.605 & 0.598 & 0.522 & 0.561 \\
+$\mathcal{F}_3$ & 0.650 & 0.629 & 0.599 & 0.484 & 0.557 & $\mathcal{F}_3$ & 0.603 & 0.590 & 0.614 & 0.545 & 0.537 \\
+$\mathcal{F}_4$ & 0.647 & 0.602 & 0.597 & 0.488 & 0.520 & $\mathcal{F}_4$ & 0.605 & 0.608 & 0.614 & 0.526 & 0.561 \\
+$\mathcal{F}_5$ & \textbf{0.693} & 0.648 & 0.620 & \textbf{0.567} & \textbf{0.605} & $\mathcal{F}_5$ & 0.632 & 0.639 & 0.583 & 0.604 & 0.542 \\
+$\mathcal{F}_6$ & \textbf{0.693} & \textbf{0.661} & \textbf{0.652} & 0.548 & 0.581 & $\mathcal{F}_6$ & \textbf{0.644} & \textbf{0.647} & \textbf{0.630} & \textbf{0.621} & \textbf{0.581} \\
+\multicolumn{6}{l}{\textit{D46 MRD (BA)}} & \multicolumn{6}{l}{\textit{OS (C-index)}} \\
+$\mathcal{F}_1$ & 0.523 & 0.497 & 0.486 & \textbf{0.542} & 0.501 & $\mathcal{F}_1$ & 0.666 & 0.692 & 0.648 & 0.652 & 0.661 \\
+$\mathcal{F}_2$ & 0.516 & 0.514 & 0.475 & 0.501 & 0.495 & $\mathcal{F}_2$ & 0.645 & 0.686 & 0.702 & 0.550 & 0.634 \\
+$\mathcal{F}_3$ & 0.511 & 0.539 & 0.509 & 0.503 & 0.500 & $\mathcal{F}_3$ & 0.686 & 0.686 & 0.678 & 0.537 & 0.634 \\
+$\mathcal{F}_4$ & 0.513 & 0.545 & 0.539 & 0.505 & 0.533 & $\mathcal{F}_4$ & 0.680 & 0.688 & 0.691 & 0.497 & 0.660 \\
+$\mathcal{F}_5$ & 0.561 & \textbf{0.564} & \textbf{0.577} & 0.518 & \textbf{0.552} & $\mathcal{F}_5$ & 0.709 & 0.683 & \textbf{0.704} & 0.734 & 0.619 \\
+$\mathcal{F}_6$ & \textbf{0.567} & 0.547 & 0.539 & 0.523 & 0.510 & $\mathcal{F}_6$ & \textbf{0.723} & \textbf{0.740} & 0.693 & \textbf{0.755} & \textbf{0.687} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1188,74 +1232,58 @@ $\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash & $\math
 \clearpage
 
 \begin{table}[p]
-\caption{\textbf{Phase~1 LLM zero-shot on the pooled external cohort,
-all feature levels} (Gm/Gma/Iv/Qw = Gemini/Gemma/InternVL/Qwen).
-The two source hospitals are pooled into a
-single external cohort ($n$=41 for survival; classification targets
-use the $n$=29 subset with available labels). Classification: BA
-($^*$~= accuracy; D46MRD has only one positive class after pooling,
-so accuracy is reported instead). Survival (EFS, OS): C-index.
-\textbf{Bold}: best feature level per column within each task block
-(ties all bolded). \textemdash: not evaluable ($\mathcal{F}_7$ not
-defined for D19/D46 MRD). External pooled cohort; exploratory,
-indicative only.}
+\caption{\textbf{Phase~1 LLM zero-shot on the pooled external cohort, all feature levels} (GPT, GPT-6.1-Sol; Arg., Gemini-4-Argon; Gma., Gemma-4-31B-it; Int., InternVL3.5-30B-A3B; Qw., Qwen3.6-35B-A3B). The two source hospitals are pooled into a single external cohort ($n$=41 for survival; classification targets use the $n$=29 subset with available labels). Classification: BA ($^*$~= accuracy; D46MRD has only one positive class after pooling, so accuracy is reported instead). Survival (EFS, OS): C-index. \textbf{Bold}: best feature level per column within each task block (ties all bolded). External pooled cohort; exploratory, indicative only.}
 \label{tab:phase1_ext}
 \centering
 \footnotesize
 \renewcommand{\arraystretch}{0.8}
 \setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}l cccc@{}}
+\begin{tabular}{@{}l ccccc@{}}
 \toprule
-\textbf{Lv.} & Gm & Gma & Iv & Qw \\
+\textbf{Lv.} & GPT & Arg. & Gma. & Int. & Qw. \\
 \midrule
-\multicolumn{5}{l}{\textit{Final Risk (BA)}} \\
-$\mathcal{F}_1$ & 0.739 & 0.794 & 0.714 & 0.794 \\
-$\mathcal{F}_2$ & 0.794 & 0.819 & 0.450 & 0.794 \\
-$\mathcal{F}_3$ & 0.708 & 0.819 & 0.531 & 0.794 \\
-$\mathcal{F}_4$ & 0.844 & 0.819 & 0.697 & 0.794 \\
-$\mathcal{F}_5$ & 0.653 & \textbf{0.894} & 0.536 & 0.739 \\
-$\mathcal{F}_6$ & 0.708 & 0.844 & 0.733 & 0.819 \\
-$\mathcal{F}_7$ & \textbf{0.925} & 0.775 & \textbf{0.750} & \textbf{0.850} \\
-\multicolumn{5}{l}{\textit{D19 MRD (BA)}} \\
-$\mathcal{F}_1$ & 0.425 & 0.425 & 0.490 & 0.380 \\
-$\mathcal{F}_2$ & 0.530 & 0.405 & 0.500 & \textbf{0.550} \\
-$\mathcal{F}_3$ & 0.425 & 0.405 & 0.500 & 0.340 \\
-$\mathcal{F}_4$ & \textbf{0.550} & 0.405 & 0.500 & 0.445 \\
-$\mathcal{F}_5$ & 0.425 & \textbf{0.465} & 0.395 & 0.445 \\
-$\mathcal{F}_6$ & 0.425 & 0.405 & \textbf{0.515} & 0.545 \\
-$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash \\
-\multicolumn{5}{l}{\textit{D46 MRD (accuracy; single positive)}} \\
-$\mathcal{F}_1$ & \textbf{0.690$^*$} & 0.586$^*$ & \textbf{0.586$^*$} & 0.621$^*$ \\
-$\mathcal{F}_2$ & 0.586$^*$ & 0.552$^*$ & 0.035$^*$ & 0.655$^*$ \\
-$\mathcal{F}_3$ & 0.586$^*$ & 0.586$^*$ & 0.035$^*$ & 0.690$^*$ \\
-$\mathcal{F}_4$ & 0.552$^*$ & 0.586$^*$ & 0.035$^*$ & \textbf{0.724$^*$} \\
-$\mathcal{F}_5$ & 0.586$^*$ & \textbf{0.621$^*$} & 0.138$^*$ & 0.690$^*$ \\
-$\mathcal{F}_6$ & 0.621$^*$ & 0.586$^*$ & 0.207$^*$ & 0.655$^*$ \\
-$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash \\
-\multicolumn{5}{l}{\textit{Relapse (BA)}} \\
-$\mathcal{F}_1$ & 0.587 & 0.634 & \textbf{0.699} & 0.482 \\
-$\mathcal{F}_2$ & 0.504 & 0.612 & 0.500 & 0.482 \\
-$\mathcal{F}_3$ & 0.674 & 0.551 & 0.562 & 0.544 \\
-$\mathcal{F}_4$ & 0.609 & 0.551 & 0.685 & 0.565 \\
-$\mathcal{F}_5$ & \textbf{0.717} & 0.612 & 0.620 & 0.587 \\
-$\mathcal{F}_6$ & 0.634 & \textbf{0.656} & 0.536 & \textbf{0.609} \\
-$\mathcal{F}_7$ & 0.500 & 0.522 & 0.500 & 0.522 \\
-\multicolumn{5}{l}{\textit{EFS (C-index)}} \\
-$\mathcal{F}_1$ & 0.657 & \textbf{0.669} & 0.627 & 0.634 \\
-$\mathcal{F}_2$ & \textbf{0.715} & 0.659 & 0.551 & \textbf{0.645} \\
-$\mathcal{F}_3$ & 0.635 & 0.590 & 0.615 & 0.638 \\
-$\mathcal{F}_4$ & 0.634 & 0.590 & 0.615 & 0.638 \\
-$\mathcal{F}_5$ & 0.617 & 0.656 & 0.639 & 0.542 \\
-$\mathcal{F}_6$ & 0.657 & 0.651 & \textbf{0.709} & 0.567 \\
-$\mathcal{F}_7$ & 0.656 & 0.664 & 0.702 & 0.591 \\
-\multicolumn{5}{l}{\textit{OS (C-index)}} \\
-$\mathcal{F}_1$ & 0.808 & \textbf{0.821} & 0.802 & 0.714 \\
-$\mathcal{F}_2$ & 0.804 & 0.792 & 0.633 & 0.744 \\
-$\mathcal{F}_3$ & 0.746 & 0.780 & 0.710 & 0.548 \\
-$\mathcal{F}_4$ & 0.760 & 0.780 & 0.710 & 0.548 \\
-$\mathcal{F}_5$ & 0.762 & 0.808 & 0.816 & 0.694 \\
-$\mathcal{F}_6$ & \textbf{0.810} & 0.603 & 0.814 & \textbf{0.806} \\
-$\mathcal{F}_7$ & 0.802 & 0.615 & \textbf{0.859} & 0.665 \\
+\multicolumn{6}{l}{\textit{Final Risk (BA)}} \\
+$\mathcal{F}_1$ & 0.739 & 0.819 & 0.794 & 0.714 & 0.794 \\
+$\mathcal{F}_2$ & 0.794 & 0.794 & 0.819 & 0.450 & 0.794 \\
+$\mathcal{F}_3$ & 0.794 & 0.789 & 0.819 & 0.531 & 0.794 \\
+$\mathcal{F}_4$ & 0.794 & 0.733 & 0.819 & 0.697 & 0.794 \\
+$\mathcal{F}_5$ & 0.814 & 0.703 & \textbf{0.894} & 0.536 & 0.739 \\
+$\mathcal{F}_6$ & \textbf{0.869} & \textbf{0.844} & 0.844 & \textbf{0.733} & \textbf{0.819} \\
+\multicolumn{6}{l}{\textit{D19 MRD (BA)}} \\
+$\mathcal{F}_1$ & 0.440 & 0.400 & 0.425 & 0.490 & 0.380 \\
+$\mathcal{F}_2$ & 0.400 & 0.420 & 0.405 & 0.500 & \textbf{0.550} \\
+$\mathcal{F}_3$ & 0.400 & 0.460 & 0.405 & 0.500 & 0.340 \\
+$\mathcal{F}_4$ & 0.380 & 0.440 & 0.405 & 0.500 & 0.445 \\
+$\mathcal{F}_5$ & \textbf{0.505} & 0.525 & \textbf{0.465} & 0.395 & 0.445 \\
+$\mathcal{F}_6$ & 0.485 & \textbf{0.605} & 0.405 & \textbf{0.515} & 0.545 \\
+\multicolumn{6}{l}{\textit{D46 MRD (accuracy; single positive)}} \\
+$\mathcal{F}_1$ & \textbf{0.931$^*$} & 0.828$^*$ & 0.586$^*$ & \textbf{0.586$^*$} & 0.621$^*$ \\
+$\mathcal{F}_2$ & 0.897$^*$ & 0.793$^*$ & 0.552$^*$ & 0.035$^*$ & 0.655$^*$ \\
+$\mathcal{F}_3$ & 0.897$^*$ & \textbf{0.931$^*$} & 0.586$^*$ & 0.035$^*$ & 0.690$^*$ \\
+$\mathcal{F}_4$ & 0.897$^*$ & 0.897$^*$ & 0.586$^*$ & 0.035$^*$ & \textbf{0.724$^*$} \\
+$\mathcal{F}_5$ & 0.828$^*$ & 0.828$^*$ & \textbf{0.621$^*$} & 0.138$^*$ & 0.690$^*$ \\
+$\mathcal{F}_6$ & 0.793$^*$ & 0.828$^*$ & 0.586$^*$ & 0.207$^*$ & 0.655$^*$ \\
+\multicolumn{6}{l}{\textit{Relapse (BA)}} \\
+$\mathcal{F}_1$ & 0.500 & 0.565 & 0.634 & \textbf{0.699} & 0.482 \\
+$\mathcal{F}_2$ & 0.500 & 0.609 & 0.612 & 0.500 & 0.482 \\
+$\mathcal{F}_3$ & 0.500 & 0.438 & 0.551 & 0.562 & 0.543 \\
+$\mathcal{F}_4$ & 0.500 & 0.460 & 0.551 & 0.685 & 0.565 \\
+$\mathcal{F}_5$ & 0.500 & \textbf{0.674} & 0.612 & 0.620 & 0.587 \\
+$\mathcal{F}_6$ & \textbf{0.565} & 0.547 & \textbf{0.656} & 0.536 & \textbf{0.609} \\
+\multicolumn{6}{l}{\textit{EFS (C-index)}} \\
+$\mathcal{F}_1$ & \textbf{0.663} & 0.622 & \textbf{0.669} & 0.627 & 0.634 \\
+$\mathcal{F}_2$ & 0.645 & 0.608 & 0.659 & 0.551 & \textbf{0.645} \\
+$\mathcal{F}_3$ & 0.586 & 0.611 & 0.590 & 0.615 & 0.638 \\
+$\mathcal{F}_4$ & 0.605 & 0.603 & 0.590 & 0.615 & 0.638 \\
+$\mathcal{F}_5$ & 0.650 & \textbf{0.636} & 0.656 & 0.639 & 0.542 \\
+$\mathcal{F}_6$ & 0.633 & 0.603 & 0.651 & \textbf{0.709} & 0.567 \\
+\multicolumn{6}{l}{\textit{OS (C-index)}} \\
+$\mathcal{F}_1$ & 0.784 & 0.728 & \textbf{0.821} & 0.802 & 0.714 \\
+$\mathcal{F}_2$ & 0.784 & 0.667 & 0.792 & 0.633 & 0.744 \\
+$\mathcal{F}_3$ & 0.752 & 0.722 & 0.780 & 0.710 & 0.548 \\
+$\mathcal{F}_4$ & 0.694 & 0.698 & 0.780 & 0.710 & 0.548 \\
+$\mathcal{F}_5$ & 0.718 & 0.694 & 0.807 & \textbf{0.816} & 0.694 \\
+$\mathcal{F}_6$ & \textbf{0.837} & \textbf{0.798} & 0.603 & 0.814 & \textbf{0.806} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1264,13 +1292,12 @@ $\mathcal{F}_7$ & 0.802 & 0.615 & \textbf{0.859} & 0.665 \\
 
 \begin{table}[p]
 \caption{\textbf{Phase~2 internal results across all feature levels and
-the three temporal splits} (Split-2 values at the decision level are compared with the LLM ensemble in Table~\ref{tab:main}). Classification: DT / RF AUROC; survival
+the three temporal splits} (Split-2 values at the decision level $\mathcal{F}_6$ are compared with the LLM ensemble in Table~\ref{tab:main}). Classification: DT / RF AUROC; survival
 (EFS, OS): survival-tree (DT) / RSF C-index. \textbf{Bold} marks
-the best feature level in each column. Splits by enrolment year: S1
+the best feature level in each column (ties all bolded). Splits by enrolment year: S1
 train~$\leq$16/test~17--19; S2 $\leq$17/18--19; S3 $\leq$18/19.
 D19/D46MRD exclude patients without a recorded MRD value.
-\textemdash{}: not evaluable (D19/D46MRD are inputs at $\mathcal{F}_7$;
-no OS events in the 2019 test set).}
+\textemdash{}: not evaluable (no OS events in the 2019 test set).}
 \label{tab:phase2_int_full}
 \centering
 \footnotesize
@@ -1283,53 +1310,47 @@ no OS events in the 2019 test set).}
 \textbf{Lv.} & DT & RF & DT & RF & DT & RF \\
 \midrule
 \multicolumn{7}{l}{\textit{Final Risk (DT / RF AUROC)}} \\
-$\mathcal{F}_1$ & 0.759 & 0.842 & 0.810 & 0.871 & 0.799 & 0.806 \\
+$\mathcal{F}_1$ & 0.759 & 0.842 & 0.810 & 0.871 & \textbf{0.799} & 0.806 \\
 $\mathcal{F}_2$ & 0.759 & 0.820 & 0.810 & 0.830 & 0.778 & 0.847 \\
 $\mathcal{F}_3$ & 0.711 & 0.849 & 0.782 & 0.872 & 0.771 & 0.743 \\
 $\mathcal{F}_4$ & 0.711 & 0.852 & 0.757 & 0.847 & 0.771 & 0.799 \\
 $\mathcal{F}_5$ & \textbf{0.893} & 0.897 & 0.909 & 0.943 & 0.736 & 0.847 \\
-$\mathcal{F}_6$ & 0.893 & 0.922 & 0.911 & 0.951 & 0.736 & 0.882 \\
-$\mathcal{F}_7$ & 0.891 & \textbf{0.996} & \textbf{0.949} & \textbf{0.998} & \textbf{0.979} & \textbf{1.000} \\
+$\mathcal{F}_6$ & \textbf{0.893} & \textbf{0.922} & \textbf{0.911} & \textbf{0.951} & 0.736 & \textbf{0.882} \\
 \multicolumn{7}{l}{\textit{D19 MRD (DT / RF AUROC)}} \\
 $\mathcal{F}_1$ & 0.537 & 0.523 & 0.485 & 0.420 & 0.393 & 0.595 \\
 $\mathcal{F}_2$ & 0.503 & 0.509 & 0.498 & 0.505 & 0.464 & 0.762 \\
 $\mathcal{F}_3$ & 0.557 & 0.657 & 0.686 & 0.791 & \textbf{0.893} & 0.810 \\
-$\mathcal{F}_4$ & 0.557 & 0.672 & \textbf{0.705} & 0.799 & 0.893 & 0.810 \\
+$\mathcal{F}_4$ & 0.557 & 0.672 & \textbf{0.705} & 0.799 & \textbf{0.893} & 0.810 \\
 $\mathcal{F}_5$ & \textbf{0.560} & 0.631 & 0.686 & 0.740 & 0.750 & \textbf{0.845} \\
 $\mathcal{F}_6$ & 0.557 & \textbf{0.684} & 0.686 & \textbf{0.811} & 0.738 & 0.631 \\
-$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
 \multicolumn{7}{l}{\textit{D46 MRD (DT / RF AUROC)}} \\
 $\mathcal{F}_1$ & 0.362 & 0.503 & 0.456 & 0.447 & \textbf{0.464} & 0.631 \\
 $\mathcal{F}_2$ & 0.518 & 0.428 & 0.456 & 0.527 & 0.321 & \textbf{0.655} \\
 $\mathcal{F}_3$ & \textbf{0.545} & 0.555 & 0.521 & 0.570 & 0.369 & 0.321 \\
 $\mathcal{F}_4$ & 0.531 & 0.554 & 0.480 & 0.595 & 0.369 & 0.298 \\
-$\mathcal{F}_5$ & 0.545 & \textbf{0.601} & \textbf{0.549} & 0.636 & 0.369 & 0.345 \\
-$\mathcal{F}_6$ & 0.545 & 0.586 & 0.521 & \textbf{0.674} & 0.369 & 0.429 \\
-$\mathcal{F}_7$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
+$\mathcal{F}_5$ & \textbf{0.545} & \textbf{0.601} & \textbf{0.549} & 0.636 & 0.369 & 0.345 \\
+$\mathcal{F}_6$ & \textbf{0.545} & 0.586 & 0.521 & \textbf{0.674} & 0.369 & 0.429 \\
 \multicolumn{7}{l}{\textit{Relapse (DT / RF AUROC)}} \\
 $\mathcal{F}_1$ & 0.480 & 0.439 & \textbf{0.529} & 0.465 & 0.274 & 0.476 \\
 $\mathcal{F}_2$ & \textbf{0.550} & 0.546 & 0.483 & 0.526 & \textbf{0.500} & 0.357 \\
 $\mathcal{F}_3$ & 0.528 & 0.483 & 0.411 & 0.485 & 0.286 & 0.274 \\
-$\mathcal{F}_4$ & 0.540 & 0.564 & 0.411 & 0.471 & 0.286 & 0.036 \\
+$\mathcal{F}_4$ & 0.540 & \textbf{0.564} & 0.411 & 0.471 & 0.286 & 0.036 \\
 $\mathcal{F}_5$ & 0.527 & 0.517 & 0.411 & 0.624 & 0.286 & 0.286 \\
 $\mathcal{F}_6$ & 0.528 & 0.547 & 0.411 & \textbf{0.630} & 0.488 & \textbf{0.500} \\
-$\mathcal{F}_7$ & 0.529 & \textbf{0.591} & 0.411 & 0.597 & 0.488 & 0.429 \\
 \multicolumn{7}{l}{\textit{EFS (DT / RSF C-index)}} \\
-$\mathcal{F}_1$ & 0.468 & 0.532 & 0.443 & 0.610 & \textbf{0.691} & \textbf{0.706} \\
-$\mathcal{F}_2$ & 0.482 & 0.516 & 0.501 & 0.597 & 0.529 & 0.559 \\
+$\mathcal{F}_1$ & 0.468 & 0.532 & 0.443 & \textbf{0.610} & \textbf{0.691} & \textbf{0.706} \\
+$\mathcal{F}_2$ & 0.482 & 0.516 & \textbf{0.501} & 0.597 & 0.529 & 0.559 \\
 $\mathcal{F}_3$ & 0.527 & 0.542 & 0.477 & 0.552 & 0.390 & 0.500 \\
-$\mathcal{F}_4$ & 0.546 & 0.520 & 0.482 & 0.533 & 0.426 & 0.485 \\
+$\mathcal{F}_4$ & \textbf{0.546} & 0.520 & 0.482 & 0.533 & 0.426 & 0.485 \\
 $\mathcal{F}_5$ & 0.494 & 0.511 & 0.490 & 0.572 & 0.390 & 0.588 \\
-$\mathcal{F}_6$ & 0.497 & 0.560 & 0.485 & 0.592 & 0.390 & 0.662 \\
-$\mathcal{F}_7$ & \textbf{0.674} & \textbf{0.684} & \textbf{0.718} & \textbf{0.746} & 0.640 & 0.691 \\
+$\mathcal{F}_6$ & 0.497 & \textbf{0.560} & 0.485 & 0.592 & 0.390 & 0.662 \\
 \multicolumn{7}{l}{\textit{OS (DT / RSF C-index)}} \\
 $\mathcal{F}_1$ & 0.541 & \textbf{0.688} & 0.531 & 0.497 & \textemdash & \textemdash \\
 $\mathcal{F}_2$ & 0.467 & 0.651 & 0.541 & 0.540 & \textemdash & \textemdash \\
 $\mathcal{F}_3$ & 0.512 & 0.556 & 0.440 & 0.515 & \textemdash & \textemdash \\
 $\mathcal{F}_4$ & 0.498 & 0.590 & 0.472 & 0.529 & \textemdash & \textemdash \\
-$\mathcal{F}_5$ & 0.492 & 0.586 & 0.445 & 0.622 & \textemdash & \textemdash \\
+$\mathcal{F}_5$ & 0.492 & 0.586 & 0.445 & \textbf{0.622} & \textemdash & \textemdash \\
 $\mathcal{F}_6$ & \textbf{0.562} & 0.621 & \textbf{0.562} & 0.620 & \textemdash & \textemdash \\
-$\mathcal{F}_7$ & 0.562 & 0.607 & 0.505 & \textbf{0.628} & \textemdash & \textemdash \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1345,8 +1366,7 @@ with a recorded value). Classification: DT / RF AUROC; $^*$~=
 accuracy (D46MRD has only one positive case after pooling, so accuracy
 is reported instead). Survival (EFS, OS): survival-tree (DT) /
 random-survival-forest (RSF) C-index. \textbf{Bold} marks the best
-feature level in each column. \textemdash{}: not evaluable (D19/D46MRD
-are inputs at $\mathcal{F}_7$). Pooled external cohort; small, indicative
+feature level in each column (ties all bolded). Pooled external cohort; small, indicative
 only.}
 \label{tab:phase2_ext}
 \centering
@@ -1362,9 +1382,8 @@ $\mathcal{F}_1$ & 0.805 & 0.878 \\
 $\mathcal{F}_2$ & 0.827 & 0.863 \\
 $\mathcal{F}_3$ & 0.779 & 0.843 \\
 $\mathcal{F}_4$ & 0.778 & 0.750 \\
-$\mathcal{F}_5$ & 0.912 & 0.938 \\
-$\mathcal{F}_6$ & 0.912 & 0.934 \\
-$\mathcal{F}_7$ & \textbf{0.968} & \textbf{0.991} \\
+$\mathcal{F}_5$ & \textbf{0.912} & \textbf{0.938} \\
+$\mathcal{F}_6$ & \textbf{0.912} & 0.934 \\
 \multicolumn{3}{l}{\textit{D19 MRD (DT / RF)}} \\
 $\mathcal{F}_1$ & \textbf{0.630} & 0.590 \\
 $\mathcal{F}_2$ & 0.505 & \textbf{0.650} \\
@@ -1372,15 +1391,13 @@ $\mathcal{F}_3$ & 0.385 & 0.265 \\
 $\mathcal{F}_4$ & 0.385 & 0.285 \\
 $\mathcal{F}_5$ & 0.385 & 0.290 \\
 $\mathcal{F}_6$ & 0.385 & 0.330 \\
-$\mathcal{F}_7$ & \textemdash & \textemdash \\
 \multicolumn{3}{l}{\textit{D46 MRD (DT / RF)}} \\
 $\mathcal{F}_1$ & \textbf{0.742$^*$} & \textbf{0.968$^*$} \\
-$\mathcal{F}_2$ & 0.581$^*$ & 0.968$^*$ \\
-$\mathcal{F}_3$ & 0.323$^*$ & 0.968$^*$ \\
-$\mathcal{F}_4$ & 0.290$^*$ & 0.968$^*$ \\
-$\mathcal{F}_5$ & 0.323$^*$ & 0.968$^*$ \\
-$\mathcal{F}_6$ & 0.323$^*$ & 0.968$^*$ \\
-$\mathcal{F}_7$ & \textemdash & \textemdash \\
+$\mathcal{F}_2$ & 0.581$^*$ & \textbf{0.968$^*$} \\
+$\mathcal{F}_3$ & 0.323$^*$ & \textbf{0.968$^*$} \\
+$\mathcal{F}_4$ & 0.290$^*$ & \textbf{0.968$^*$} \\
+$\mathcal{F}_5$ & 0.323$^*$ & \textbf{0.968$^*$} \\
+$\mathcal{F}_6$ & 0.323$^*$ & \textbf{0.968$^*$} \\
 \multicolumn{3}{l}{\textit{Relapse (DT / RF)}} \\
 $\mathcal{F}_1$ & \textbf{0.583} & \textbf{0.528} \\
 $\mathcal{F}_2$ & 0.397 & 0.494 \\
@@ -1388,23 +1405,20 @@ $\mathcal{F}_3$ & 0.333 & 0.300 \\
 $\mathcal{F}_4$ & 0.525 & 0.272 \\
 $\mathcal{F}_5$ & 0.333 & 0.377 \\
 $\mathcal{F}_6$ & 0.219 & 0.267 \\
-$\mathcal{F}_7$ & 0.250 & 0.383 \\
 \multicolumn{3}{l}{\textit{EFS (DT / RSF C-index)}} \\
 $\mathcal{F}_1$ & \textbf{0.603} & 0.567 \\
-$\mathcal{F}_2$ & 0.552 & 0.572 \\
+$\mathcal{F}_2$ & 0.552 & \textbf{0.572} \\
 $\mathcal{F}_3$ & 0.507 & 0.434 \\
 $\mathcal{F}_4$ & 0.509 & 0.475 \\
 $\mathcal{F}_5$ & 0.419 & 0.444 \\
 $\mathcal{F}_6$ & 0.419 & 0.439 \\
-$\mathcal{F}_7$ & 0.490 & \textbf{0.608} \\
 \multicolumn{3}{l}{\textit{OS (DT / RSF C-index)}} \\
 $\mathcal{F}_1$ & 0.619 & \textbf{0.718} \\
-$\mathcal{F}_2$ & 0.657 & 0.718 \\
+$\mathcal{F}_2$ & 0.657 & \textbf{0.718} \\
 $\mathcal{F}_3$ & 0.571 & 0.468 \\
-$\mathcal{F}_4$ & 0.702 & 0.512 \\
+$\mathcal{F}_4$ & \textbf{0.702} & 0.512 \\
 $\mathcal{F}_5$ & 0.647 & 0.556 \\
 $\mathcal{F}_6$ & 0.647 & 0.512 \\
-$\mathcal{F}_7$ & \textbf{0.710} & 0.643 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1414,14 +1428,14 @@ $\mathcal{F}_7$ & \textbf{0.710} & 0.643 \\
 \begin{table}[ht]
 \caption{Cosine RAG belief revision: RF AUROC before ($p_\text{RF}$) and
 after ($p_\text{rev}$) belief revision ($K=5$, $\alpha_\text{base}=0.6$),
-best experiment per task. Internal results are reported per temporal
-split; external results use the pooled external cohort, as the per-site
+at the feature level used per task ($\mathcal{F}_6$ for Final Risk,
+relapse, EFS and OS; $\mathcal{F}_3$ for D19 MRD; $\mathcal{F}_2$ for
+D46 MRD). Internal results are reported per temporal split; external results use the pooled external cohort, as the per-site
 external cohorts are too small or single-class for this analysis.
 For the survival endpoints (EFS, OS) the values are Harrell's C-index:
 base is the RSF risk score and the revision replaces the
 similarity-weighted binary-outcome mean by a similarity-weighted
-Kaplan--Meier neighbourhood event probability at 24 months
-(experiment~P2-Exp8, the MRD-augmented feature set).
+Kaplan--Meier neighbourhood event probability at 24 months.
 \textbf{Bold}: largest gain (Split~3 has 17 test patients, 3 of them
 D46MRD-positive; indicative only). $\dagger$~insufficient positives; not
 computed. \textemdash: too few events (OS, 2019 test split).}
@@ -1434,9 +1448,9 @@ computed. \textemdash: too few events (OS, 2019 test split).}
 \textbf{Task} & \textbf{Split} & $p_\text{RF}$ & $p_\text{rev}$ & \textbf{$\Delta$} \\
 \midrule
 \multicolumn{5}{l}{\textit{Internal (temporal splits)}} \\
-Final Risk & Split~1 & 0.996 & 0.998 & $+0.002$ \\
-Final Risk & Split~2 & 0.998 & 0.999 & $+0.002$ \\
-Final Risk & Split~3 & 1.000 & 1.000 & $+0.000$ \\
+Final Risk & Split~1 & 0.922 & 0.912 & $-0.010$ \\
+Final Risk & Split~2 & 0.951 & 0.949 & $-0.002$ \\
+Final Risk & Split~3 & 0.882 & 0.833 & $-0.049$ \\
 D19MRD & Split~1 & 0.657 & 0.655 & $-0.003$ \\
 D19MRD & Split~2 & 0.791 & 0.787 & $-0.004$ \\
 D19MRD & Split~3 & 0.810 & 0.833 & $+0.024$ \\
@@ -1448,22 +1462,22 @@ Relapse & Split~2 & 0.630 & 0.588 & $-0.042$ \\
 Relapse & Split~3 & 0.500 & 0.476 & $-0.024$ \\
 \addlinespace[2pt]
 \multicolumn{5}{l}{\quad\textit{Survival endpoints (C-index; RSF base vs KM revision)}} \\
-EFS & Split~1 & 0.684 & 0.704 & $+0.020$ \\
-EFS & Split~2 & 0.746 & 0.745 & $-0.001$ \\
-EFS & Split~3 & 0.691 & 0.706 & $+0.015$ \\
-OS & Split~1 & 0.607 & 0.617 & $+0.010$ \\
-OS & Split~2 & 0.629 & 0.634 & $+0.005$ \\
+EFS & Split~1 & 0.560 & 0.566 & $+0.006$ \\
+EFS & Split~2 & 0.592 & 0.584 & $-0.008$ \\
+EFS & Split~3 & 0.662 & 0.677 & $+0.015$ \\
+OS & Split~1 & 0.621 & 0.637 & $+0.016$ \\
+OS & Split~2 & 0.620 & 0.617 & $-0.003$ \\
 OS & Split~3 & \multicolumn{3}{c}{\textemdash} \\
 \midrule
 \multicolumn{5}{l}{\textit{External (pooled cohort)}} \\
-Final Risk & --- & 0.991 & 1.000 & $+0.009$ \\
+Final Risk & --- & 0.934 & 0.951 & $+0.017$ \\
 D19MRD & --- & 0.265 & 0.230 & $-0.035$ \\
 D46MRD & --- & \multicolumn{3}{c}{$\dagger$ ($n_\text{pos}=1$)} \\
 Relapse & --- & 0.267 & 0.283 & $+0.016$ \\
 \addlinespace[2pt]
 \multicolumn{5}{l}{\quad\textit{Survival endpoints (C-index; RSF base vs KM revision)}} \\
-EFS & --- & 0.608 & 0.613 & $+0.005$ \\
-OS & --- & 0.643 & 0.659 & $+0.016$ \\
+EFS & --- & 0.439 & 0.419 & $-0.020$ \\
+OS & --- & 0.512 & 0.540 & $+0.028$ \\
 \bottomrule
 \end{tabular}
 \end{table}
