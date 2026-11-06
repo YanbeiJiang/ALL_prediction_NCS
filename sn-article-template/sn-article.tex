@@ -20,10 +20,10 @@
 %%==============================================================%%
 %% Title
 %%==============================================================%%
-\title[LLMs versus local data in paediatric ALL]{%
-  Zero-shot language models versus accumulating local data for
-  timeline-aligned prediction in paediatric acute lymphoblastic
-  leukaemia}
+\title[LLMs, marrow morphology and local data in paediatric ALL]{%
+  Zero-shot language models and automated marrow morphology versus
+  accumulating local data for timeline-aligned prediction in
+  paediatric acute lymphoblastic leukaemia}
 
 %%==============================================================%%
 %% Authors
@@ -48,38 +48,41 @@
 \abstract{%
 Prediction models for paediatric acute lymphoblastic leukaemia (ALL)
 are usually trained on a hospital's own historical cases, yet a
-hospital that adopts a new protocol starts with none.
-Here we ask how much local data a zero-shot large language model (LLM)
-is worth along the clinical timeline.
-We aligned six nested feature sets with data acquisition from
-admission to the completion of diagnostic work-up (Day~7--10), before
-any assessment of minimal residual disease (MRD), and predicted six
-decisions from the last of them—Final Risk, day-19 and day-46 MRD,
-relapse, event-free survival (EFS) and overall survival (OS).
-Random forests and random survival forests were trained on cases
-partitioned by enrolment year (301 patients, 2015--2019), with an
-external cohort of 41 patients from two hospitals.
+hospital that adopts a new protocol starts with none, and the
+diagnostic marrow smear, examined in every patient, rarely enters such
+models.
+We ask how much local data a zero-shot large language model (LLM) is
+worth along the clinical timeline, and what automatically measured
+marrow morphology adds.
+In 301 patients split by enrolment year and 41 external patients from
+two hospitals, we predicted Final Risk, day-19 and day-46 minimal
+residual disease (MRD), relapse, event-free survival (EFS) and overall
+survival (OS) from six nested feature sets available before any MRD
+assessment.
+Cell size, cytoplasm, chromatin, nucleoli and vacuoles were measured
+automatically on the Day-1 smear, checked against haematologists'
+reports, and given to the LLMs as a short text report, without images,
+and to random forests and random survival forests as variables.
 An equal-weight ensemble of five zero-shot LLMs matched random forests
 trained on about 50 local patients for Final Risk and 100 for day-19
-MRD (AUROC 0.93 and 0.78; differences from fully trained forests not
-significant).
-For EFS and OS, locally trained random survival forests did not reach
-the ensemble at any training size (C-index 0.60 for both with all 186
-training patients, versus 0.68 and 0.71).
+MRD.
+Morphology raised the ensemble's discrimination for all six targets,
+to AUROC 0.95 for Final Risk and 0.81 for day-19 MRD, on par with
+fully trained forests (0.95 and 0.84), and to C-indices of 0.71 for
+EFS and 0.72 for OS, against at most 0.61 for survival forests with or
+without morphology.
 At the external hospitals the survival forests lost discrimination
 (EFS 0.44, OS 0.54) whereas the LLM ensemble did not (0.69 and 0.84;
-$P<0.01$ for both, and $P<0.05$ when only patients from the same
-hospital were compared).
-Final Risk was largely fixed by Initial Risk, which alone reproduced it
-in 90.7\% of patients, and relapse and day-46 MRD remained near chance
-for all methods.
-Zero-shot LLMs are therefore a credible starting point before local
-data accrue, and remain complementary afterwards.
+$P<0.01$, and $P<0.05$ within hospitals).
+Zero-shot LLMs that read routine data and an automated morphology
+report are therefore a credible starting point before local data
+accrue, and remain complementary afterwards.
 }
 
 \keywords{paediatric acute lymphoblastic leukaemia, large language
-models, zero-shot prediction, learning curves, temporal validation,
-survival analysis, external validation}
+models, zero-shot prediction, bone marrow morphology, automated image
+analysis, learning curves, temporal validation, survival analysis,
+external validation}
 
 \maketitle
 
@@ -178,10 +181,25 @@ ones~\cite{[CITE:ClinicalBench2026],[CITE:Brown2025JAMIA]}.
 Retrieval of similar patients or of external knowledge can
 help~\cite{[CITE:ChenPSB2026],[CITE:Datta2026],[CITE:Xu2024RAMEHR],[CITE:Zhu2024EMERGE],[CITE:Chen2025JMIR]},
 but none of these studies concerns paediatric oncology.
+
+A second source of information is examined in every patient but rarely
+reaches a prediction model.
+The diagnostic bone marrow smear is read on Day~1, and the
+morphologist's description of the blasts—their size, the amount of
+cytoplasm, the nucleoli and the presence of vacuoles—once defined the
+FAB subtypes of ALL~\cite{[CITE:Bennett1976]}.
+In current risk stratification this description serves diagnosis, and
+it is recorded as free text rather than as quantitative variables.
+Turning the smear into a few quantitative, interpretable measures would
+make it usable by both kinds of model: as variables for a trained
+model and, without passing any image, as a short report that an LLM
+reads alongside the clinical data.
+
 It therefore remains unclear how much local data a zero-shot LLM is
-worth, for which decisions it suffices, and whether it remains useful
-once a case database has accrued or when a model is moved to another
-hospital.
+worth, for which decisions it suffices, whether it remains useful once
+a case database has accrued or when a model is moved to another
+hospital, and whether information that the structured record leaves
+out, such as marrow morphology, adds to it.
 We address these questions on a dataset in which six temporally
 ordered clinical feature sets (five strictly nested; $\mathcal{F}_4$ is
 a Day-1 branch of $\mathcal{F}_3$) map onto the feature-acquisition
@@ -192,26 +210,34 @@ Every target is predicted before the first MRD assessment, so MRD is
 always an outcome and never an input.
 We compare an ensemble of five zero-shot LLMs (Phase~1) with decision
 trees, random forests and random survival forests trained on the
-growing case database under temporal splits (Phase~2), test both on an
-external cohort from two hospitals without retraining, and add a
+growing case database under temporal splits (Phase~2), add to both an
+automated morphology profile of the Day-1 marrow smear, test both on
+an external cohort from two hospitals without retraining, and add a
 retrieval-based belief revision that uses the accumulated cases to
 revise model probabilities and to ground LLM-generated clinical
 narratives.
 
-Our contributions are threefold.
+Our contributions are fourfold.
 (\textit{i})~A timeline-aligned evaluation of six clinical decisions in
 paediatric ALL that shows when each becomes predictable before
 treatment response is known: Final Risk is largely fixed by Initial
 Risk at Day~5, day-19 MRD becomes predictable once immunophenotype is
-available, and relapse and day-46 MRD remain near chance with routine
-data.
-(\textit{ii})~A quantification of the value of zero-shot LLMs relative
+available, and relapse and day-46 MRD remain the hardest targets.
+(\textit{ii})~An automated, image-free route from the diagnostic
+marrow smear to prediction: measures of cell size, cytoplasm,
+chromatin, nucleoli and vacuoles, checked against the haematologists'
+reports and passed to the LLMs as a short text report, with which the
+LLM ensemble improved for all six targets (for example, AUROC 0.93 to
+0.95 for Final Risk and 0.78 to 0.81 for day-19 MRD, and C-index 0.68
+to 0.71 for EFS).
+(\textit{iii})~A quantification of the value of zero-shot LLMs relative
 to accumulating local data: the LLM ensemble matched random forests
 trained on about 50 and 100 local patients for Final Risk and day-19
-MRD, was not reached by locally trained survival forests at any
-training size for EFS and OS, and kept its survival discrimination at
-two external hospitals where the trained models lost theirs.
-(\textit{iii})~A retrieval-based belief revision extended to censored
+MRD, was not reached for EFS and OS by locally trained survival
+forests at any training size, nor with morphology added, and kept its
+survival discrimination at two external hospitals where the trained
+models lost theirs.
+(\textit{iv})~A retrieval-based belief revision extended to censored
 survival outcomes, with LLM-generated narratives for physician review.
 
 \begin{table}[t]
@@ -224,6 +250,8 @@ $\checkmark$, addressed; ($\checkmark$), addressed partly or by some
 studies in the family; --, not addressed.
 Time-ordered features: predictors organised by the time at which
 they become available.
+Marrow morphology: quantitative measures from bone marrow smear images
+used as predictors.
 Classification + survival: classification and time-to-event targets
 evaluated on the same features.
 Temporal split: training and test sets separated by calendar time.
@@ -236,20 +264,20 @@ Retrieval: retrieval of similar cases or external knowledge.}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3.5pt}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{6.0cm}*{8}{c}@{}}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{6.0cm}*{9}{c}@{}}
 \toprule
-\textbf{Family of prior work} & \rotatebox{90}{\textbf{Paediatric ALL}} & \rotatebox{90}{\textbf{Time-ordered features}} & \rotatebox{90}{\textbf{Classif.\ + survival}} & \rotatebox{90}{\textbf{Temporal split}} & \rotatebox{90}{\textbf{External cohort}} & \rotatebox{90}{\textbf{Zero-shot LLM}} & \rotatebox{90}{\textbf{Learning curve}} & \rotatebox{90}{\textbf{Retrieval}} \\
+\textbf{Family of prior work} & \rotatebox{90}{\textbf{Paediatric ALL}} & \rotatebox{90}{\textbf{Time-ordered features}} & \rotatebox{90}{\textbf{Marrow morphology}} & \rotatebox{90}{\textbf{Classif.\ + survival}} & \rotatebox{90}{\textbf{Temporal split}} & \rotatebox{90}{\textbf{External cohort}} & \rotatebox{90}{\textbf{Zero-shot LLM}} & \rotatebox{90}{\textbf{Learning curve}} & \rotatebox{90}{\textbf{Retrieval}} \\
 \midrule
-Protocol risk rules and MRD studies~\cite{[CITE:Schultz2007],[CITE:Borowitz2008],[CITE:Conter2010]} & $\checkmark$ & ($\checkmark$) & -- & -- & -- & -- & -- & -- \\
-Cox nomograms and risk scores~\cite{[CITE:Mao2020],[CITE:Zhang2020],[CITE:He2022],[CITE:Sang2026],[CITE:Liu2022TALL],[CITE:Chen2025FrontPediatr]} & $\checkmark$ & -- & -- & -- & -- & -- & -- & -- \\
-Machine learning on routine clinical data~\cite{[CITE:Pan2017],[CITE:Mehrbakhsh2024],[CITE:Song2025],[CITE:Cui2025Transformer],[CITE:Saravanan2026]} & $\checkmark$ & -- & -- & -- & -- & -- & -- & -- \\
-Omics, single-cell and cytometry models~\cite{[CITE:Kang2010],[CITE:Fitter2021],[CITE:Good2018],[CITE:Bohannan2022],[CITE:Mosquera2024],[CITE:Zhai2026],[CITE:Martinez2025]} & $\checkmark$ & -- & ($\checkmark$) & -- & ($\checkmark$) & -- & -- & -- \\
-Multi-task outcome prediction (clinTALL)~\cite{[CITE:Stoiber2026]} & $\checkmark$ & -- & $\checkmark$ & -- & -- & -- & -- & -- \\
-Language models on adult health records~\cite{[CITE:Jiang2023NYUTron],[CITE:Renc2024ETHOS],[CITE:Kiermeyer2026]} & -- & -- & -- & ($\checkmark$) & -- & ($\checkmark$) & -- & -- \\
-Prompted LLMs versus conventional models~\cite{[CITE:Zhu2026ClinicRealm],[CITE:ClinicalBench2026],[CITE:Brown2025JAMIA]} & -- & -- & -- & -- & -- & $\checkmark$ & ($\checkmark$) & ($\checkmark$) \\
-Retrieval-augmented clinical prediction~\cite{[CITE:ChenPSB2026],[CITE:Datta2026],[CITE:Xu2024RAMEHR],[CITE:Zhu2024EMERGE],[CITE:Chen2025JMIR]} & -- & -- & -- & ($\checkmark$) & -- & ($\checkmark$) & -- & $\checkmark$ \\
+Protocol risk rules and MRD studies~\cite{[CITE:Schultz2007],[CITE:Borowitz2008],[CITE:Conter2010]} & $\checkmark$ & ($\checkmark$) & -- & -- & -- & -- & -- & -- & -- \\
+Cox nomograms and risk scores~\cite{[CITE:Mao2020],[CITE:Zhang2020],[CITE:He2022],[CITE:Sang2026],[CITE:Liu2022TALL],[CITE:Chen2025FrontPediatr]} & $\checkmark$ & -- & -- & -- & -- & -- & -- & -- & -- \\
+Machine learning on routine clinical data~\cite{[CITE:Pan2017],[CITE:Mehrbakhsh2024],[CITE:Song2025],[CITE:Cui2025Transformer],[CITE:Saravanan2026]} & $\checkmark$ & -- & -- & -- & -- & -- & -- & -- & -- \\
+Omics, single-cell and cytometry models~\cite{[CITE:Kang2010],[CITE:Fitter2021],[CITE:Good2018],[CITE:Bohannan2022],[CITE:Mosquera2024],[CITE:Zhai2026],[CITE:Martinez2025]} & $\checkmark$ & -- & -- & ($\checkmark$) & -- & ($\checkmark$) & -- & -- & -- \\
+Multi-task outcome prediction (clinTALL)~\cite{[CITE:Stoiber2026]} & $\checkmark$ & -- & -- & $\checkmark$ & -- & -- & -- & -- & -- \\
+Language models on adult health records~\cite{[CITE:Jiang2023NYUTron],[CITE:Renc2024ETHOS],[CITE:Kiermeyer2026]} & -- & -- & -- & -- & ($\checkmark$) & -- & ($\checkmark$) & -- & -- \\
+Prompted LLMs versus conventional models~\cite{[CITE:Zhu2026ClinicRealm],[CITE:ClinicalBench2026],[CITE:Brown2025JAMIA]} & -- & -- & -- & -- & -- & -- & $\checkmark$ & ($\checkmark$) & ($\checkmark$) \\
+Retrieval-augmented clinical prediction~\cite{[CITE:ChenPSB2026],[CITE:Datta2026],[CITE:Xu2024RAMEHR],[CITE:Zhu2024EMERGE],[CITE:Chen2025JMIR]} & -- & -- & -- & -- & ($\checkmark$) & -- & ($\checkmark$) & -- & $\checkmark$ \\
 \midrule
-\textbf{This work} & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\textbf{This work} & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -300,6 +328,23 @@ Discrimination is summarised by AUROC for classification, where the
 LLM ensemble's score is the fraction of the five models predicting the
 positive class, and by Harrell's C-index for survival.
 
+From $\mathcal{F}_3$ onward, each level can be augmented with
+morphology of the Day-1 diagnostic marrow smear ($+$M; Methods).
+An automated pipeline segmented the nucleated cells on the smear
+images, measured their size, cytoplasm, chromatin, nucleoli and
+vacuoles, and summarised them per patient.
+Three feature sets of increasing refinement were derived (M1--M3); the
+most detailed, M3, rests on 46,964 cells (median 135 per patient) and
+was available for 293 of the 300 internal patients in the temporal
+splits (Table~\ref{tab:cohort}).
+The LLMs received morphology as a short text report appended to the
+clinical features, never as images, and the trained models received
+the same measures as additional variables.
+Morphology-augmented predictions also use only data available by
+Day~7--10, before any MRD assessment.
+The pipeline was applied to the internal smears, so external
+comparisons use clinical features.
+
 \begin{table}[ht]
 \caption{Cohort characteristics and prediction target distributions.
 The External cohort pools patients from two independent hospitals
@@ -307,7 +352,10 @@ The External cohort pools patients from two independent hospitals
 $\dagger$~patients with complete labels
 for all four classification targets.
 MRD percentages are of patients with a recorded value (internal
-D19MRD $n=299$, D46MRD $n=298$; external $n=29$ and $n=31$).}
+D19MRD $n=299$, D46MRD $n=298$; external $n=29$ and $n=31$).
+$^\S$Patients with a morphology profile of each feature set (Methods),
+internal counts among the 300 patients in the temporal splits; --, not
+computed.}
 \label{tab:cohort}
 \centering
 \small
@@ -331,6 +379,11 @@ D46MRD $\geq 0.01\%$ & 29 (9.7\%) & 1 \\
 \multicolumn{3}{l}{\textit{Survival endpoints}} \\
 EFS events & 75 (24.9\%) & 24 (58.5\%) \\
 OS events & 24 (8.0\%) & 7 (17.1\%) \\
+\midrule
+\multicolumn{3}{l}{\textit{Day-1 marrow morphology profile$^\S$}} \\
+M1 & 219 & 13 \\
+M2 & 221 & -- \\
+M3 & 293 & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -400,8 +453,8 @@ could draw on prior knowledge of how the diagnostic features relate to
 outcome.
 
 \textbf{Relapse and D46 MRD remain close to chance.}
-Neither approach exceeded an AUROC of 0.70 for either target at any
-level.
+With clinical features alone, neither approach exceeded an AUROC of
+0.70 for either target at any level.
 Results for each LLM and each level are given in Supplementary
 Tables~\ref{tab:phase1_full}--\ref{tab:phase2_ext}.
 
@@ -423,6 +476,41 @@ MRD-positive external patient).}
 \end{figure}
 
 %%--------------------------------------------------------------%%
+\subsection{Automated marrow morphology adds to the zero-shot LLMs}
+\label{sec:morph_results}
+%%--------------------------------------------------------------%%
+
+The automated measures agreed with the haematologists' written
+descriptions of the blasts where those descriptions were specific
+(Supplementary Table~\ref{tab:morph_validation}).
+Among 285 patients whose diagnostic report described the blast
+population, the fraction of vacuolated cells separated reports that
+mentioned vacuoles from those that did not (AUROC 0.69, 95\% CI 0.62
+to 0.76, averaged within imaging batch), and the fraction of large
+cells separated blasts described as medium or large from small ones
+(0.67, 0.54 to 0.83); the fraction of cells with visible cytoplasm
+agreed more weakly (0.60, 0.44 to 0.75).
+Size variation and nuclear shape did not agree with the reports (0.48
+for both) and were left out of the report given to the LLMs.
+
+Adding morphology raised the discrimination of the LLM ensemble for
+all six targets in the 2018--19 test set (Table~\ref{tab:main}):
+Final Risk from 0.932 to 0.952, D19 MRD from 0.784 to 0.812, D46 MRD
+from 0.599 to 0.667, relapse from 0.631 to 0.663, EFS from 0.682 to
+0.705 (difference $+0.023$, 95\% CI 0.001 to 0.047; $p=0.045$) and OS
+from 0.713 to 0.719.
+The largest gain was for D46 MRD ($+0.069$), the target that clinical
+features alone left closest to chance.
+The trained models gained less: with morphology, the random forests
+reached 0.953 for Final Risk and 0.842 for D19 MRD, and the survival
+forest 0.607 for OS, within 0.01 of their clinical-only values, while
+for D46 MRD, relapse and EFS they stayed below them.
+An LLM can read a short morphology report with prior knowledge of
+what large, vacuolated or cytoplasm-poor blasts imply, whereas a
+forest has to learn the role of 10 to 17 additional variables from 186
+training patients.
+
+%%--------------------------------------------------------------%%
 \subsection{How many local patients is a zero-shot LLM worth?}
 \label{sec:worth}
 %%--------------------------------------------------------------%%
@@ -438,15 +526,16 @@ For EFS and OS, the RSF stayed below the LLM ensemble at every training
 size, including all 186 training patients (mean C-index at most 0.62
 for EFS and 0.61 for OS, against 0.68 and 0.71).
 
-With all training data (Table~\ref{tab:main}), no internal difference
-between the LLM ensemble and trained models was statistically
-significant.
-Trained RF had slightly higher AUROC for Final Risk (0.951 versus
-0.932; difference $-0.018$, 95\% CI $-0.064$ to $0.022$) and D19 MRD
-(0.834 versus 0.784), whereas the LLM ensemble had higher C-indices for
-EFS (0.682 versus 0.599; $+0.083$, $-0.017$ to $0.182$; $p=0.099$) and
-OS (0.713 versus 0.599; $+0.114$, $-0.035$ to $0.269$).
-The survival advantage pointed the same way in the earlier split
+With all training data and morphology added to both approaches
+(Table~\ref{tab:main}), the LLM ensemble was on par with the random
+forests for Final Risk (0.952 versus 0.953; difference $-0.001$, 95\%
+CI $-0.030$ to $0.024$) and close to them for D19 MRD (0.812 versus
+0.842; $-0.030$, $-0.133$ to $0.057$), and it was ahead of the survival
+forests for EFS (0.705 versus 0.575; $+0.130$, $0.000$ to $0.261$;
+$p=0.050$) and OS (0.719 versus 0.607; $+0.112$, $-0.027$ to $0.264$).
+With clinical features alone the differences pointed the same way
+(Final Risk $-0.018$, D19 MRD $-0.050$, EFS $+0.083$, OS $+0.114$; none
+significant), as did the survival differences in the earlier split
 trained on 2015--16 (EFS $+0.052$, OS $+0.064$) and, for EFS, in the
 2019 test set ($+0.051$; Supplementary Table~\ref{tab:supp_decision}).
 The OS training sets contained only 8 and 13 deaths, so a model that
@@ -454,8 +543,9 @@ must learn from local events has little to learn from, whereas the
 LLMs bring prognostic knowledge from pretraining.
 
 For Final Risk, neither approach went beyond Initial Risk.
-The LLM ensemble and the RF assigned the correct group with balanced
-accuracies of 0.901 and 0.899, against 0.906 for Initial Risk alone;
+With clinical features, the LLM ensemble and the RF assigned the
+correct group with balanced accuracies of 0.901 and 0.899, against
+0.906 for Initial Risk alone;
 the remaining errors are patients upgraded on the basis of MRD, which
 no model can know at $\mathcal{F}_6$.
 The protocol rule reaches 1.000 only because it uses the Day-19 and
@@ -481,54 +571,60 @@ and OS the trained model stays below the LLM ensemble at every size.}
 \end{figure}
 
 \begin{table}[t]
-\caption{\textbf{Zero-shot LLM ensemble versus locally trained models
-at the pre-specified decision level.}
-All targets are predicted from $\mathcal{F}_6$ (Day~7--10), before any
-MRD assessment.
+\caption{\textbf{Zero-shot LLM ensemble versus locally trained models,
+with and without marrow morphology.}
+All predictions use data available by Day~7--10, before any MRD
+assessment: clinical features at $\mathcal{F}_6$ (LLM, Trained) and,
+with morphology ($+$M), clinical features up to $\mathcal{F}_6$
+together with the Day-1 marrow-morphology features (LLM$+$M,
+Trained$+$M).
+The feature level and morphology feature set used for each $+$M value
+are given in Supplementary Table~\ref{tab:morph_config}.
 Internal: 2018--19 enrolment test set (Split~2; models trained on
 2015--17). External: two hospitals (models trained on all internal
-patients).
-LLM, equal-weight ensemble of five zero-shot LLMs; trained, random
+patients; clinical features only).
+LLM, equal-weight ensemble of five zero-shot LLMs; Trained, random
 forest (classification) or random survival forest (survival).
 AUROC for Final Risk, D19 MRD, D46 MRD and relapse; Harrell's C-index
-for EFS and OS. $\Delta$, LLM ensemble minus trained model, with 95\%
+for EFS and OS. $\Delta$, LLM ensemble minus trained model (internal:
+LLM$+$M minus Trained$+$M; external: clinical features), with 95\%
 bootstrap CI (2,000 resamples); $^{*}p<0.05$.
-Equiv.\ $n$, number of local training patients at which the
-trained model's mean learning curve reaches the LLM ensemble
-(Fig.~\ref{fig:worth}); $>$186, not reached with all 186 training
-patients; n.a., both approaches near chance.
+Equiv.\ $n$, number of local training patients at which the trained
+model's mean learning curve reaches the LLM ensemble (clinical
+features, Fig.~\ref{fig:worth}); $>$186, not reached with all 186
+training patients; n.a., both approaches near chance.
 $^{\dagger}$Four positive patients.
 $^{\ddagger}$Relapse status almost coincides with hospital of origin,
 because one hospital contributed only relapsed patients.
 Initial Risk alone reproduces Final Risk in 90.7\% of patients
 (Section~\ref{sec:when}).
-All test sets, balanced accuracies and sensitivity analyses are in
-Supplementary Table~\ref{tab:supp_decision}.}
+All test sets, balanced accuracies and sensitivity analyses for the
+clinical features are in Supplementary Table~\ref{tab:supp_decision}.}
 \label{tab:main}
 \centering
 \footnotesize
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}llcccc@{}}
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{@{}llcccccc@{}}
 \toprule
-\textbf{Target} & \textbf{Test set} & \textbf{LLM} & \textbf{Trained} & \textbf{$\Delta$ [95\% CI]} & \textbf{Equiv.\ $n$} \\
+\textbf{Target} & \textbf{Test set} & \textbf{LLM} & \textbf{LLM$+$M} & \textbf{Trained} & \textbf{Trained$+$M} & \textbf{$\Delta$ [95\% CI]} & \textbf{Equiv.\ $n$} \\
 \midrule
-Final Risk & Internal & 0.932 & 0.951 & $-$0.018 [$-$0.064, +0.022] & $\approx$49 \\
- & External & 0.842 & 0.936 & $-$0.094 [$-$0.265, +0.029] & \\
+Final Risk & Internal & 0.932 & 0.952 & 0.951 & 0.953 & $-$0.001 [$-$0.030, +0.024] & $\approx$49 \\
+ & External & 0.842 & -- & 0.936 & -- & $-$0.094 [$-$0.265, +0.029] & \\
 \addlinespace[2pt]
-D19 MRD & Internal & 0.784 & 0.834 & $-$0.050 [$-$0.208, +0.093] & $\approx$103 \\
- & External & 0.455$^{\dagger}$ & 0.350$^{\dagger}$ & +0.105 [$-$0.178, +0.421] & \\
+D19 MRD & Internal & 0.784 & 0.812 & 0.834 & 0.842 & $-$0.030 [$-$0.133, +0.057] & $\approx$103 \\
+ & External & 0.455$^{\dagger}$ & -- & 0.350$^{\dagger}$ & -- & +0.105 [$-$0.178, +0.421] & \\
 \addlinespace[2pt]
-D46 MRD & Internal & 0.599 & 0.697 & $-$0.098 [$-$0.269, +0.061] & n.a. \\
- & External & \multicolumn{3}{l}{not evaluable (1 positive)} & \\
+D46 MRD & Internal & 0.599 & 0.667 & 0.697 & 0.635 & +0.032 [$-$0.185, +0.242] & n.a. \\
+ & External & \multicolumn{5}{l}{not evaluable (1 positive)} & \\
 \addlinespace[2pt]
-Relapse & Internal & 0.631 & 0.623 & +0.009 [$-$0.197, +0.211] & n.a. \\
- & External & 0.652$^{\ddagger}$ & 0.210$^{\ddagger}$ & +0.442 [+0.160, +0.703]$^{*}$ & \\
+Relapse & Internal & 0.631 & 0.663 & 0.623 & 0.613 & +0.051 [$-$0.164, +0.268] & n.a. \\
+ & External & 0.652$^{\ddagger}$ & -- & 0.210$^{\ddagger}$ & -- & +0.442 [+0.160, +0.703]$^{*}$ & \\
 \addlinespace[2pt]
-EFS & Internal & 0.682 & 0.599 & +0.083 [$-$0.017, +0.182] & $>$186 \\
- & External & 0.692 & 0.435 & +0.256 [+0.139, +0.403]$^{*}$ & \\
+EFS & Internal & 0.682 & 0.705 & 0.599 & 0.575 & +0.130 [+0.000, +0.261] & $>$186 \\
+ & External & 0.692 & -- & 0.435 & -- & +0.256 [+0.139, +0.403]$^{*}$ & \\
 \addlinespace[2pt]
-OS & Internal & 0.713 & 0.599 & +0.114 [$-$0.035, +0.269] & $>$186 \\
- & External & 0.843 & 0.536 & +0.307 [+0.104, +0.540]$^{*}$ & \\
+OS & Internal & 0.713 & 0.719 & 0.599 & 0.607 & +0.112 [$-$0.027, +0.264] & $>$186 \\
+ & External & 0.843 & -- & 0.536 & -- & +0.307 [+0.104, +0.540]$^{*}$ & \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -539,10 +635,12 @@ OS & Internal & 0.713 & 0.599 & +0.114 [$-$0.035, +0.269] & $>$186 \\
 %%--------------------------------------------------------------%%
 
 Applied without retraining to the external cohort
-(Fig.~\ref{fig:external}a and Table~\ref{tab:main}), the trained RSF
-lost discrimination for EFS (C-index 0.599 internally, 0.435
-externally) and OS (0.599 and 0.536), whereas the LLM ensemble did not
-(EFS 0.682 and 0.692; OS 0.713 and 0.843).
+(Fig.~\ref{fig:external}a and Table~\ref{tab:main}), where only
+clinical features were used because morphology profiles were available
+for 13 of the 41 patients, the trained RSF lost discrimination for EFS
+(C-index 0.599 internally, 0.435 externally) and OS (0.599 and 0.536),
+whereas the LLM ensemble did not (EFS 0.682 and 0.692; OS 0.713 and
+0.843).
 The external differences were $+0.256$ (95\% CI 0.139 to 0.403) for
 EFS and $+0.307$ (0.104 to 0.540) for OS.
 Because one source hospital contributed only relapsed patients, we
@@ -620,6 +718,10 @@ For EFS and OS it was not reached by survival forests trained on any
 available number of local patients, and it kept its discrimination at
 two other hospitals, where the trained survival models fell to or below
 chance.
+A short, automatically generated report of the Day-1 marrow smear,
+given to the LLMs as text, improved the ensemble for every target and
+brought it level with fully trained random forests for Final Risk,
+whereas the same measures added little to the trained models.
 
 \textbf{When a zero-shot LLM suffices.}
 These results help reconcile two apparently conflicting lines of
@@ -635,7 +737,8 @@ The LLMs' advantage is largest where local events are scarce and where
 the case mix shifts, the two situations in which a locally trained
 model has least to learn from or most to unlearn.
 In practice, a centre starting a new protocol could use a zero-shot LLM
-ensemble for survival risk from the first patient, and move to, or
+ensemble, with the automated morphology report, for survival risk from
+the first patient, and move to, or
 combine it with, locally trained models for the classification targets
 once 50 to 100 cases have accrued.
 
@@ -648,6 +751,26 @@ implemented as explicit logic than predicted by a language model.
 The value of zero-shot LLMs lies instead in outcomes that no rule
 defines—survival and, to a lesser extent, early treatment response.
 
+\textbf{Morphology as text.}
+The marrow smear is examined in every patient, yet its content rarely
+reaches a prediction model.
+Passing it to the LLMs as a few measured statements rather than as
+images has practical advantages.
+Each statement can be checked against the smear and against the
+haematologist's reading, which let us drop the measures that did not
+agree (size variation and nuclear shape); expressing each measure as a
+percentile within its imaging batch put batches with different
+staining and image acquisition on a common scale without retraining;
+and a text-only model can use the report at a cost of a few hundred
+tokens per patient.
+The LLMs could also relate the measures to outcome through prior
+knowledge: large, vacuolated or cytoplasm-poor blasts carry a meaning
+that a forest trained on 186 patients has to learn from the data.
+This matches the pattern of the main comparison: prior knowledge is
+most useful where local data are scarce, and an automated morphology
+report extends it to information that the structured record does not
+contain.
+
 \textbf{MRD and the limits of routine data.}
 Because all predictions were made before treatment response was
 measured, they test what can be anticipated from diagnostic data alone.
@@ -655,11 +778,13 @@ In this setting the trained survival forests stayed at C-indices of
 0.50 to 0.65, consistent with the established role of MRD, which our
 design withholds, as the dominant prognostic
 factor~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}; the LLM ensemble
-reached 0.68 to 0.71, suggesting that prior knowledge of how Initial
-Risk and cytogenetics relate to outcome can partly substitute for
-local events.
-Relapse and D46 MRD remained near chance at every level, consistent
-with the failure of computational flow cytometry at
+reached 0.68 to 0.71, and 0.71 to 0.72 with morphology, suggesting
+that prior knowledge of how Initial Risk, cytogenetics and blast
+morphology relate to outcome can partly substitute for local events.
+Relapse and D46 MRD remained the hardest targets: with clinical
+features they were near chance at every level, and with morphology the
+LLM ensemble reached AUROCs of 0.66 and 0.67, consistent with the
+failure of computational flow cytometry at
 diagnosis~\cite{[CITE:Martinez2025]} and the modest discrimination of
 a large clinical relapse model~\cite{[CITE:Saravanan2026]}.
 Stronger relapse signal has so far come mainly from single-cell and
@@ -689,7 +814,16 @@ are not interpretable and the confidence intervals of the survival
 differences are wide; larger, prospectively collected external cohorts
 are needed to confirm the robustness of the LLM ensemble.
 Internally, the survival advantage of the LLM ensemble did not reach
-statistical significance in any single test set.
+statistical significance in any single test set, and most of the
+morphology gains have confidence intervals that include zero.
+The morphology measures are approximate: cell types were not
+separated, so all nucleated cells on the diagnostic smear were treated
+as the leukaemic population; batch differences in staining and imaging
+were handled by within-batch percentiles rather than by stain
+normalisation; and only some measures agreed with the haematologists'
+reports.
+The pipeline was applied to the internal smears only, so the value of
+morphology at other hospitals remains to be tested.
 Learning curves were estimated on one temporal split, the 2019 test set
 contains only 17 patients, and no correction was made for multiple
 comparisons.
@@ -721,7 +855,8 @@ Ethics approval was obtained from [ETHICS NUMBER]; all data were
 de-identified prior to analysis.
 Each patient record includes structured clinical data (demographics,
 haematological indices, immunophenotype, 51-marker flow cytometry panel,
-cytogenetics, MRD values).
+cytogenetics, MRD values), digitised images of the diagnostic (Day~1)
+bone marrow smear and the haematologist's written morphology report.
 
 The external validation cohort ($n=41$) was supplied as a single
 merged file spanning two source hospitals, distinguished by the
@@ -753,6 +888,10 @@ Table~\ref{tab:featurelist}.
 D19 and D46 MRD are prediction targets and are not used as input
 features at any level.
 All six prediction targets are evaluated on the same feature hierarchy.
+Morphology features of the Day-1 marrow smear
+(Section~\ref{sec:morph}) can be added to $\mathcal{F}_3$--$\mathcal{F}_6$
+($\mathcal{F}_k$$+$M); they are not used with $\mathcal{F}_1$ and
+$\mathcal{F}_2$, which serve as minimal clinical baselines.
 
 For Phase~2, categorical features were one-hot encoded (CNS status as
 CNS2 or CNS3 versus CNS1) and numerical
@@ -764,6 +903,105 @@ z_{ij}^{(\text{test})} =
 \label{eq:zscore}
 \end{equation}
 with missing values imputed by training-split medians.
+
+\subsection{Bone marrow morphology features}\label{sec:morph}
+
+\textbf{Cell segmentation and selection.}
+Candidate cells on each diagnostic smear image were segmented with
+SAM~3~\cite{[CITE:SAM]} using the text prompt \textit{``dark stained
+nucleated cell''} (mask score $\geq 0.5$) at the native image
+resolution.
+Cells were then selected relative to each image's own background in
+CIELAB colour space, with the white point set to the median of the
+non-cell pixels.
+A mask was kept as a nucleated cell when its mean $b^*$ offset from the
+background was below $-33$ or, in images whose red cells were pink, more
+than 15 units below the red-cell mode.
+Masks were removed when they touched the image border, lay within a
+larger nucleated mask ($>70\%$ overlap), duplicated a higher-scoring
+mask (intersection over union $>0.5$), were smaller than half the
+red-cell area of the image (platelets, debris, bare nuclei) or had a
+solidity below 0.85 (clumps and smudged cells).
+Cell types were not separated: because the diagnostic marrow in ALL is
+dominated by blasts, all retained nucleated cells were treated as the
+leukaemic population.
+
+\textbf{Cell-level measures.}
+Cell size was expressed as the cell diameter divided by the red-cell
+diameter of the same image, so that red cells serve as an internal
+ruler.
+Nucleus and cytoplasm were separated by two-cluster $k$-means on the
+$a^*$ and $b^*$ channels; the cytoplasm cluster was accepted only if it
+was clearly less magenta than the nucleus and lay along the cell edge,
+otherwise the cell was recorded as having no visible cytoplasm.
+Chromatin texture was measured as fine-scale contrast (difference of
+Gaussians) and as the coefficient of variation of $L^*$ within the
+nucleus; vacuole-like and nucleolus-like structures were detected by
+white top-hat filtering at two scales, as small near-background spots
+in the cell and as wider pale spots inside the nucleus; and the outline
+was described by circularity, solidity, nuclear solidity, aspect ratio
+and cytoplasm blueness.
+
+\textbf{Patient-level feature sets.}
+Cell-level measures were summarised per patient as medians, spreads
+and proportions.
+The primary feature set, M3, comprises 16 descriptors: median cell size
+and its coefficient of variation, the fractions of large ($>2$ red-cell
+diameters) and small cells, the cytoplasm fraction and the fraction of
+cells with visible cytoplasm, cytoplasm blueness, chromatin contrast
+and variation, nuclear lightness, nuclear and cell solidity,
+circularity, aspect ratio, and the fractions of cells with
+nucleolus-like and vacuole-like structures (Supplementary
+Table~\ref{tab:morph_features}).
+The smears had been digitised in three batches that differ in staining
+and image acquisition (the median nucleus-to-cytoplasm ratio, for
+example, ranged from 0.74 to 2.77 across batches), so each descriptor
+was expressed as a percentile among the patients of the same batch; no
+outcome information enters this step.
+Patients with fewer than 20 measured cells received no M3 profile.
+M3 rests on 46,964 cells (median 135 per patient) and covers 293 of the
+300 internal patients in the temporal splits.
+Two earlier feature sets from the same images were also used.
+M1 consists of 17 per-patient means of cell geometry,
+nucleus-to-cytoplasm ratio, chromatin texture (including GLCM
+contrast), nucleoli, morphological uniformity and the fractions of
+hand-mirror and vacuolated cells, computed on cells kept by brightness
+and hue rules (9,501 cells; profiles for 219 of the 300 patients).
+M2 consists of 10 descriptors (equivalent diameter, circularity,
+aspect ratio, solidity, nucleus-to-cytoplasm ratio, nuclear solidity
+and brightness, cytoplasm saturation, large-cell fraction and size
+heterogeneity) computed at native resolution and expressed as
+within-batch percentiles (19,108 cells; profiles, requiring at least
+five cells, for 221 of the 300 patients).
+
+\textbf{Morphology as model input.}
+For the LLMs, morphology was appended to the serialised clinical
+features as a short text block, never as an image.
+The M3 report states the number of cells and the resulting
+reliability, the typical cell diameter in red-cell units and
+micrometres, the share of large cells, the share of cells with a
+visible cytoplasm rim and the share of vacuolated cells, each with its
+within-batch percentile and the batch's typical value, and notes that
+the measurements are automated and supportive only; it is limited to
+the measures that agreed with the expert reports (below).
+The M2 report gives each descriptor as a within-batch percentile with a
+qualitative grade and an automated FAB-style impression (L1-like,
+L2-like or indeterminate), and the M1 report lists the 17 descriptors.
+Patients without a profile were scored with the prompt of the same
+level without morphology.
+For RF and RSF, the descriptors (M1 as raw values; M2 and M3 as
+percentiles with a missing-profile indicator) were appended to the
+level's variables and preprocessed as above.
+
+\textbf{Agreement with expert reports.}
+For 285 internal patients the haematologist's diagnostic report
+described the blast population.
+From this description we extracted six labels—cell size (small versus
+medium or large), size uniformity, amount of cytoplasm, vacuoles,
+nuclear shape and nucleoli—and measured the agreement of each M3
+descriptor with its label as the AUROC averaged over imaging batches,
+so that batch differences cannot contribute (95\% CI from 1,000
+bootstrap resamples).
 
 \subsection{Phase~1: LLM zero-shot inference}\label{sec:llm_inference}
 
@@ -798,7 +1036,8 @@ was used as a sensitivity analysis (Supplementary
 Table~\ref{tab:supp_decision}).
 Per-patient outputs were cached; the cohort was scored for every
 combination of feature level ($\times 6$), task ($\times 6$), and
-model ($\times 5$).
+model ($\times 5$), and at $\mathcal{F}_3$--$\mathcal{F}_6$ also with
+each morphology feature set ($\times 3$; Section~\ref{sec:morph}).
 
 \subsection{Phase~2: Decision tree and random forest}\label{sec:dt}
 
@@ -806,7 +1045,8 @@ A decision tree (DT; \texttt{max\_depth}=4, \texttt{class\_weight}=%
 `balanced', \texttt{criterion}=`gini', \texttt{random\_state}=42)
 and a random forest (RF; $n_\text{estimators}=100$,
 \texttt{class\_weight}=`balanced') were trained for each feature level
-and temporal split.
+and temporal split, with and without the morphology descriptors
+(Section~\ref{sec:morph}).
 Three temporal splits defined by enrolment year threshold $\mathcal{T}_s$
 (Eq.~\ref{eq:splits}) ensure strict temporal non-leakage.
 \begin{equation}
@@ -855,8 +1095,11 @@ assessment.
 D19 and D46 MRD are thus predicted before they are measured, and Final
 Risk, relapse, EFS and OS are predicted before treatment response is
 known, when the intensity of subsequent therapy could still be adapted.
-All comparisons between the LLM ensemble and trained models use this
-level and the same test patients.
+Comparisons on clinical features use this level; with morphology, the
+clinical features come from a level up to $\mathcal{F}_6$, so these
+predictions, too, precede any MRD assessment.
+All comparisons between the LLM ensemble and trained models use the
+same test patients.
 For balanced accuracy, RF probabilities were thresholded at the
 training-set prevalence.
 Learning curves were computed on Split~2: for
@@ -959,9 +1202,10 @@ AUROC and balanced accuracy were computed with
 with \texttt{scikit-survival}~\cite{[CITE:sksurv]}.
 Confidence intervals are percentile intervals from 2,000 patient-level
 bootstrap resamples.
-Differences between the LLM ensemble and trained models were computed
-on the same resamples, with two-sided $p$-values given by twice the
-smaller tail of the bootstrap distribution of the difference.
+Differences between the LLM ensemble and trained models, and between
+each model with and without morphology, were computed on the same
+resamples, with two-sided $p$-values given by twice the smaller tail of
+the bootstrap distribution of the difference.
 In the external cohort we also computed a within-hospital C-index that
 counts only patient pairs from the same hospital, with bootstrap
 resampling stratified by hospital.
@@ -986,7 +1230,8 @@ with [HOSPITAL NAME]; requests to the corresponding author.
 \section*{Code availability}
 %%==============================================================%%
 
-Analysis code and LLM prompts will be made available at
+Analysis code, LLM prompts and the bone marrow morphology pipeline
+will be made available at
 \url{https://github.com/YanbeiJiang/ALL_prediction_NCS}
 upon acceptance.
 
@@ -1024,7 +1269,8 @@ studies, grouped by family and compared with this work}
 Data: Clin, clinical and laboratory variables; Cyto, cytogenetics or
 molecular genetics; MRD, minimal residual disease; Flow, flow
 cytometry; EHR, structured electronic health records; Notes, free-text
-clinical notes; KG, knowledge graph.
+clinical notes; KG, knowledge graph; Morph, automated bone marrow
+smear morphology.
 Endpoints: $^\star$~modelled jointly by one model; otherwise separate
 models or a single endpoint.
 TL (timeline): $\checkmark$~only features available at the time of
@@ -1080,7 +1326,7 @@ Datta 2026~\cite{[CITE:Datta2026]} & Adult ICU (MIMIC-III) & LLM + ML (KAMELEON)
 Zhu 2024~\cite{[CITE:Zhu2024EMERGE]} & Adult ICU (MIMIC) & LLM + fusion (EMERGE) & EHR, Notes, KG & 2 tasks & $\checkmark$ & Rand. & RAG \\
 Kiermeyer 2026~\cite{[CITE:Kiermeyer2026]} & Adult cancer (3,522) & LLM features + RSF & Notes, TNM & OS & $\checkmark$ & CV & ZS \\
 \midrule
-\textbf{This work} & Paed.\ ALL (301 + 41) & LLMs; DT/RF/RSF; RAG & Clin, Flow, Cyto & 6 targets$^\star$ & nested & Temp. + Ext. & ZS, RAG \\
+\textbf{This work} & Paed.\ ALL (301 + 41) & LLMs; DT/RF/RSF; RAG & Clin, Flow, Cyto, Morph & 6 targets$^\star$ & nested & Temp. + Ext. & ZS, RAG \\
 \bottomrule
 \end{tabular}
 \end{sidewaystable}
@@ -1107,6 +1353,7 @@ $\mathcal{F}_3$     & Day 1     & + Immunophenotype + 51 flow cytometry markers 
 $\mathcal{F}_4$     & Day 1     & $\mathcal{F}_3$ + non-risk clinical factors \\
 $\mathcal{F}_5$     & Day 5     & $\mathcal{F}_3$ + CNS status + Day~5 blast\% + Initial Risk \\
 $\mathcal{F}_6$     & Day 7--10 & $\mathcal{F}_5$ + Fusion gene + Karyotype + FISH \\
+$\mathcal{F}_k$$+$M & Day 1 smear & $\mathcal{F}_k$ ($k=3,\dots,6$) + marrow morphology (feature set M1, M2 or M3) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1134,6 +1381,35 @@ $\mathcal{F}_3$ & $+$ Immunophenotype (B/T lineage); 42 CD markers (CD1a, CD2, C
 $\mathcal{F}_4$ & (base $\mathcal{F}_3$) $+$ non-risk clinical factors: chief-complaint category, pregnancy number, birth order, term/preterm status, delivery mode, birth weight, feeding type, admission weight, liver span, spleen span, haemoglobin, platelet count \\
 $\mathcal{F}_5$ & (base $\mathcal{F}_3$) $+$ CNS status (CNSL); Day-5 peripheral blast\%; Initial Risk \\
 $\mathcal{F}_6$ & (base $\mathcal{F}_5$) $+$ Fusion gene; Karyotype; FISH \\
+$\mathcal{F}_k$$+$M & (base $\mathcal{F}_3$--$\mathcal{F}_6$) $+$ Day-1 marrow morphology: feature set M1, M2 or M3 (Supplementary Table~\ref{tab:morph_features}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\clearpage
+
+\begin{table}[ht]
+\caption{\textbf{Bone marrow morphology feature sets} (Methods,
+Section~\ref{sec:morph}). Cells, nucleated cells measured; patients,
+internal patients in the temporal splits with a profile (of 300).
+Trained models receive the descriptors as variables (M2 and M3 with a
+missing-profile indicator); the LLMs receive the text report. All
+percentiles are computed within the patient's imaging batch.}
+\label{tab:morph_features}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}l c >{\raggedright\arraybackslash}p{5.6cm} >{\raggedright\arraybackslash}p{3.9cm}@{}}
+\toprule
+\textbf{Set} & \textbf{Cells / patients} & \textbf{Descriptors (trained models)} & \textbf{Report (LLMs)} \\
+\midrule
+M1 & 9,501 / 219 & 17 per-patient values: mean cell area, major and minor axis, aspect ratio, eccentricity, circularity, extent, nucleus-to-cytoplasm ratio, nucleus-to-cell ratio, chromatin fineness, chromatin high-frequency texture, GLCM contrast, nucleoli count and size, morphological uniformity, hand-mirror and vacuolated fractions & The 17 descriptors \\
+\addlinespace[3pt]
+M2 & 19,108 / 221 & 10 percentiles: equivalent diameter, circularity, aspect ratio, solidity, nucleus-to-cytoplasm ratio, nuclear solidity, nuclear brightness, cytoplasm saturation, large-cell fraction, size heterogeneity & Percentiles with qualitative grades; automated FAB-style impression (L1-like, L2-like, indeterminate); reliability from the number of cells \\
+\addlinespace[3pt]
+M3 & 46,964 / 293 & 16 percentiles: median size in red-cell diameters and its coefficient of variation, large-cell and small-cell fractions, cytoplasm fraction, visible-cytoplasm fraction, cytoplasm blueness, chromatin contrast and variation, nuclear lightness, nuclear and cell solidity, circularity, aspect ratio, nucleolus-like and vacuolated fractions & Typical diameter (red-cell units and $\mu$m), shares of large cells, cells with visible cytoplasm and vacuolated cells, each with percentile and batch-typical value; reliability \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1197,6 +1473,95 @@ external cohort, within-hospital C-index (LLM ensemble vs trained).
 \bottomrule
 \end{tabular}
 \end{sidewaystable}
+
+
+\clearpage
+
+\noindent\textbf{Morphology configurations.}
+Table~\ref{tab:main} reports one morphology-augmented ($+$M) result
+for each target and method.
+Supplementary Table~\ref{tab:morph_config} gives the configuration
+behind each of these values: the clinical feature level
+($\mathcal{F}_3$--$\mathcal{F}_6$) and the morphology feature set
+(M1--M3).
+For each target and method, the twelve combinations of level and
+feature set were evaluated on the 2018--19 test patients, and the
+combination with the highest AUROC or C-index is reported (ties
+resolved in favour of the more refined feature set and then the
+earlier level); the LLM ensemble uses the same combination for all five
+models.
+The table also gives the number of test patients with a profile of
+the chosen feature set, the same method's value with clinical features
+at $\mathcal{F}_6$, and the difference between the two with its 95\%
+bootstrap CI.
+
+\begin{table}[ht]
+\caption{\textbf{Configuration behind each morphology-augmented
+($+$M) result in Table~\ref{tab:main}} (2018--19 test set, Split~2).
+Configuration, clinical feature level and morphology feature set
+(Supplementary Table~\ref{tab:morph_features}). With M, test patients
+with a profile of that feature set; the others were scored without
+morphology. Clinical, the same method with clinical features at
+$\mathcal{F}_6$. $\Delta$, $+$M minus clinical, with 95\% bootstrap CI
+(2,000 resamples); $^{*}p<0.05$. LLM, five-model ensemble; RF, random
+forest; RSF, random survival forest. AUROC for Final Risk, D19 MRD,
+D46 MRD and relapse; Harrell's C-index for EFS and OS.}
+\label{tab:morph_config}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llccccc@{}}
+\toprule
+\textbf{Target} & \textbf{Method} & \textbf{Configuration} & \textbf{With M} & \textbf{Clinical} & \textbf{$+$M} & \textbf{$\Delta$ [95\% CI]} \\
+\midrule
+Final Risk & LLM & $\mathcal{F}_6$ + M3 & 110/113 & 0.932 & 0.952 & +0.019 [$-$0.008, +0.054] \\
+ & RF & $\mathcal{F}_6$ + M2 & 90/113 & 0.951 & 0.953 & +0.003 [$-$0.018, +0.026] \\
+\addlinespace[2pt]
+D19 MRD & LLM & $\mathcal{F}_6$ + M3 & 110/113 & 0.784 & 0.812 & +0.028 [$-$0.018, +0.095] \\
+ & RF & $\mathcal{F}_6$ + M3 & 110/113 & 0.834 & 0.842 & +0.007 [$-$0.087, +0.112] \\
+\addlinespace[2pt]
+D46 MRD & LLM & $\mathcal{F}_5$ + M2 & 90/113 & 0.599 & 0.667 & +0.069 [$-$0.025, +0.176] \\
+ & RF & $\mathcal{F}_3$ + M1 & 90/113 & 0.697 & 0.635 & $-$0.061 [$-$0.215, +0.108] \\
+\addlinespace[2pt]
+Relapse & LLM & $\mathcal{F}_6$ + M1 & 90/113 & 0.631 & 0.663 & +0.032 [$-$0.079, +0.138] \\
+ & RF & $\mathcal{F}_6$ + M3 & 110/113 & 0.623 & 0.613 & $-$0.010 [$-$0.165, +0.159] \\
+\addlinespace[2pt]
+EFS & LLM & $\mathcal{F}_6$ + M1 & 90/114 & 0.682 & 0.705 & +0.023 [+0.001, +0.047]$^{*}$ \\
+ & RSF & $\mathcal{F}_6$ + M1 & 90/114 & 0.599 & 0.575 & $-$0.025 [$-$0.152, +0.102] \\
+\addlinespace[2pt]
+OS & LLM & $\mathcal{F}_5$ + M3 & 111/114 & 0.713 & 0.719 & +0.006 [$-$0.037, +0.050] \\
+ & RSF & $\mathcal{F}_6$ + M3 & 111/114 & 0.599 & 0.607 & +0.008 [$-$0.131, +0.144] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\caption{\textbf{Agreement of the M3 morphology measures with the
+haematologists' reports.} Labels were extracted from the description
+of the blast population in the diagnostic morphology report (285
+patients; $n$, patients whose report states the feature). AUROC of the
+descriptor for the label, averaged over the three imaging batches so
+that batch differences cannot contribute, with 95\% CI from 1,000
+bootstrap resamples; 0.5 indicates no agreement (for nuclear solidity,
+agreement would appear as values below 0.5). Report, whether the
+measure is included in the M3 text report given to the LLMs.}
+\label{tab:morph_validation}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+\textbf{Label in the report} & \textbf{M3 descriptor} & \textbf{Positive / $n$} & \textbf{AUROC [95\% CI]} & \textbf{Report} \\
+\midrule
+Vacuoles present & Vacuolated-cell fraction & 56 / 285 & 0.69 [0.62, 0.76] & yes \\
+Medium or large (vs small) & Large-cell fraction & 33 / 90 & 0.67 [0.54, 0.83] & yes \\
+More cytoplasm (vs scant) & Visible-cytoplasm fraction & 16 / 264 & 0.60 [0.44, 0.75] & yes \\
+Clear nucleoli & Nucleolus-like fraction & 92 / 269 & 0.67 [0.45, 0.90] & no \\
+Varied size (vs uniform) & Size coefficient of variation & 159 / 180 & 0.48 [0.34, 0.62] & no \\
+Irregular nucleus & Nuclear solidity & 157 / 184 & 0.48 [0.29, 0.59] & no \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \clearpage
 
@@ -1776,6 +2141,17 @@ Predicting 30-day postoperative mortality and American Society of
 Anesthesiologists physical status using retrieval-augmented large
 language models: development and validation study.
 \textit{J. Med. Internet Res.} \textbf{27}, e75052 (2025).
+
+\bibitem{[CITE:Bennett1976]}
+Bennett, J.M. et al.
+Proposals for the classification of the acute leukaemias.
+French-American-British (FAB) co-operative group.
+\textit{Br. J. Haematol.} \textbf{33}, 451--458 (1976).
+
+\bibitem{[CITE:SAM]}
+Carion, N. et al.
+SAM~3: Segment anything with concepts.
+Preprint at \url{https://arxiv.org/abs/2511.16719} (2025).
 
 \bibitem{[CITE:vLLM]}
 Kwon, W. et al.
