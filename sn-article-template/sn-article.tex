@@ -64,10 +64,10 @@ trained on about 50 local patients for Final Risk and 100 for day-19
 MRD (AUROC 0.93 and 0.78; differences from fully trained forests not
 significant).
 For EFS and OS, locally trained random survival forests did not reach
-the ensemble at any training size (C-index 0.59 and 0.62 with all 186
+the ensemble at any training size (C-index 0.60 for both with all 186
 training patients, versus 0.68 and 0.71).
 At the external hospitals the survival forests lost discrimination
-(EFS 0.44, OS 0.51) whereas the LLM ensemble did not (0.69 and 0.84;
+(EFS 0.44, OS 0.54) whereas the LLM ensemble did not (0.69 and 0.84;
 $P<0.01$ for both, and $P<0.05$ when only patients from the same
 hospital were compared).
 Final Risk was largely fixed by Initial Risk, which alone reproduced it
@@ -366,7 +366,7 @@ Three patterns stand out.
 
 \textbf{Final Risk is largely fixed by Initial Risk.}
 Trained RF reached an AUROC of 0.87 from white blood cell count and age
-alone and 0.94--0.95 once Initial Risk entered at $\mathcal{F}_5$; the
+alone and 0.95 once Initial Risk entered at $\mathcal{F}_5$; the
 LLM ensemble rose from 0.79 to 0.93 over the same levels.
 This follows from how Final Risk is defined.
 In our cohort Initial Risk alone reproduced Final Risk in 90.7\% of
@@ -374,7 +374,7 @@ internal patients, and a three-condition rule—Initial Risk of IR or HR,
 D19 MRD $\geq 1\%$, or D46 MRD $\geq 0.01\%$—reproduced it in 299 of
 301 internal patients (99.3\%) and in 40 of 41 external patients.
 At $\mathcal{F}_6$ both approaches performed close to Initial Risk
-alone (balanced accuracy 0.901 for the LLM ensemble and 0.891 for the
+alone (balanced accuracy 0.901 for the LLM ensemble and 0.899 for the
 RF, versus 0.906 in the 2018--19 test set).
 The remaining uncertainty is which of the 187 initially low-risk
 patients will be upgraded (28 patients, 26 of them MRD-positive), which
@@ -382,14 +382,14 @@ is the MRD prediction problem.
 
 \textbf{D19 MRD becomes predictable with immunophenotype.}
 RF AUROC was 0.42 and 0.51 at $\mathcal{F}_1$ and $\mathcal{F}_2$ and
-0.74--0.81 from $\mathcal{F}_3$, when immunophenotype and flow
+0.75--0.83 from $\mathcal{F}_3$, when immunophenotype and flow
 cytometry markers entered; the LLM ensemble reached 0.68--0.69 at
 $\mathcal{F}_3$ and $\mathcal{F}_4$ and 0.78--0.79 from
 $\mathcal{F}_5$.
 
 \textbf{Before MRD, survival discrimination comes mainly from the LLMs.}
 The RSF C-index stayed between 0.53 and 0.61 for EFS and between 0.50
-and 0.62 for OS at every level.
+and 0.65 for OS at every level.
 The LLM ensemble reached 0.71 for OS from Day~5, once Initial Risk was
 available, and 0.68 for EFS at $\mathcal{F}_6$, when cytogenetics
 entered.
@@ -400,7 +400,7 @@ could draw on prior knowledge of how the diagnostic features relate to
 outcome.
 
 \textbf{Relapse and D46 MRD remain close to chance.}
-Neither approach exceeded an AUROC of 0.68 for either target at any
+Neither approach exceeded an AUROC of 0.70 for either target at any
 level.
 Results for each LLM and each level are given in Supplementary
 Tables~\ref{tab:phase1_full}--\ref{tab:phase2_ext}.
@@ -433,29 +433,29 @@ retrained RF and RSF on random subsets of $m$ patients from the
 patients as the LLM ensemble (Fig.~\ref{fig:worth}; 20 repeats per
 size).
 The LLM ensemble matched trained models built from about 49 patients
-for Final Risk and 101 for D19 MRD.
+for Final Risk and 103 for D19 MRD.
 For EFS and OS, the RSF stayed below the LLM ensemble at every training
-size, including all 186 training patients (mean C-index at most 0.61
-for EFS and 0.62 for OS, against 0.68 and 0.71).
+size, including all 186 training patients (mean C-index at most 0.62
+for EFS and 0.61 for OS, against 0.68 and 0.71).
 
 With all training data (Table~\ref{tab:main}), no internal difference
 between the LLM ensemble and trained models was statistically
 significant.
-Trained RF had slightly higher AUROC for Final Risk (0.950 versus
-0.932; difference $-0.017$, 95\% CI $-0.066$ to $0.024$) and D19 MRD
-(0.811 versus 0.784), whereas the LLM ensemble had higher C-indices for
-EFS (0.682 versus 0.592; $+0.090$, $-0.008$ to $0.191$; $p=0.071$) and
-OS (0.713 versus 0.620; $+0.093$, $-0.043$ to $0.245$).
+Trained RF had slightly higher AUROC for Final Risk (0.951 versus
+0.932; difference $-0.018$, 95\% CI $-0.064$ to $0.022$) and D19 MRD
+(0.834 versus 0.784), whereas the LLM ensemble had higher C-indices for
+EFS (0.682 versus 0.599; $+0.083$, $-0.017$ to $0.182$; $p=0.099$) and
+OS (0.713 versus 0.599; $+0.114$, $-0.035$ to $0.269$).
 The survival advantage pointed the same way in the earlier split
-trained on 2015--16 (EFS $+0.049$, OS $+0.059$) and, for EFS, in the
-2019 test set ($+0.066$; Supplementary Table~\ref{tab:supp_decision}).
+trained on 2015--16 (EFS $+0.052$, OS $+0.064$) and, for EFS, in the
+2019 test set ($+0.051$; Supplementary Table~\ref{tab:supp_decision}).
 The OS training sets contained only 8 and 13 deaths, so a model that
 must learn from local events has little to learn from, whereas the
 LLMs bring prognostic knowledge from pretraining.
 
 For Final Risk, neither approach went beyond Initial Risk.
 The LLM ensemble and the RF assigned the correct group with balanced
-accuracies of 0.901 and 0.891, against 0.906 for Initial Risk alone;
+accuracies of 0.901 and 0.899, against 0.906 for Initial Risk alone;
 the remaining errors are patients upgraded on the basis of MRD, which
 no model can know at $\mathcal{F}_6$.
 The protocol rule reaches 1.000 only because it uses the Day-19 and
@@ -512,23 +512,23 @@ Supplementary Table~\ref{tab:supp_decision}.}
 \toprule
 \textbf{Target} & \textbf{Test set} & \textbf{LLM} & \textbf{Trained} & \textbf{$\Delta$ [95\% CI]} & \textbf{Equiv.\ $n$} \\
 \midrule
-Final Risk & Internal & 0.932 & 0.950 & $-$0.017 [$-$0.066, +0.024] & $\approx$49 \\
- & External & 0.842 & 0.925 & $-$0.083 [$-$0.247, +0.037] & \\
+Final Risk & Internal & 0.932 & 0.951 & $-$0.018 [$-$0.064, +0.022] & $\approx$49 \\
+ & External & 0.842 & 0.936 & $-$0.094 [$-$0.265, +0.029] & \\
 \addlinespace[2pt]
-D19 MRD & Internal & 0.784 & 0.811 & $-$0.027 [$-$0.174, +0.110] & $\approx$101 \\
- & External & 0.455$^{\dagger}$ & 0.330$^{\dagger}$ & +0.125 [$-$0.278, +0.617] & \\
+D19 MRD & Internal & 0.784 & 0.834 & $-$0.050 [$-$0.208, +0.093] & $\approx$103 \\
+ & External & 0.455$^{\dagger}$ & 0.350$^{\dagger}$ & +0.105 [$-$0.178, +0.421] & \\
 \addlinespace[2pt]
-D46 MRD & Internal & 0.599 & 0.674 & $-$0.076 [$-$0.250, +0.081] & n.a. \\
+D46 MRD & Internal & 0.599 & 0.697 & $-$0.098 [$-$0.269, +0.061] & n.a. \\
  & External & \multicolumn{3}{l}{not evaluable (1 positive)} & \\
 \addlinespace[2pt]
-Relapse & Internal & 0.631 & 0.629 & +0.003 [$-$0.199, +0.198] & n.a. \\
- & External & 0.652$^{\ddagger}$ & 0.279$^{\ddagger}$ & +0.373 [+0.058, +0.667]$^{*}$ & \\
+Relapse & Internal & 0.631 & 0.623 & +0.009 [$-$0.197, +0.211] & n.a. \\
+ & External & 0.652$^{\ddagger}$ & 0.210$^{\ddagger}$ & +0.442 [+0.160, +0.703]$^{*}$ & \\
 \addlinespace[2pt]
-EFS & Internal & 0.682 & 0.592 & +0.090 [$-$0.008, +0.191] & $>$186 \\
- & External & 0.692 & 0.439 & +0.253 [+0.135, +0.401]$^{*}$ & \\
+EFS & Internal & 0.682 & 0.599 & +0.083 [$-$0.017, +0.182] & $>$186 \\
+ & External & 0.692 & 0.435 & +0.256 [+0.139, +0.403]$^{*}$ & \\
 \addlinespace[2pt]
-OS & Internal & 0.713 & 0.620 & +0.093 [$-$0.043, +0.245] & $>$186 \\
- & External & 0.843 & 0.512 & +0.331 [+0.114, +0.588]$^{*}$ & \\
+OS & Internal & 0.713 & 0.599 & +0.114 [$-$0.035, +0.269] & $>$186 \\
+ & External & 0.843 & 0.536 & +0.307 [+0.104, +0.540]$^{*}$ & \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -540,26 +540,26 @@ OS & Internal & 0.713 & 0.620 & +0.093 [$-$0.043, +0.245] & $>$186 \\
 
 Applied without retraining to the external cohort
 (Fig.~\ref{fig:external}a and Table~\ref{tab:main}), the trained RSF
-lost discrimination for EFS (C-index 0.592 internally, 0.439
-externally) and OS (0.620 and 0.512), whereas the LLM ensemble did not
+lost discrimination for EFS (C-index 0.599 internally, 0.435
+externally) and OS (0.599 and 0.536), whereas the LLM ensemble did not
 (EFS 0.682 and 0.692; OS 0.713 and 0.843).
-The external differences were $+0.253$ (95\% CI 0.135 to 0.401) for
-EFS and $+0.331$ (0.114 to 0.588) for OS.
+The external differences were $+0.256$ (95\% CI 0.139 to 0.403) for
+EFS and $+0.307$ (0.104 to 0.540) for OS.
 Because one source hospital contributed only relapsed patients, we
 repeated the survival comparison counting only patient pairs from the
-same hospital; the LLM ensemble remained ahead (EFS 0.686 versus 0.498,
-difference $+0.188$, 0.036 to 0.378; OS 0.850 versus 0.626, $+0.224$,
-0.028 to 0.492).
+same hospital; the LLM ensemble remained ahead (EFS 0.686 versus 0.465,
+difference $+0.220$, 0.072 to 0.411; OS 0.850 versus 0.626, $+0.224$,
+0.036 to 0.480).
 Final Risk transferred for both approaches (AUROC 0.842 for the LLM
-ensemble and 0.925 for the RF; difference not significant).
+ensemble and 0.936 for the RF; difference not significant).
 The external D19 MRD, D46 MRD and relapse comparisons are not
 informative: they rest on four positive patients, one positive patient,
 and a relapse label that almost coincides with hospital of origin,
-respectively; the significant relapse difference (0.652 versus 0.279)
+respectively; the significant relapse difference (0.652 versus 0.210)
 therefore reflects the hospital mix rather than relapse prediction.
 Kaplan--Meier curves split at the median predicted risk separated EFS
 for the LLM ensemble internally (log-rank $p=0.008$) and externally
-($p=0.010$), but not for the RSF ($p=0.262$ and $p=0.694$;
+($p=0.010$), but not for the RSF ($p=0.124$ and $p=0.799$;
 Fig.~\ref{fig:external}b--e).
 
 \begin{figure}[t]
@@ -587,15 +587,16 @@ per group.}
 %%--------------------------------------------------------------%%
 
 Revising RF probabilities towards the outcomes of the five most similar
-training cases (Methods) changed classification AUROC by $-0.049$ to
-$+0.073$ across tasks and splits, apart from a gain of $+0.226$ for D46
-MRD in the 17-patient 2019 test set, which contains only three
-positives (Supplementary Table~\ref{tab:belief_revision}).
+training cases (Methods) changed classification AUROC by $-0.062$ to
+$+0.073$ in the 2017--19 and 2018--19 test sets and the external
+cohort; in the 17-patient 2019 test set, which contains only three
+positives for relapse and each MRD target, the changes ranged from
+$-0.062$ to $+0.226$ (Supplementary Table~\ref{tab:belief_revision}).
 For survival, a censoring-aware variant that replaces neighbour
 outcomes with a similarity-weighted Kaplan--Meier event probability
 gave small but consistent gains (mean C-index change $+0.007$ over 42
 combinations of feature level $\mathcal{F}_1$--$\mathcal{F}_6$, test
-set and endpoint, 26 of them positive; Wilcoxon $p=0.003$).
+set and endpoint, 25 of them positive; Wilcoxon $p=0.010$).
 For each of the 17 patients in the 2019 test set and each
 classification target, an LLM (Gemini-4-Argon) then produced a short
 narrative combining the prediction, the decision-tree path and the
@@ -651,7 +652,7 @@ defines—survival and, to a lesser extent, early treatment response.
 Because all predictions were made before treatment response was
 measured, they test what can be anticipated from diagnostic data alone.
 In this setting the trained survival forests stayed at C-indices of
-0.50 to 0.62, consistent with the established role of MRD, which our
+0.50 to 0.65, consistent with the established role of MRD, which our
 design withholds, as the dominant prognostic
 factor~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}; the LLM ensemble
 reached 0.68 to 0.71, suggesting that prior knowledge of how Initial
@@ -753,7 +754,8 @@ D19 and D46 MRD are prediction targets and are not used as input
 features at any level.
 All six prediction targets are evaluated on the same feature hierarchy.
 
-For Phase~2, categorical features were one-hot encoded and numerical
+For Phase~2, categorical features were one-hot encoded (CNS status as
+CNS2 or CNS3 versus CNS1) and numerical
 features z-score normalised using training-split statistics only:
 \begin{equation}
 z_{ij}^{(\text{test})} =
@@ -1158,40 +1160,40 @@ external cohort, within-hospital C-index (LLM ensemble vs trained).
 \textbf{Test set} & \textbf{LLM ensemble} & \textbf{Trained} & \textbf{BA LLM} & \textbf{BA trained} & \textbf{Notes} \\
 \midrule
 \multicolumn{6}{@{}l}{\textit{Final Risk ($\mathcal{F}_6$)}} \\
-\quad Split 1 (2017--19) ($n$=200, 100) & 0.910 [0.865, 0.951] & 0.921 [0.876, 0.959] & 0.890 & 0.895 & Initial Risk 0.895 \\
-\quad Split 2 (2018--19) ($n$=113, 48) & 0.932 [0.876, 0.981] & 0.950 [0.900, 0.988] & 0.901 & 0.891 & Initial Risk 0.906 \\
-\quad Split 3 (2019) ($n$=17, 8) & 0.896 [0.727, 1.000] & 0.882 [0.686, 1.000] & 0.819 & 0.757 & Initial Risk 0.812 \\
-\quad External ($n$=29, 20) & 0.842 [0.672, 0.967] & 0.925 [0.816, 1.000] & 0.844 & 0.783 & Initial Risk 0.900 \\
+\quad Split 1 (2017--19) ($n$=200, 100) & 0.910 [0.865, 0.951] & 0.918 [0.872, 0.957] & 0.890 & 0.895 & Initial Risk 0.895 \\
+\quad Split 2 (2018--19) ($n$=113, 48) & 0.932 [0.876, 0.981] & 0.951 [0.904, 0.986] & 0.901 & 0.899 & Initial Risk 0.906 \\
+\quad Split 3 (2019) ($n$=17, 8) & 0.896 [0.727, 1.000] & 0.854 [0.639, 1.000] & 0.819 & 0.757 & Initial Risk 0.812 \\
+\quad External ($n$=29, 20) & 0.842 [0.672, 0.967] & 0.936 [0.825, 1.000] & 0.844 & 0.864 & Initial Risk 0.900 \\
 \addlinespace[2pt]
 \multicolumn{6}{@{}l}{\textit{D19 MRD ($\mathcal{F}_6$)}} \\
-\quad Split 1 (2017--19) ($n$=200, 31) & 0.710 [0.607, 0.810] & 0.684 [0.561, 0.797] & 0.639 & 0.642 &  \\
-\quad Split 2 (2018--19) ($n$=113, 13) & 0.784 [0.622, 0.915] & 0.811 [0.685, 0.916] & 0.733 & 0.725 &  \\
-\quad Split 3 (2019) ($n$=17, 3) & 0.548 [0.183, 0.906] & 0.631 [0.333, 0.933] & 0.524 & 0.524 &  \\
-\quad External ($n$=29, 4) & 0.455 [0.107, 1.000] & 0.330 [0.120, 0.577] & 0.465 & 0.345 &  \\
+\quad Split 1 (2017--19) ($n$=200, 31) & 0.710 [0.607, 0.810] & 0.687 [0.566, 0.802] & 0.639 & 0.636 & \\
+\quad Split 2 (2018--19) ($n$=113, 13) & 0.784 [0.622, 0.915] & 0.834 [0.726, 0.924] & 0.733 & 0.758 & \\
+\quad Split 3 (2019) ($n$=17, 3) & 0.548 [0.183, 0.906] & 0.679 [0.375, 0.933] & 0.524 & 0.583 & \\
+\quad External ($n$=29, 4) & 0.455 [0.107, 1.000] & 0.350 [0.135, 0.594] & 0.465 & 0.405 & \\
 \addlinespace[2pt]
 \multicolumn{6}{@{}l}{\textit{D46 MRD ($\mathcal{F}_6$)}} \\
-\quad Split 1 (2017--19) ($n$=200, 21) & 0.504 [0.380, 0.629] & 0.586 [0.465, 0.706] & 0.517 & 0.559 &  \\
-\quad Split 2 (2018--19) ($n$=113, 11) & 0.599 [0.400, 0.792] & 0.674 [0.481, 0.842] & 0.618 & 0.663 &  \\
-\quad Split 3 (2019) ($n$=17, 3) & 0.607 [0.375, 0.821] & 0.429 [0.067, 0.867] & 0.357 & 0.452 &  \\
+\quad Split 1 (2017--19) ($n$=200, 21) & 0.504 [0.380, 0.629] & 0.584 [0.462, 0.707] & 0.517 & 0.556 & \\
+\quad Split 2 (2018--19) ($n$=113, 11) & 0.599 [0.400, 0.792] & 0.697 [0.518, 0.847] & 0.618 & 0.643 & \\
+\quad Split 3 (2019) ($n$=17, 3) & 0.607 [0.375, 0.821] & 0.393 [0.000, 0.867] & 0.357 & 0.488 & \\
 \quad External & \multicolumn{5}{l}{not evaluable} \\
 \addlinespace[2pt]
 \multicolumn{6}{@{}l}{\textit{Relapse ($\mathcal{F}_6$)}} \\
-\quad Split 1 (2017--19) ($n$=200, 28) & 0.652 [0.552, 0.749] & 0.548 [0.430, 0.667] & 0.516 & 0.516 &  \\
-\quad Split 2 (2018--19) ($n$=113, 17) & 0.631 [0.495, 0.759] & 0.629 [0.463, 0.771] & 0.560 & 0.574 &  \\
-\quad Split 3 (2019) ($n$=17, 3) & 0.798 [0.575, 1.000] & 0.500 [0.000, 0.906] & 0.631 & 0.512 &  \\
-\quad External ($n$=29, 23) & 0.652 [0.414, 0.860] & 0.279 [0.104, 0.474] & 0.569 & 0.323 &  \\
+\quad Split 1 (2017--19) ($n$=200, 28) & 0.652 [0.552, 0.749] & 0.542 [0.422, 0.661] & 0.516 & 0.536 & \\
+\quad Split 2 (2018--19) ($n$=113, 17) & 0.631 [0.495, 0.759] & 0.623 [0.455, 0.768] & 0.560 & 0.534 & \\
+\quad Split 3 (2019) ($n$=17, 3) & 0.798 [0.575, 1.000] & 0.417 [0.078, 0.750] & 0.631 & 0.512 & \\
+\quad External ($n$=29, 23) & 0.652 [0.414, 0.860] & 0.210 [0.065, 0.389] & 0.569 & 0.217 & \\
 \addlinespace[2pt]
 \multicolumn{6}{@{}l}{\textit{EFS ($\mathcal{F}_6$)}} \\
-\quad Split 1 (2017--19) ($n$=201, 43) & 0.609 [0.529, 0.694] & 0.560 [0.480, 0.645] & -- & -- & rank mean 0.608 \\
-\quad Split 2 (2018--19) ($n$=114, 25) & 0.682 [0.579, 0.782] & 0.592 [0.472, 0.716] & -- & -- & rank mean 0.673 \\
-\quad Split 3 (2019) ($n$=17, 5) & 0.728 [0.476, 0.927] & 0.662 [0.404, 0.884] & -- & -- & rank mean 0.706 \\
-\quad External ($n$=41, 24) & 0.692 [0.573, 0.809] & 0.439 [0.304, 0.570] & -- & -- & rank mean 0.693; within hospital 0.686 vs 0.498 \\
+\quad Split 1 (2017--19) ($n$=201, 43) & 0.609 [0.529, 0.694] & 0.557 [0.476, 0.641] & -- & -- & rank mean 0.608 \\
+\quad Split 2 (2018--19) ($n$=114, 25) & 0.682 [0.579, 0.782] & 0.599 [0.479, 0.720] & -- & -- & rank mean 0.673 \\
+\quad Split 3 (2019) ($n$=17, 5) & 0.728 [0.476, 0.927] & 0.676 [0.429, 0.894] & -- & -- & rank mean 0.706 \\
+\quad External ($n$=41, 24) & 0.692 [0.573, 0.809] & 0.435 [0.298, 0.564] & -- & -- & rank mean 0.693; within hospital 0.686 vs 0.465 \\
 \addlinespace[2pt]
 \multicolumn{6}{@{}l}{\textit{OS ($\mathcal{F}_6$)}} \\
-\quad Split 1 (2017--19) ($n$=201, 15) & 0.680 [0.532, 0.816] & 0.621 [0.471, 0.765] & -- & -- & rank mean 0.682 \\
-\quad Split 2 (2018--19) ($n$=114, 10) & 0.713 [0.555, 0.858] & 0.620 [0.426, 0.797] & -- & -- & rank mean 0.713 \\
+\quad Split 1 (2017--19) ($n$=201, 15) & 0.680 [0.532, 0.816] & 0.616 [0.465, 0.761] & -- & -- & rank mean 0.682 \\
+\quad Split 2 (2018--19) ($n$=114, 10) & 0.713 [0.555, 0.858] & 0.599 [0.403, 0.782] & -- & -- & rank mean 0.713 \\
 \quad Split 3 (2019) & \multicolumn{5}{l}{not evaluable} \\
-\quad External ($n$=41, 7) & 0.843 [0.722, 0.947] & 0.512 [0.237, 0.782] & -- & -- & rank mean 0.845; within hospital 0.850 vs 0.626 \\
+\quad External ($n$=41, 7) & 0.843 [0.722, 0.947] & 0.536 [0.274, 0.793] & -- & -- & rank mean 0.845; within hospital 0.850 vs 0.626 \\
 \bottomrule
 \end{tabular}
 \end{sidewaystable}
@@ -1320,43 +1322,43 @@ $\mathcal{F}_1$ & 0.759 & 0.842 & 0.810 & 0.871 & \textbf{0.799} & 0.806 \\
 $\mathcal{F}_2$ & 0.759 & 0.820 & 0.810 & 0.830 & 0.778 & 0.847 \\
 $\mathcal{F}_3$ & 0.711 & 0.849 & 0.782 & 0.872 & 0.771 & 0.743 \\
 $\mathcal{F}_4$ & 0.711 & 0.852 & 0.757 & 0.847 & 0.771 & 0.799 \\
-$\mathcal{F}_5$ & \textbf{0.893} & 0.897 & 0.909 & 0.943 & 0.736 & 0.847 \\
-$\mathcal{F}_6$ & \textbf{0.893} & \textbf{0.922} & \textbf{0.911} & \textbf{0.951} & 0.736 & \textbf{0.882} \\
+$\mathcal{F}_5$ & \textbf{0.891} & 0.896 & \textbf{0.911} & 0.951 & 0.736 & \textbf{0.882} \\
+$\mathcal{F}_6$ & \textbf{0.891} & \textbf{0.919} & 0.909 & \textbf{0.952} & 0.736 & 0.854 \\
 \multicolumn{7}{l}{\textit{D19 MRD (DT / RF AUROC)}} \\
 $\mathcal{F}_1$ & 0.537 & 0.523 & 0.485 & 0.420 & 0.393 & 0.595 \\
 $\mathcal{F}_2$ & 0.503 & 0.509 & 0.498 & 0.505 & 0.464 & 0.762 \\
 $\mathcal{F}_3$ & 0.557 & 0.657 & 0.686 & 0.791 & \textbf{0.893} & 0.810 \\
 $\mathcal{F}_4$ & 0.557 & 0.672 & \textbf{0.705} & 0.799 & \textbf{0.893} & 0.810 \\
-$\mathcal{F}_5$ & \textbf{0.560} & 0.631 & 0.686 & 0.740 & 0.750 & \textbf{0.845} \\
-$\mathcal{F}_6$ & 0.557 & \textbf{0.684} & 0.686 & \textbf{0.811} & 0.738 & 0.631 \\
+$\mathcal{F}_5$ & \textbf{0.560} & 0.635 & 0.686 & 0.755 & 0.750 & \textbf{0.833} \\
+$\mathcal{F}_6$ & 0.557 & \textbf{0.687} & 0.686 & \textbf{0.834} & 0.738 & 0.679 \\
 \multicolumn{7}{l}{\textit{D46 MRD (DT / RF AUROC)}} \\
 $\mathcal{F}_1$ & 0.362 & 0.503 & 0.456 & 0.447 & \textbf{0.464} & 0.631 \\
 $\mathcal{F}_2$ & 0.518 & 0.428 & 0.456 & 0.527 & 0.321 & \textbf{0.655} \\
 $\mathcal{F}_3$ & \textbf{0.545} & 0.555 & 0.521 & 0.570 & 0.369 & 0.321 \\
 $\mathcal{F}_4$ & 0.531 & 0.554 & 0.480 & 0.595 & 0.369 & 0.298 \\
-$\mathcal{F}_5$ & \textbf{0.545} & \textbf{0.601} & \textbf{0.549} & 0.636 & 0.369 & 0.345 \\
-$\mathcal{F}_6$ & \textbf{0.545} & 0.586 & 0.521 & \textbf{0.674} & 0.369 & 0.429 \\
+$\mathcal{F}_5$ & \textbf{0.545} & \textbf{0.601} & \textbf{0.549} & 0.655 & 0.369 & 0.274 \\
+$\mathcal{F}_6$ & \textbf{0.545} & 0.584 & \textbf{0.549} & \textbf{0.697} & 0.369 & 0.393 \\
 \multicolumn{7}{l}{\textit{Relapse (DT / RF AUROC)}} \\
-$\mathcal{F}_1$ & 0.480 & 0.439 & \textbf{0.529} & 0.465 & 0.274 & 0.476 \\
-$\mathcal{F}_2$ & \textbf{0.550} & 0.546 & 0.483 & 0.526 & \textbf{0.500} & 0.357 \\
+$\mathcal{F}_1$ & 0.480 & 0.439 & \textbf{0.529} & 0.465 & 0.274 & \textbf{0.476} \\
+$\mathcal{F}_2$ & \textbf{0.550} & 0.546 & 0.483 & 0.526 & 0.500 & 0.357 \\
 $\mathcal{F}_3$ & 0.528 & 0.483 & 0.411 & 0.485 & 0.286 & 0.274 \\
 $\mathcal{F}_4$ & 0.540 & \textbf{0.564} & 0.411 & 0.471 & 0.286 & 0.036 \\
-$\mathcal{F}_5$ & 0.527 & 0.517 & 0.411 & 0.624 & 0.286 & 0.286 \\
-$\mathcal{F}_6$ & 0.528 & 0.547 & 0.411 & \textbf{0.630} & 0.488 & \textbf{0.500} \\
+$\mathcal{F}_5$ & 0.527 & 0.509 & 0.411 & 0.616 & 0.286 & 0.191 \\
+$\mathcal{F}_6$ & 0.532 & 0.542 & 0.411 & \textbf{0.624} & \textbf{0.559} & 0.417 \\
 \multicolumn{7}{l}{\textit{EFS (DT / RSF C-index)}} \\
 $\mathcal{F}_1$ & 0.468 & 0.532 & 0.443 & \textbf{0.610} & \textbf{0.691} & \textbf{0.706} \\
 $\mathcal{F}_2$ & 0.482 & 0.516 & \textbf{0.501} & 0.597 & 0.529 & 0.559 \\
 $\mathcal{F}_3$ & 0.527 & 0.542 & 0.477 & 0.552 & 0.390 & 0.500 \\
 $\mathcal{F}_4$ & \textbf{0.546} & 0.520 & 0.482 & 0.533 & 0.426 & 0.485 \\
-$\mathcal{F}_5$ & 0.494 & 0.511 & 0.490 & 0.572 & 0.390 & 0.588 \\
-$\mathcal{F}_6$ & 0.497 & \textbf{0.560} & 0.485 & 0.592 & 0.390 & 0.662 \\
+$\mathcal{F}_5$ & 0.514 & 0.530 & 0.490 & 0.584 & 0.390 & 0.559 \\
+$\mathcal{F}_6$ & 0.488 & \textbf{0.557} & 0.485 & 0.599 & 0.390 & 0.676 \\
 \multicolumn{7}{l}{\textit{OS (DT / RSF C-index)}} \\
 $\mathcal{F}_1$ & 0.541 & \textbf{0.688} & 0.531 & 0.497 & \textemdash & \textemdash \\
-$\mathcal{F}_2$ & 0.467 & 0.651 & 0.541 & 0.540 & \textemdash & \textemdash \\
+$\mathcal{F}_2$ & 0.467 & 0.651 & \textbf{0.541} & 0.540 & \textemdash & \textemdash \\
 $\mathcal{F}_3$ & 0.512 & 0.556 & 0.440 & 0.515 & \textemdash & \textemdash \\
 $\mathcal{F}_4$ & 0.498 & 0.590 & 0.472 & 0.529 & \textemdash & \textemdash \\
-$\mathcal{F}_5$ & 0.492 & 0.586 & 0.445 & \textbf{0.622} & \textemdash & \textemdash \\
-$\mathcal{F}_6$ & \textbf{0.562} & 0.621 & \textbf{0.562} & 0.620 & \textemdash & \textemdash \\
+$\mathcal{F}_5$ & 0.507 & 0.592 & 0.440 & \textbf{0.645} & \textemdash & \textemdash \\
+$\mathcal{F}_6$ & \textbf{0.562} & 0.616 & 0.508 & 0.599 & \textemdash & \textemdash \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1388,15 +1390,15 @@ $\mathcal{F}_1$ & 0.805 & 0.878 \\
 $\mathcal{F}_2$ & 0.827 & 0.863 \\
 $\mathcal{F}_3$ & 0.779 & 0.843 \\
 $\mathcal{F}_4$ & 0.778 & 0.750 \\
-$\mathcal{F}_5$ & \textbf{0.912} & \textbf{0.938} \\
-$\mathcal{F}_6$ & \textbf{0.912} & 0.934 \\
+$\mathcal{F}_5$ & \textbf{0.912} & 0.930 \\
+$\mathcal{F}_6$ & \textbf{0.912} & \textbf{0.940} \\
 \multicolumn{3}{l}{\textit{D19 MRD (DT / RF)}} \\
 $\mathcal{F}_1$ & \textbf{0.630} & 0.590 \\
 $\mathcal{F}_2$ & 0.505 & \textbf{0.650} \\
 $\mathcal{F}_3$ & 0.385 & 0.265 \\
 $\mathcal{F}_4$ & 0.385 & 0.285 \\
-$\mathcal{F}_5$ & 0.385 & 0.290 \\
-$\mathcal{F}_6$ & 0.385 & 0.330 \\
+$\mathcal{F}_5$ & 0.385 & 0.305 \\
+$\mathcal{F}_6$ & 0.385 & 0.350 \\
 \multicolumn{3}{l}{\textit{D46 MRD (DT / RF)}} \\
 $\mathcal{F}_1$ & \textbf{0.742$^*$} & \textbf{0.968$^*$} \\
 $\mathcal{F}_2$ & 0.581$^*$ & \textbf{0.968$^*$} \\
@@ -1409,22 +1411,22 @@ $\mathcal{F}_1$ & \textbf{0.583} & \textbf{0.528} \\
 $\mathcal{F}_2$ & 0.397 & 0.494 \\
 $\mathcal{F}_3$ & 0.333 & 0.300 \\
 $\mathcal{F}_4$ & 0.525 & 0.272 \\
-$\mathcal{F}_5$ & 0.333 & 0.377 \\
-$\mathcal{F}_6$ & 0.219 & 0.267 \\
+$\mathcal{F}_5$ & 0.333 & 0.384 \\
+$\mathcal{F}_6$ & 0.219 & 0.246 \\
 \multicolumn{3}{l}{\textit{EFS (DT / RSF C-index)}} \\
 $\mathcal{F}_1$ & \textbf{0.603} & 0.567 \\
 $\mathcal{F}_2$ & 0.552 & \textbf{0.572} \\
 $\mathcal{F}_3$ & 0.507 & 0.434 \\
 $\mathcal{F}_4$ & 0.509 & 0.475 \\
-$\mathcal{F}_5$ & 0.419 & 0.444 \\
-$\mathcal{F}_6$ & 0.419 & 0.439 \\
+$\mathcal{F}_5$ & 0.419 & 0.430 \\
+$\mathcal{F}_6$ & 0.419 & 0.435 \\
 \multicolumn{3}{l}{\textit{OS (DT / RSF C-index)}} \\
 $\mathcal{F}_1$ & 0.619 & \textbf{0.718} \\
 $\mathcal{F}_2$ & 0.657 & \textbf{0.718} \\
 $\mathcal{F}_3$ & 0.571 & 0.468 \\
 $\mathcal{F}_4$ & \textbf{0.702} & 0.512 \\
-$\mathcal{F}_5$ & 0.647 & 0.556 \\
-$\mathcal{F}_6$ & 0.647 & 0.512 \\
+$\mathcal{F}_5$ & 0.647 & 0.540 \\
+$\mathcal{F}_6$ & 0.647 & 0.536 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1454,36 +1456,36 @@ computed. \textemdash: too few events (OS, 2019 test split).}
 \textbf{Task} & \textbf{Split} & $p_\text{RF}$ & $p_\text{rev}$ & \textbf{$\Delta$} \\
 \midrule
 \multicolumn{5}{l}{\textit{Internal (temporal splits)}} \\
-Final Risk & Split~1 & 0.922 & 0.912 & $-0.010$ \\
-Final Risk & Split~2 & 0.951 & 0.949 & $-0.002$ \\
-Final Risk & Split~3 & 0.882 & 0.833 & $-0.049$ \\
+Final Risk & Split~1 & 0.919 & 0.910 & $-0.008$ \\
+Final Risk & Split~2 & 0.952 & 0.948 & $-0.004$ \\
+Final Risk & Split~3 & 0.854 & 0.792 & $-0.062$ \\
 D19MRD & Split~1 & 0.657 & 0.655 & $-0.003$ \\
 D19MRD & Split~2 & 0.791 & 0.787 & $-0.004$ \\
 D19MRD & Split~3 & 0.810 & 0.833 & $+0.024$ \\
 D46MRD & Split~1 & 0.428 & 0.408 & $-0.020$ \\
 D46MRD & Split~2 & 0.527 & 0.600 & $+0.073$ \\
 D46MRD & Split~3 & 0.655 & \textbf{0.881} & $\mathbf{+0.226}$ \\
-Relapse & Split~1 & 0.547 & 0.546 & $-0.001$ \\
-Relapse & Split~2 & 0.630 & 0.588 & $-0.042$ \\
-Relapse & Split~3 & 0.500 & 0.476 & $-0.024$ \\
+Relapse & Split~1 & 0.542 & 0.549 & $+0.007$ \\
+Relapse & Split~2 & 0.624 & 0.562 & $-0.062$ \\
+Relapse & Split~3 & 0.417 & 0.524 & $+0.107$ \\
 \addlinespace[2pt]
 \multicolumn{5}{l}{\quad\textit{Survival endpoints (C-index; RSF base vs KM revision)}} \\
-EFS & Split~1 & 0.560 & 0.566 & $+0.006$ \\
-EFS & Split~2 & 0.592 & 0.584 & $-0.008$ \\
-EFS & Split~3 & 0.662 & 0.677 & $+0.015$ \\
-OS & Split~1 & 0.621 & 0.637 & $+0.016$ \\
-OS & Split~2 & 0.620 & 0.617 & $-0.003$ \\
+EFS & Split~1 & 0.557 & 0.566 & $+0.008$ \\
+EFS & Split~2 & 0.599 & 0.594 & $-0.005$ \\
+EFS & Split~3 & 0.676 & 0.676 & $+0.000$ \\
+OS & Split~1 & 0.616 & 0.632 & $+0.017$ \\
+OS & Split~2 & 0.599 & 0.600 & $+0.001$ \\
 OS & Split~3 & \multicolumn{3}{c}{\textemdash} \\
 \midrule
 \multicolumn{5}{l}{\textit{External (pooled cohort)}} \\
-Final Risk & --- & 0.934 & 0.951 & $+0.017$ \\
+Final Risk & --- & 0.940 & 0.953 & $+0.013$ \\
 D19MRD & --- & 0.265 & 0.230 & $-0.035$ \\
 D46MRD & --- & \multicolumn{3}{c}{$\dagger$ ($n_\text{pos}=1$)} \\
-Relapse & --- & 0.267 & 0.283 & $+0.016$ \\
+Relapse & --- & 0.246 & 0.261 & $+0.015$ \\
 \addlinespace[2pt]
 \multicolumn{5}{l}{\quad\textit{Survival endpoints (C-index; RSF base vs KM revision)}} \\
-EFS & --- & 0.439 & 0.419 & $-0.020$ \\
-OS & --- & 0.512 & 0.540 & $+0.028$ \\
+EFS & --- & 0.435 & 0.421 & $-0.014$ \\
+OS & --- & 0.536 & 0.556 & $+0.020$ \\
 \bottomrule
 \end{tabular}
 \end{table}
