@@ -332,11 +332,9 @@ From $\mathcal{F}_3$ onward, each level can be augmented with
 morphology of the Day-1 diagnostic marrow smear ($+$M; Methods).
 An automated pipeline segmented the nucleated cells on the smear
 images, measured their size, cytoplasm, chromatin, nucleoli and
-vacuoles, and summarised them per patient.
-Three feature sets of increasing refinement were derived (M1--M3); the
-most detailed, M3, rests on 46,964 cells (median 135 per patient) and
-was available for 293 of the 300 internal patients in the temporal
-splits.
+vacuoles, and summarised them per patient as a morphology profile.
+The profile rests on 46,964 cells (median 135 per patient) and was
+available for 293 of the 300 internal patients in the temporal splits.
 The LLMs received morphology as a short text report appended to the
 clinical features, never as images, and the trained models received
 the same measures as additional variables.
@@ -495,7 +493,7 @@ The trained models gained less: with morphology, the random forests
 reached 0.953 for Final Risk and 0.842 for D19 MRD, and the survival
 forest 0.607 for OS, within 0.01 of their clinical-only values, while
 for D46 MRD, relapse and EFS they stayed below them.
-For a forest, morphology adds 10 to 17 variables whose role has to be
+For a forest, morphology adds 16 variables whose role has to be
 learned from 186 training patients; the LLMs receive the same
 information as a short report.
 
@@ -566,8 +564,8 @@ assessment: clinical features at $\mathcal{F}_6$ (LLM, Trained) and,
 with morphology ($+$M), clinical features up to $\mathcal{F}_6$
 together with the Day-1 marrow-morphology features (LLM$+$M,
 Trained$+$M).
-The feature level and morphology feature set used for each $+$M value
-are given in Supplementary Table~\ref{tab:morph_config}.
+The configuration used for each $+$M value is given in Supplementary
+Table~\ref{tab:morph_config}.
 Internal: 2018--19 enrolment test set (Split~2; models trained on
 2015--17). External: two hospitals (models trained on all internal
 patients; clinical features only).
@@ -923,10 +921,10 @@ in the cell and as wider pale spots inside the nucleus; and the outline
 was described by circularity, solidity, nuclear solidity, aspect ratio
 and cytoplasm blueness.
 
-\textbf{Patient-level feature sets.}
+\textbf{Patient-level profile.}
 Cell-level measures were summarised per patient as medians, spreads
 and proportions.
-The primary feature set, M3, comprises 16 descriptors: median cell size
+The morphology profile comprises 16 descriptors: median cell size
 and its coefficient of variation, the fractions of large ($>2$ red-cell
 diameters) and small cells, the cytoplasm fraction and the fraction of
 cells with visible cytoplasm, cytoplasm blueness, chromatin contrast
@@ -939,47 +937,32 @@ and image acquisition (the median nucleus-to-cytoplasm ratio, for
 example, ranged from 0.74 to 2.77 across batches), so each descriptor
 was expressed as a percentile among the patients of the same batch; no
 outcome information enters this step.
-Patients with fewer than 20 measured cells received no M3 profile.
-M3 rests on 46,964 cells (median 135 per patient) and covers 293 of the
-300 internal patients in the temporal splits.
-Two earlier feature sets from the same images were also used.
-M1 consists of 17 per-patient means of cell geometry,
-nucleus-to-cytoplasm ratio, chromatin texture (including GLCM
-contrast), nucleoli, morphological uniformity and the fractions of
-hand-mirror and vacuolated cells, computed on cells kept by brightness
-and hue rules (9,501 cells; profiles for 219 of the 300 patients).
-M2 consists of 10 descriptors (equivalent diameter, circularity,
-aspect ratio, solidity, nucleus-to-cytoplasm ratio, nuclear solidity
-and brightness, cytoplasm saturation, large-cell fraction and size
-heterogeneity) computed at native resolution and expressed as
-within-batch percentiles (19,108 cells; profiles, requiring at least
-five cells, for 221 of the 300 patients).
+Patients with fewer than 20 measured cells received no profile.
+The profile rests on 46,964 cells (median 135 per patient) and covers
+293 of the 300 internal patients in the temporal splits.
 
 \textbf{Morphology as model input.}
 For the LLMs, morphology was appended to the serialised clinical
 features as a short text block, never as an image.
-The M3 report states the number of cells and the resulting
+The report states the number of cells and the resulting
 reliability, the typical cell diameter in red-cell units and
 micrometres, the share of large cells, the share of cells with a
 visible cytoplasm rim and the share of vacuolated cells, each with its
 within-batch percentile and the batch's typical value, and notes that
 the measurements are automated and supportive only; it is limited to
 the measures that agreed with the expert reports (below).
-The M2 report gives each descriptor as a within-batch percentile with a
-qualitative grade and an automated FAB-style impression (L1-like,
-L2-like or indeterminate), and the M1 report lists the 17 descriptors.
 Patients without a profile were scored with the prompt of the same
 level without morphology.
-For RF and RSF, the descriptors (M1 as raw values; M2 and M3 as
-percentiles with a missing-profile indicator) were appended to the
-level's variables and preprocessed as above.
+For RF and RSF, the 16 percentile descriptors and a missing-profile
+indicator were appended to the level's variables and preprocessed as
+above.
 
 \textbf{Agreement with expert reports.}
 For 285 internal patients the haematologist's diagnostic report
 described the blast population.
 From this description we extracted six labels—cell size (small versus
 medium or large), size uniformity, amount of cytoplasm, vacuoles,
-nuclear shape and nucleoli—and measured the agreement of each M3
+nuclear shape and nucleoli—and measured the agreement of each
 descriptor with its label as the AUROC averaged over imaging batches,
 so that batch differences cannot contribute (95\% CI from 1,000
 bootstrap resamples).
@@ -1018,7 +1001,7 @@ Table~\ref{tab:supp_decision}).
 Per-patient outputs were cached; the cohort was scored for every
 combination of feature level ($\times 6$), task ($\times 6$), and
 model ($\times 5$), and at $\mathcal{F}_3$--$\mathcal{F}_6$ also with
-each morphology feature set ($\times 3$; Section~\ref{sec:morph}).
+the morphology report (Section~\ref{sec:morph}).
 
 \subsection{Phase~2: Decision tree and random forest}\label{sec:dt}
 
@@ -1334,7 +1317,7 @@ $\mathcal{F}_3$     & Day 1     & + Immunophenotype + 51 flow cytometry markers 
 $\mathcal{F}_4$     & Day 1     & $\mathcal{F}_3$ + non-risk clinical factors \\
 $\mathcal{F}_5$     & Day 5     & $\mathcal{F}_3$ + CNS status + Day~5 blast\% + Initial Risk \\
 $\mathcal{F}_6$     & Day 7--10 & $\mathcal{F}_5$ + Fusion gene + Karyotype + FISH \\
-$\mathcal{F}_k$$+$M & Day 1 smear & $\mathcal{F}_k$ ($k=3,\dots,6$) + marrow morphology (feature set M1, M2 or M3) \\
+$\mathcal{F}_k$$+$M & Day 1 smear & $\mathcal{F}_k$ ($k=3,\dots,6$) + marrow morphology profile \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1362,7 +1345,7 @@ $\mathcal{F}_3$ & $+$ Immunophenotype (B/T lineage); 42 CD markers (CD1a, CD2, C
 $\mathcal{F}_4$ & (base $\mathcal{F}_3$) $+$ non-risk clinical factors: chief-complaint category, pregnancy number, birth order, term/preterm status, delivery mode, birth weight, feeding type, admission weight, liver span, spleen span, haemoglobin, platelet count \\
 $\mathcal{F}_5$ & (base $\mathcal{F}_3$) $+$ CNS status (CNSL); Day-5 peripheral blast\%; Initial Risk \\
 $\mathcal{F}_6$ & (base $\mathcal{F}_5$) $+$ Fusion gene; Karyotype; FISH \\
-$\mathcal{F}_k$$+$M & (base $\mathcal{F}_3$--$\mathcal{F}_6$) $+$ Day-1 marrow morphology: feature set M1, M2 or M3 (Supplementary Table~\ref{tab:morph_features}) \\
+$\mathcal{F}_k$$+$M & (base $\mathcal{F}_3$--$\mathcal{F}_6$) $+$ Day-1 marrow morphology profile (Supplementary Table~\ref{tab:morph_features}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1371,26 +1354,22 @@ $\mathcal{F}_k$$+$M & (base $\mathcal{F}_3$--$\mathcal{F}_6$) $+$ Day-1 marrow m
 \clearpage
 
 \begin{table}[ht]
-\caption{\textbf{Bone marrow morphology feature sets} (Methods,
-Section~\ref{sec:morph}). Cells, nucleated cells measured; patients,
-internal patients in the temporal splits with a profile (of 300).
-Trained models receive the descriptors as variables (M2 and M3 with a
-missing-profile indicator); the LLMs receive the text report. All
-percentiles are computed within the patient's imaging batch.}
+\caption{\textbf{Bone marrow morphology profile} (Methods,
+Section~\ref{sec:morph}). The profile rests on 46,964 nucleated cells
+and is available for 293 of the 300 internal patients in the temporal
+splits. All percentiles are computed within the patient's imaging
+batch.}
 \label{tab:morph_features}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{4pt}
-\setlength{\tabcolsep}{3.5pt}
-\begin{tabular}{@{}l c >{\raggedright\arraybackslash}p{5.6cm} >{\raggedright\arraybackslash}p{3.9cm}@{}}
+\begin{tabular}{@{}l >{\raggedright\arraybackslash}p{0.72\linewidth}@{}}
 \toprule
-\textbf{Set} & \textbf{Cells / patients} & \textbf{Descriptors (trained models)} & \textbf{Report (LLMs)} \\
+\textbf{Input} & \textbf{Content} \\
 \midrule
-M1 & 9,501 / 219 & 17 per-patient values: mean cell area, major and minor axis, aspect ratio, eccentricity, circularity, extent, nucleus-to-cytoplasm ratio, nucleus-to-cell ratio, chromatin fineness, chromatin high-frequency texture, GLCM contrast, nucleoli count and size, morphological uniformity, hand-mirror and vacuolated fractions & The 17 descriptors \\
+Trained models (variables) & 16 percentiles: median size in red-cell diameters and its coefficient of variation, large-cell and small-cell fractions, cytoplasm fraction, visible-cytoplasm fraction, cytoplasm blueness, chromatin contrast and variation, nuclear lightness, nuclear and cell solidity, circularity, aspect ratio, nucleolus-like and vacuolated fractions; missing-profile indicator \\
 \addlinespace[3pt]
-M2 & 19,108 / 221 & 10 percentiles: equivalent diameter, circularity, aspect ratio, solidity, nucleus-to-cytoplasm ratio, nuclear solidity, nuclear brightness, cytoplasm saturation, large-cell fraction, size heterogeneity & Percentiles with qualitative grades; automated FAB-style impression (L1-like, L2-like, indeterminate); reliability from the number of cells \\
-\addlinespace[3pt]
-M3 & 46,964 / 293 & 16 percentiles: median size in red-cell diameters and its coefficient of variation, large-cell and small-cell fractions, cytoplasm fraction, visible-cytoplasm fraction, cytoplasm blueness, chromatin contrast and variation, nuclear lightness, nuclear and cell solidity, circularity, aspect ratio, nucleolus-like and vacuolated fractions & Typical diameter (red-cell units and $\mu$m), shares of large cells, cells with visible cytoplasm and vacuolated cells, each with percentile and batch-typical value; reliability \\
+LLMs (text report) & Number of cells and reliability; typical diameter (red-cell units and $\mu$m); shares of large cells, cells with visible cytoplasm and vacuolated cells, each with its percentile and the batch-typical value \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1461,27 +1440,34 @@ external cohort, within-hospital C-index (LLM ensemble vs trained).
 \noindent\textbf{Morphology configurations.}
 Table~\ref{tab:main} reports one morphology-augmented ($+$M) result
 for each target and method.
-Supplementary Table~\ref{tab:morph_config} gives the configuration
-behind each of these values: the clinical feature level
-($\mathcal{F}_3$--$\mathcal{F}_6$) and the morphology feature set
-(M1--M3).
-For each target and method, the twelve combinations of level and
-feature set were evaluated on the 2018--19 test patients, and the
-combination with the highest AUROC or C-index is reported (ties
-resolved in favour of the more refined feature set and then the
-earlier level); the LLM ensemble uses the same combination for all five
-models.
-The table also gives the number of test patients with a profile of
-the chosen feature set, the same method's value with clinical features
-at $\mathcal{F}_6$, and the difference between the two with its 95\%
+Besides the profile described in Methods (here M3), two earlier
+versions of the profile were computed from the same images.
+M1 consists of 17 per-patient means of cell geometry,
+nucleus-to-cytoplasm ratio, chromatin texture, nucleoli and the
+fractions of hand-mirror and vacuolated cells (9,501 cells; profiles
+for 219 of the 300 patients), and its report lists the 17 values.
+M2 consists of 10 within-batch percentiles of cell size and shape,
+nucleus-to-cytoplasm ratio, nuclear and cytoplasm colour and size
+heterogeneity (19,108 cells; 221 patients), and its report adds an
+automated FAB-style impression.
+For each target and method, the twelve combinations of clinical
+feature level ($\mathcal{F}_3$--$\mathcal{F}_6$) and profile version
+were evaluated on the 2018--19 test patients, and the combination with
+the highest AUROC or C-index is reported (ties resolved in favour of
+the later version and then the earlier level); the LLM ensemble uses
+the same combination for all five models.
+Supplementary Table~\ref{tab:morph_config} gives the chosen
+configuration, the number of test patients with a profile of that
+version, the same method's value with clinical features at
+$\mathcal{F}_6$, and the difference between the two with its 95\%
 bootstrap CI.
 
 \begin{table}[ht]
 \caption{\textbf{Configuration behind each morphology-augmented
 ($+$M) result in Table~\ref{tab:main}} (2018--19 test set, Split~2).
-Configuration, clinical feature level and morphology feature set
-(Supplementary Table~\ref{tab:morph_features}). With M, test patients
-with a profile of that feature set; the others were scored without
+Configuration, clinical feature level and profile version (M1--M3,
+described above). With M, test patients with a profile of that
+version; the others were scored without
 morphology. Clinical, the same method with clinical features at
 $\mathcal{F}_6$. $\Delta$, $+$M minus clinical, with 95\% bootstrap CI
 (2,000 resamples); $^{*}p<0.05$. LLM, five-model ensemble; RF, random
@@ -1517,7 +1503,7 @@ OS & LLM & $\mathcal{F}_5$ + M3 & 111/114 & 0.713 & 0.719 & +0.006 [$-$0.037, +0
 \end{table}
 
 \begin{table}[ht]
-\caption{\textbf{Agreement of the M3 morphology measures with the
+\caption{\textbf{Agreement of the morphology measures with the
 haematologists' reports.} Labels were extracted from the description
 of the blast population in the diagnostic morphology report (285
 patients; $n$, patients whose report states the feature). AUROC of the
@@ -1525,14 +1511,14 @@ descriptor for the label, averaged over the three imaging batches so
 that batch differences cannot contribute, with 95\% CI from 1,000
 bootstrap resamples; 0.5 indicates no agreement (for nuclear solidity,
 agreement would appear as values below 0.5). Report, whether the
-measure is included in the M3 text report given to the LLMs.}
+measure is included in the text report given to the LLMs.}
 \label{tab:morph_validation}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}llccc@{}}
 \toprule
-\textbf{Label in the report} & \textbf{M3 descriptor} & \textbf{Positive / $n$} & \textbf{AUROC [95\% CI]} & \textbf{Report} \\
+\textbf{Label in the report} & \textbf{Descriptor} & \textbf{Positive / $n$} & \textbf{AUROC [95\% CI]} & \textbf{Report} \\
 \midrule
 Vacuoles present & Vacuolated-cell fraction & 56 / 285 & 0.69 [0.62, 0.76] & yes \\
 Medium or large (vs small) & Large-cell fraction & 33 / 90 & 0.67 [0.54, 0.83] & yes \\
