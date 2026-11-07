@@ -21,7 +21,7 @@
 %% Title
 %%==============================================================%%
 \title[LLMs, marrow morphology and local data in paediatric ALL]{%
-  Zero-shot language models and automated marrow morphology versus
+  Large language models and automated marrow morphology versus
   accumulating local data for timeline-aligned prediction in
   paediatric acute lymphoblastic leukaemia}
 
@@ -51,9 +51,9 @@ are usually trained on a hospital's own historical cases, yet a
 hospital that adopts a new protocol starts with none, and the
 diagnostic marrow smear, examined in every patient, rarely enters such
 models.
-We ask how much local data a zero-shot large language model (LLM) is
-worth along the clinical timeline, and what automatically measured
-marrow morphology adds.
+We ask how much local data the judgement of a large language model
+(LLM), which needs no training cases, is worth along the clinical
+timeline, and what automatically measured marrow morphology adds.
 In 301 patients split by enrolment year and 41 external patients from
 two hospitals, we predicted Final Risk, day-19 and day-46 minimal
 residual disease (MRD), relapse, event-free survival (EFS) and overall
@@ -63,9 +63,9 @@ Cell size, cytoplasm, chromatin, nucleoli and vacuoles were measured
 automatically on the Day-1 smear, checked against haematologists'
 reports, and given to the LLMs as a short text report, without images,
 and to random forests and random survival forests as variables.
-An equal-weight ensemble of five zero-shot LLMs matched random forests
-trained on about 50 local patients for Final Risk and 100 for day-19
-MRD.
+An equal-weight ensemble of five LLMs, each given the patient's data
+and asked for a prediction, matched random forests trained on about 50
+local patients for Final Risk and 100 for day-19 MRD.
 Morphology raised the ensemble's discrimination for all six targets,
 to AUROC 0.95 for Final Risk and 0.81 for day-19 MRD, on par with
 fully trained forests (0.95 and 0.84), and to C-indices of 0.71 for
@@ -74,13 +74,13 @@ without morphology.
 At the external hospitals the survival forests lost discrimination
 (EFS 0.44, OS 0.54) whereas the LLM ensemble did not (0.69 and 0.84;
 $P<0.01$, and $P<0.05$ within hospitals).
-Zero-shot LLMs that read routine data and an automated morphology
-report are therefore a credible starting point before local data
+LLMs that read routine data and an automated morphology report are
+therefore a credible starting point before local data
 accrue, and remain complementary afterwards.
 }
 
 \keywords{paediatric acute lymphoblastic leukaemia, large language
-models, zero-shot prediction, bone marrow morphology, automated image
+models, clinical prediction, bone marrow morphology, automated image
 analysis, learning curves, temporal validation, survival analysis,
 external validation}
 
@@ -165,12 +165,14 @@ how a model behaves as a hospital's database grows.
 The third timeline exposes a practical problem that the first two do
 not: a hospital that adopts a new protocol, or a centre that begins to
 collect structured data, starts with no local cases to learn from.
-Large language models (LLMs) can be queried zero-shot, drawing on
-clinical knowledge acquired during pretraining~\cite{[CITE:Phaterpekar2026]}.
+Large language models (LLMs) can be given a patient's data and asked
+for a judgement directly, drawing on clinical knowledge acquired during
+pretraining rather than on local cases~\cite{[CITE:Phaterpekar2026]}.
 On adult hospital data, language models have predicted readmission,
 mortality and other outcomes after domain pretraining, with temporal
-and prospective validation~\cite{[CITE:Jiang2023NYUTron]}, or zero-shot
-from tokenised patient timelines~\cite{[CITE:Renc2024ETHOS]}, and
+and prospective validation~\cite{[CITE:Jiang2023NYUTron]}, or without
+task-specific training from tokenised patient
+timelines~\cite{[CITE:Renc2024ETHOS]}, and
 LLM-extracted features from clinical notes have improved survival
 models in adult cancer~\cite{[CITE:Kiermeyer2026]}.
 With serialised structured data, however, the value of prompted LLMs
@@ -195,7 +197,7 @@ make it usable by both kinds of model: as variables for a trained
 model and, without passing any image, as a short report that an LLM
 reads alongside the clinical data.
 
-It therefore remains unclear how much local data a zero-shot LLM is
+It therefore remains unclear how much local data an LLM's judgement is
 worth, for which decisions it suffices, whether it remains useful once
 a case database has accrued or when a model is moved to another
 hospital, and whether information that the structured record leaves
@@ -208,8 +210,9 @@ targets map onto the target timeline, and enrolment year defines the
 data-accumulation timeline.
 Every target is predicted before the first MRD assessment, so MRD is
 always an outcome and never an input.
-We compare an ensemble of five zero-shot LLMs (Phase~1) with decision
-trees, random forests and random survival forests trained on the
+We compare an ensemble of five LLMs, each asked for a prediction from
+the patient's data (Phase~1), with decision trees, random forests and
+random survival forests trained on the
 growing case database under temporal splits (Phase~2), add to both an
 automated morphology profile of the Day-1 marrow smear, test both on
 an external cohort from two hospitals without retraining, and add a
@@ -230,7 +233,7 @@ reports and passed to the LLMs as a short text report, with which the
 LLM ensemble improved for all six targets (for example, AUROC 0.93 to
 0.95 for Final Risk and 0.78 to 0.81 for day-19 MRD, and C-index 0.68
 to 0.71 for EFS).
-(\textit{iii})~A quantification of the value of zero-shot LLMs relative
+(\textit{iii})~A quantification of the value of LLM judgement relative
 to accumulating local data: the LLM ensemble matched random forests
 trained on about 50 and 100 local patients for Final Risk and day-19
 MRD, was not reached for EFS and OS by locally trained survival
@@ -257,6 +260,8 @@ evaluated on the same features.
 Temporal split: training and test sets separated by calendar time.
 External cohort: outcome prediction evaluated on a cohort from other
 institutions.
+LLM prediction: predictions obtained by prompting a large language
+model with patient data, without training on local cases.
 Learning curve: performance compared with models trained on
 different amounts of local data.
 Retrieval: retrieval of similar cases or external knowledge.}
@@ -266,7 +271,7 @@ Retrieval: retrieval of similar cases or external knowledge.}
 \setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{6.0cm}*{9}{c}@{}}
 \toprule
-\textbf{Family of prior work} & \rotatebox{90}{\textbf{Paediatric ALL}} & \rotatebox{90}{\textbf{Time-ordered features}} & \rotatebox{90}{\textbf{Marrow morphology}} & \rotatebox{90}{\textbf{Classif.\ + survival}} & \rotatebox{90}{\textbf{Temporal split}} & \rotatebox{90}{\textbf{External cohort}} & \rotatebox{90}{\textbf{Zero-shot LLM}} & \rotatebox{90}{\textbf{Learning curve}} & \rotatebox{90}{\textbf{Retrieval}} \\
+\textbf{Family of prior work} & \rotatebox{90}{\textbf{Paediatric ALL}} & \rotatebox{90}{\textbf{Time-ordered features}} & \rotatebox{90}{\textbf{Marrow morphology}} & \rotatebox{90}{\textbf{Classif.\ + survival}} & \rotatebox{90}{\textbf{Temporal split}} & \rotatebox{90}{\textbf{External cohort}} & \rotatebox{90}{\textbf{LLM prediction}} & \rotatebox{90}{\textbf{Learning curve}} & \rotatebox{90}{\textbf{Retrieval}} \\
 \midrule
 Protocol risk rules and MRD studies~\cite{[CITE:Schultz2007],[CITE:Borowitz2008],[CITE:Conter2010]} & $\checkmark$ & ($\checkmark$) & -- & -- & -- & -- & -- & -- & -- \\
 Cox nomograms and risk scores~\cite{[CITE:Mao2020],[CITE:Zhang2020],[CITE:He2022],[CITE:Sang2026],[CITE:Liu2022TALL],[CITE:Chen2025FrontPediatr]} & $\checkmark$ & -- & -- & -- & -- & -- & -- & -- & -- \\
