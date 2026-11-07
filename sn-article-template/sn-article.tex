@@ -51,9 +51,9 @@ are usually trained on a hospital's own historical cases, yet a
 hospital that adopts a new protocol starts with none, and the
 diagnostic marrow smear, examined in every patient, rarely enters such
 models.
-We ask how much local data the judgement of a large language model
-(LLM), which needs no training cases, is worth along the clinical
-timeline, and what automatically measured marrow morphology adds.
+We ask how much local data a large language model (LLM) is worth along
+the clinical timeline, and what automatically measured marrow
+morphology adds.
 In 301 patients split by enrolment year and 41 external patients from
 two hospitals, we predicted Final Risk, day-19 and day-46 minimal
 residual disease (MRD), relapse, event-free survival (EFS) and overall
@@ -63,9 +63,8 @@ Cell size, cytoplasm, chromatin, nucleoli and vacuoles were measured
 automatically on the Day-1 smear, checked against haematologists'
 reports, and given to the LLMs as a short text report, without images,
 and to random forests and random survival forests as variables.
-An equal-weight ensemble of five LLMs, each given the patient's data
-and asked for a prediction, matched random forests trained on about 50
-local patients for Final Risk and 100 for day-19 MRD.
+An equal-weight ensemble of five LLMs matched random forests trained on
+about 50 local patients for Final Risk and 100 for day-19 MRD.
 Morphology raised the ensemble's discrimination for all six targets,
 to AUROC 0.95 for Final Risk and 0.81 for day-19 MRD, on par with
 fully trained forests (0.95 and 0.84), and to C-indices of 0.71 for
@@ -165,14 +164,12 @@ how a model behaves as a hospital's database grows.
 The third timeline exposes a practical problem that the first two do
 not: a hospital that adopts a new protocol, or a centre that begins to
 collect structured data, starts with no local cases to learn from.
-Large language models (LLMs) can be given a patient's data and asked
-for a judgement directly, drawing on clinical knowledge acquired during
-pretraining rather than on local cases~\cite{[CITE:Phaterpekar2026]}.
+Large language models (LLMs) have been used to predict cancer survival
+from initial oncology consultation documents~\cite{[CITE:Phaterpekar2026]}.
 On adult hospital data, language models have predicted readmission,
 mortality and other outcomes after domain pretraining, with temporal
-and prospective validation~\cite{[CITE:Jiang2023NYUTron]}, or without
-task-specific training from tokenised patient
-timelines~\cite{[CITE:Renc2024ETHOS]}, and
+and prospective validation~\cite{[CITE:Jiang2023NYUTron]}, or from
+tokenised patient timelines~\cite{[CITE:Renc2024ETHOS]}, and
 LLM-extracted features from clinical notes have improved survival
 models in adult cancer~\cite{[CITE:Kiermeyer2026]}.
 With serialised structured data, however, the value of prompted LLMs
@@ -197,8 +194,8 @@ make it usable by both kinds of model: as variables for a trained
 model and, without passing any image, as a short report that an LLM
 reads alongside the clinical data.
 
-It therefore remains unclear how much local data an LLM's judgement is
-worth, for which decisions it suffices, whether it remains useful once
+It therefore remains unclear how much local data an LLM is worth, for
+which decisions it suffices, whether it remains useful once
 a case database has accrued or when a model is moved to another
 hospital, and whether information that the structured record leaves
 out, such as marrow morphology, adds to it.
@@ -210,9 +207,8 @@ targets map onto the target timeline, and enrolment year defines the
 data-accumulation timeline.
 Every target is predicted before the first MRD assessment, so MRD is
 always an outcome and never an input.
-We compare an ensemble of five LLMs, each asked for a prediction from
-the patient's data (Phase~1), with decision trees, random forests and
-random survival forests trained on the
+We compare an ensemble of five LLMs (Phase~1) with decision trees,
+random forests and random survival forests trained on the
 growing case database under temporal splits (Phase~2), add to both an
 automated morphology profile of the Day-1 marrow smear, test both on
 an external cohort from two hospitals without retraining, and add a
@@ -233,8 +229,8 @@ reports and passed to the LLMs as a short text report, with which the
 LLM ensemble improved for all six targets (for example, AUROC 0.93 to
 0.95 for Final Risk and 0.78 to 0.81 for day-19 MRD, and C-index 0.68
 to 0.71 for EFS).
-(\textit{iii})~A quantification of the value of LLM judgement relative
-to accumulating local data: the LLM ensemble matched random forests
+(\textit{iii})~A quantification of the value of LLMs relative to
+accumulating local data: the LLM ensemble matched random forests
 trained on about 50 and 100 local patients for Final Risk and day-19
 MRD, was not reached for EFS and OS by locally trained survival
 forests at any training size, nor with morphology added, and kept its
@@ -260,8 +256,8 @@ evaluated on the same features.
 Temporal split: training and test sets separated by calendar time.
 External cohort: outcome prediction evaluated on a cohort from other
 institutions.
-LLM prediction: predictions obtained by prompting a large language
-model with patient data, without training on local cases.
+LLM prediction: outcomes predicted by prompting a large language model
+with patient data.
 Learning curve: performance compared with models trained on
 different amounts of local data.
 Retrieval: retrieval of similar cases or external knowledge.}
@@ -321,9 +317,8 @@ assessment.
 MRD values are therefore never used as inputs, and every prediction is
 made before treatment response is known, when therapy could still be
 adapted.
-At each level we compare an equal-weight ensemble of five zero-shot
-LLMs (GPT-6.1-Sol, Gemini-4-Argon, Gemma-4-31B-it, InternVL3.5-30B-A3B
-and Qwen3.6-35B-A3B), which uses no training data, with random forests
+At each level we compare an equal-weight ensemble of five LLMs (GPT-6.1-Sol, Gemini-4-Argon, Gemma-4-31B-it, InternVL3.5-30B-A3B
+and Qwen3.6-35B-A3B) with random forests
 (RF) and random survival forests (RSF) trained on patients from earlier
 enrolment years.
 The primary internal test set is the 2018--19 enrolment cohort
@@ -405,8 +400,8 @@ input.
 \textbf{b,}~Trained models learn from earlier enrolment years and are
 tested on later years (three temporal splits) and, without retraining,
 on an external cohort from two hospitals.
-\textbf{c,}~At each level, predictions come either from five zero-shot
-LLMs, combined by equal-weight averaging, or from decision trees,
+\textbf{c,}~At each level, predictions come either from five LLMs,
+combined by equal-weight averaging, or from decision trees,
 random forests and random survival forests trained on the accumulating
 case database; retrieval of similar past cases revises the trained
 models' probabilities and grounds an LLM-generated clinical narrative.}
@@ -453,9 +448,7 @@ available, and 0.68 for EFS at $\mathcal{F}_6$, when cytogenetics
 entered.
 Without MRD, which dominates prognosis in contemporary
 protocols~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}, the trained
-models had little signal to learn from local events, whereas the LLMs
-could draw on prior knowledge of how the diagnostic features relate to
-outcome.
+models had little signal to learn from the few local events.
 
 \textbf{Relapse and D46 MRD remain close to chance.}
 With clinical features alone, neither approach exceeded an AUROC of
@@ -468,8 +461,8 @@ Tables~\ref{tab:phase1_full}--\ref{tab:phase2_ext}.
 \includegraphics[width=\textwidth]{fig2_when_predictable}
 \caption{\textbf{What becomes predictable, and when.}
 Discrimination of each target at each feature level ($\mathcal{F}_1$--$\mathcal{F}_6$,
-with the day on which the level becomes available) for the zero-shot
-LLM ensemble (\textbf{a}, \textbf{b}) and for trained random forests
+with the day on which the level becomes available) for the LLM
+ensemble (\textbf{a}, \textbf{b}) and for trained random forests
 (classification) or random survival forests (survival)
 (\textbf{c}, \textbf{d}), in the internal 2018--19 test set
 (\textbf{a}, \textbf{c}; trained on 2015--17) and in the external
@@ -481,7 +474,7 @@ MRD-positive external patient).}
 \end{figure}
 
 %%--------------------------------------------------------------%%
-\subsection{Automated marrow morphology adds to the zero-shot LLMs}
+\subsection{Automated marrow morphology improves the LLM ensemble}
 \label{sec:morph_results}
 %%--------------------------------------------------------------%%
 
@@ -510,17 +503,16 @@ The trained models gained less: with morphology, the random forests
 reached 0.953 for Final Risk and 0.842 for D19 MRD, and the survival
 forest 0.607 for OS, within 0.01 of their clinical-only values, while
 for D46 MRD, relapse and EFS they stayed below them.
-An LLM can read a short morphology report with prior knowledge of
-what large, vacuolated or cytoplasm-poor blasts imply, whereas a
-forest has to learn the role of 10 to 17 additional variables from 186
-training patients.
+For a forest, morphology adds 10 to 17 variables whose role has to be
+learned from 186 training patients; the LLMs receive the same
+information as a short report.
 
 %%--------------------------------------------------------------%%
-\subsection{How many local patients is a zero-shot LLM worth?}
+\subsection{How many local patients is an LLM worth?}
 \label{sec:worth}
 %%--------------------------------------------------------------%%
 
-To quantify the value of zero-shot LLMs relative to local data, we
+To quantify the value of the LLMs relative to local data, we
 retrained RF and RSF on random subsets of $m$ patients from the
 2015--17 training years and evaluated them on the same 2018--19 test
 patients as the LLM ensemble (Fig.~\ref{fig:worth}; 20 repeats per
@@ -543,9 +535,8 @@ With clinical features alone the differences pointed the same way
 significant), as did the survival differences in the earlier split
 trained on 2015--16 (EFS $+0.052$, OS $+0.064$) and, for EFS, in the
 2019 test set ($+0.051$; Supplementary Table~\ref{tab:supp_decision}).
-The OS training sets contained only 8 and 13 deaths, so a model that
-must learn from local events has little to learn from, whereas the
-LLMs bring prognostic knowledge from pretraining.
+The OS training sets contained only 8 and 13 deaths, which leaves a
+trained model little to learn from.
 
 For Final Risk, neither approach went beyond Initial Risk.
 With clinical features, the LLM ensemble and the RF assigned the
@@ -559,14 +550,14 @@ Day-46 MRD results.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{fig3_learning_curves}
-\caption{\textbf{How many local patients a zero-shot LLM ensemble is
+\caption{\textbf{How many local patients an LLM ensemble is
 worth.}
 Random forests (AUROC) and random survival forests (C-index) were
 trained on $m$ patients drawn at random from the 2015--17 enrolment
 years (20 repeats per size; line, mean; band, 10th--90th percentile)
 and evaluated on the 2018--19 test patients at the decision level
 $\mathcal{F}_6$.
-The blue line and band show the zero-shot LLM ensemble on the same
+The blue line and band show the LLM ensemble on the same
 patients (95\% bootstrap CI).
 Dashed lines mark the training size at which the trained model's mean
 reaches the LLM ensemble.
@@ -576,7 +567,7 @@ and OS the trained model stays below the LLM ensemble at every size.}
 \end{figure}
 
 \begin{table}[t]
-\caption{\textbf{Zero-shot LLM ensemble versus locally trained models,
+\caption{\textbf{LLM ensemble versus locally trained models,
 with and without marrow morphology.}
 All predictions use data available by Day~7--10, before any MRD
 assessment: clinical features at $\mathcal{F}_6$ (LLM, Trained) and,
@@ -588,7 +579,7 @@ are given in Supplementary Table~\ref{tab:morph_config}.
 Internal: 2018--19 enrolment test set (Split~2; models trained on
 2015--17). External: two hospitals (models trained on all internal
 patients; clinical features only).
-LLM, equal-weight ensemble of five zero-shot LLMs; Trained, random
+LLM, equal-weight ensemble of five LLMs; Trained, random
 forest (classification) or random survival forest (survival).
 AUROC for Final Risk, D19 MRD, D46 MRD and relapse; Harrell's C-index
 for EFS and OS. $\Delta$, LLM ensemble minus trained model (internal:
@@ -670,7 +661,7 @@ Fig.~\ref{fig:external}b--e).
 \includegraphics[width=\textwidth]{fig4_external_km}
 \caption{\textbf{Internal versus external performance.}
 \textbf{a,}~Discrimination at the decision level (95\% bootstrap CI)
-for the zero-shot LLM ensemble and trained random forests or random
+for the LLM ensemble and trained random forests or random
 survival forests, in the internal 2018--19 test set (filled) and the
 external cohort (open). External D46 MRD (one positive patient) is
 omitted; external D19 MRD (four positives) and relapse (confounded with
@@ -716,8 +707,7 @@ By aligning six clinical decisions with the timelines along which data
 are acquired and accumulate, we found that this assumption matters
 less than expected for several of them.
 Predicting every decision at the end of diagnostic work-up, before any
-MRD result, a zero-shot ensemble of five LLMs using no local data
-matched random forests trained on about 50 and 100 local patients for
+MRD result, an ensemble of five LLMs matched random forests trained on about 50 and 100 local patients for
 Final Risk and D19 MRD.
 For EFS and OS it was not reached by survival forests trained on any
 available number of local patients, and it kept its discrimination at
@@ -728,7 +718,7 @@ given to the LLMs as text, improved the ensemble for every target and
 brought it level with fully trained random forests for Final Risk,
 whereas the same measures added little to the trained models.
 
-\textbf{When a zero-shot LLM suffices.}
+\textbf{When an LLM suffices.}
 These results help reconcile two apparently conflicting lines of
 evidence.
 Prompted LLMs have outperformed conventional models trained on ten
@@ -741,8 +731,8 @@ available for training.
 The LLMs' advantage is largest where local events are scarce and where
 the case mix shifts, the two situations in which a locally trained
 model has least to learn from or most to unlearn.
-In practice, a centre starting a new protocol could use a zero-shot LLM
-ensemble, with the automated morphology report, for survival risk from
+In practice, a centre starting a new protocol could use an LLM ensemble,
+with the automated morphology report, for survival risk from
 the first patient, and move to, or
 combine it with, locally trained models for the classification targets
 once 50 to 100 cases have accrued.
@@ -753,7 +743,7 @@ over trained models once a modest case database existed, and for Final
 Risk neither approach went beyond Initial Risk alone.
 Decisions that are defined by a stratification protocol are better
 implemented as explicit logic than predicted by a language model.
-The value of zero-shot LLMs lies instead in outcomes that no rule
+The value of the LLMs lies instead in outcomes that no rule
 defines—survival and, to a lesser extent, early treatment response.
 
 \textbf{Morphology as text.}
@@ -768,13 +758,9 @@ percentile within its imaging batch put batches with different
 staining and image acquisition on a common scale without retraining;
 and a text-only model can use the report at a cost of a few hundred
 tokens per patient.
-The LLMs could also relate the measures to outcome through prior
-knowledge: large, vacuolated or cytoplasm-poor blasts carry a meaning
-that a forest trained on 186 patients has to learn from the data.
-This matches the pattern of the main comparison: prior knowledge is
-most useful where local data are scarce, and an automated morphology
-report extends it to information that the structured record does not
-contain.
+A forest, by contrast, has to learn the role of each added variable
+from 186 training patients, which may explain why the same measures
+helped the trained models little.
 
 \textbf{MRD and the limits of routine data.}
 Because all predictions were made before treatment response was
@@ -783,9 +769,7 @@ In this setting the trained survival forests stayed at C-indices of
 0.50 to 0.65, consistent with the established role of MRD, which our
 design withholds, as the dominant prognostic
 factor~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}; the LLM ensemble
-reached 0.68 to 0.71, and 0.71 to 0.72 with morphology, suggesting
-that prior knowledge of how Initial Risk, cytogenetics and blast
-morphology relate to outcome can partly substitute for local events.
+reached 0.68 to 0.71, and 0.71 to 0.72 with morphology.
 Relapse and D46 MRD remained the hardest targets: with clinical
 features they were near chance at every level, and with morphology the
 LLM ensemble reached AUROCs of 0.66 and 0.67, consistent with the
@@ -834,7 +818,7 @@ contains only 17 patients, and no correction was made for multiple
 comparisons.
 All predictions were made before MRD assessment; we did not study how
 they should be updated once MRD results become available.
-The LLMs were used zero-shot with fixed prompts; their outputs may
+The LLMs were used with fixed prompts; their outputs may
 change with model versions, the two proprietary models were queried
 with their providers' default decoding settings and are therefore not
 strictly deterministic, and fine-tuning or few-shot prompting might
@@ -1008,7 +992,7 @@ descriptor with its label as the AUROC averaged over imaging batches,
 so that batch differences cannot contribute (95\% CI from 1,000
 bootstrap resamples).
 
-\subsection{Phase~1: LLM zero-shot inference}\label{sec:llm_inference}
+\subsection{Phase~1: LLM inference}\label{sec:llm_inference}
 
 For classification tasks, each patient's features were serialised into a
 key--value list and presented with a task-specific system prompt
@@ -1089,8 +1073,8 @@ site-specific fine-tuning was performed.
 DT and RF were trained on the full internal set using the same
 preprocessing pipeline (Eq.~\ref{eq:zscore}).
 RSF was trained identically.
-For Phase~1 LLM evaluation, no training was involved; the same
-zero-shot prompts were applied to external patient feature vectors.
+For Phase~1, the same prompts were applied to the external patients'
+features.
 
 \subsection{Decision levels, learning curves and protocol baseline}\label{sec:comparison}
 
@@ -1288,7 +1272,7 @@ cross-validation; Temp.~temporal split; Ext.~independent external
 cohort; Prosp.~prospective deployment; $^\ddagger$~the set described
 as independent or external comes from the same source; $^\S$~the
 external cohort was not used to evaluate outcome prediction.
-LLM: ZS~zero-shot prompting or generation; FT~domain-pretrained or
+LLM: Pr~prompted prediction or generation; FT~domain-pretrained or
 fine-tuned language model; RAG~retrieval augmentation.}
 \label{tab:related_full}
 \centering
@@ -1322,16 +1306,16 @@ Stoiber 2026~\cite{[CITE:Stoiber2026]} & T-ALL (1,309 + 228) & Multi-task networ
 \addlinespace[2pt]
 \multicolumn{8}{@{}l}{\textit{Language models and retrieval for clinical prediction (adult, non-leukaemia)}} \\
 Jiang 2023~\cite{[CITE:Jiang2023NYUTron]} & Adult inpatients & Clinical LM (NYUTron) & Notes & 5 tasks & $\checkmark$ & Temp. + Prosp. & FT \\
-Renc 2024~\cite{[CITE:Renc2024ETHOS]} & Adult (MIMIC-IV) & EHR transformer (ETHOS) & EHR events & Multiple$^\star$ & $\checkmark$ & Rand. & ZS \\
-Brown 2025~\cite{[CITE:Brown2025JAMIA]} & Adult (2 sites) & LLM vs boosted trees & EHR & 2 tasks & $\checkmark$ & CV, bootstrap & ZS, RAG \\
-Zhu 2026~\cite{[CITE:Zhu2026ClinicRealm]} & Adult (MIMIC, TJH) & LLM vs ML (ClinicRealm) & EHR & 3 tasks & $\checkmark$ & Rand. & ZS \\
-Chen 2026~\cite{[CITE:ClinicalBench2026]} & Adult (MIMIC) & LLM vs ML (ClinicalBench) & EHR codes as text & 3 tasks & $\checkmark$ & Rand. & ZS \\
-Chen 2026~\cite{[CITE:ChenPSB2026]} & Adult ED (87,112) & LLM vs LightGBM & EHR, Notes & ED revisit & $\checkmark$ & Temp. & ZS, RAG \\
+Renc 2024~\cite{[CITE:Renc2024ETHOS]} & Adult (MIMIC-IV) & EHR transformer (ETHOS) & EHR events & Multiple$^\star$ & $\checkmark$ & Rand. & Pr \\
+Brown 2025~\cite{[CITE:Brown2025JAMIA]} & Adult (2 sites) & LLM vs boosted trees & EHR & 2 tasks & $\checkmark$ & CV, bootstrap & Pr, RAG \\
+Zhu 2026~\cite{[CITE:Zhu2026ClinicRealm]} & Adult (MIMIC, TJH) & LLM vs ML (ClinicRealm) & EHR & 3 tasks & $\checkmark$ & Rand. & Pr \\
+Chen 2026~\cite{[CITE:ClinicalBench2026]} & Adult (MIMIC) & LLM vs ML (ClinicalBench) & EHR codes as text & 3 tasks & $\checkmark$ & Rand. & Pr \\
+Chen 2026~\cite{[CITE:ChenPSB2026]} & Adult ED (87,112) & LLM vs LightGBM & EHR, Notes & ED revisit & $\checkmark$ & Temp. & Pr, RAG \\
 Datta 2026~\cite{[CITE:Datta2026]} & Adult ICU (MIMIC-III) & LLM + ML (KAMELEON) & EHR, Notes, KG & 2 tasks$^\star$ & part. & Rand. & FT, RAG \\
 Zhu 2024~\cite{[CITE:Zhu2024EMERGE]} & Adult ICU (MIMIC) & LLM + fusion (EMERGE) & EHR, Notes, KG & 2 tasks & $\checkmark$ & Rand. & RAG \\
-Kiermeyer 2026~\cite{[CITE:Kiermeyer2026]} & Adult cancer (3,522) & LLM features + RSF & Notes, TNM & OS & $\checkmark$ & CV & ZS \\
+Kiermeyer 2026~\cite{[CITE:Kiermeyer2026]} & Adult cancer (3,522) & LLM features + RSF & Notes, TNM & OS & $\checkmark$ & CV & Pr \\
 \midrule
-\textbf{This work} & Paed.\ ALL (301 + 41) & LLMs; DT/RF/RSF; RAG & Clin, Flow, Cyto, Morph & 6 targets$^\star$ & nested & Temp. + Ext. & ZS, RAG \\
+\textbf{This work} & Paed.\ ALL (301 + 41) & LLMs; DT/RF/RSF; RAG & Clin, Flow, Cyto, Morph & 6 targets$^\star$ & nested & Temp. + Ext. & Pr, RAG \\
 \bottomrule
 \end{tabular}
 \end{sidewaystable}
@@ -1422,7 +1406,7 @@ M3 & 46,964 / 293 & 16 percentiles: median size in red-cell diameters and its co
 \clearpage
 
 \begin{sidewaystable}
-\caption{\textbf{Zero-shot LLM ensemble versus trained models at the
+\caption{\textbf{LLM ensemble versus trained models at the
 decision level $\mathcal{F}_6$ in every test set.}
 AUROC (classification) or Harrell's C-index (survival) with 95\%
 bootstrap CI (2,000 resamples), followed by balanced accuracy (BA; LLM
@@ -1571,7 +1555,7 @@ Irregular nucleus & Nuclear solidity & 157 / 184 & 0.48 [0.29, 0.59] & no \\
 \clearpage
 
 \begin{table}[!t]
-\caption{\textbf{Phase~1 LLM zero-shot performance across all six clinical feature levels and six prediction targets (internal cohort; classification $n=298$ patients with all four labels, survival $n=301$).} Each cell is the balanced accuracy (BA; classification targets) or Harrell's concordance index (survival targets) for one LLM at one feature level; \textbf{bold} marks each model's best feature level for that target (column maximum; ties all bolded). BA is computed from the parsed categorical prediction (equivalently, the AUROC of the binary prediction); patients without a valid answer from a model (at most 20) are excluded from that model's estimate. GPT, GPT-6.1-Sol; Arg., Gemini-4-Argon; Gma., Gemma-4-31B-it; Int., InternVL3.5-30B-A3B; Qw., Qwen3.6-35B-A3B.}
+\caption{\textbf{Phase~1 LLM performance across all six clinical feature levels and six prediction targets (internal cohort; classification $n=298$ patients with all four labels, survival $n=301$).} Each cell is the balanced accuracy (BA; classification targets) or Harrell's concordance index (survival targets) for one LLM at one feature level; \textbf{bold} marks each model's best feature level for that target (column maximum; ties all bolded). BA is computed from the parsed categorical prediction (equivalently, the AUROC of the binary prediction); patients without a valid answer from a model (at most 20) are excluded from that model's estimate. GPT, GPT-6.1-Sol; Arg., Gemini-4-Argon; Gma., Gemma-4-31B-it; Int., InternVL3.5-30B-A3B; Qw., Qwen3.6-35B-A3B.}
 \label{tab:phase1_full}
 \centering
 \footnotesize
@@ -1610,7 +1594,7 @@ $\mathcal{F}_6$ & \textbf{0.567} & 0.547 & 0.539 & 0.523 & 0.510 & $\mathcal{F}_
 \clearpage
 
 \begin{table}[p]
-\caption{\textbf{Phase~1 LLM zero-shot on the pooled external cohort, all feature levels} (GPT, GPT-6.1-Sol; Arg., Gemini-4-Argon; Gma., Gemma-4-31B-it; Int., InternVL3.5-30B-A3B; Qw., Qwen3.6-35B-A3B). The two source hospitals are pooled into a single external cohort ($n$=41 for survival; classification targets use the $n$=29 subset with available labels). Classification: BA ($^*$~= accuracy; D46MRD has only one positive class after pooling, so accuracy is reported instead). Survival (EFS, OS): C-index. \textbf{Bold}: best feature level per column within each task block (ties all bolded). External pooled cohort; exploratory, indicative only.}
+\caption{\textbf{Phase~1 LLMs on the pooled external cohort, all feature levels} (GPT, GPT-6.1-Sol; Arg., Gemini-4-Argon; Gma., Gemma-4-31B-it; Int., InternVL3.5-30B-A3B; Qw., Qwen3.6-35B-A3B). The two source hospitals are pooled into a single external cohort ($n$=41 for survival; classification targets use the $n$=29 subset with available labels). Classification: BA ($^*$~= accuracy; D46MRD has only one positive class after pooling, so accuracy is reported instead). Survival (EFS, OS): C-index. \textbf{Bold}: best feature level per column within each task block (ties all bolded). External pooled cohort; exploratory, indicative only.}
 \label{tab:phase1_ext}
 \centering
 \footnotesize
