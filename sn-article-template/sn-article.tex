@@ -54,8 +54,9 @@ models.
 We ask how much local data a large language model (LLM) is worth along
 the clinical timeline, and what automatically measured marrow
 morphology adds.
-In 301 patients split by enrolment year and 41 external patients from
-two hospitals, we predicted Final Risk, day-19 and day-46 minimal
+In 301 patients split by enrolment year, a routine external cohort of
+20 patients and an external cohort of 21 patients who all relapsed, we
+predicted Final Risk, day-19 and day-46 minimal
 residual disease (MRD), relapse, event-free survival (EFS) and overall
 survival (OS) from six nested feature sets available before any MRD
 assessment.
@@ -70,9 +71,11 @@ to AUROC 0.95 for Final Risk and 0.81 for day-19 MRD, on par with
 fully trained forests (0.95 and 0.84), and to C-indices of 0.71 for
 EFS and 0.72 for OS, against at most 0.61 for survival forests with or
 without morphology.
-At the external hospitals the survival forests lost discrimination
-(EFS 0.44, OS 0.54) whereas the LLM ensemble did not (0.69 and 0.84;
-$P<0.01$, and $P<0.05$ within hospitals).
+In the relapse cohort, both approaches flagged only a minority of
+the children at diagnosis (29\% and 38\%), but the LLM ensemble
+ordered the time to relapse and to death (C-index 0.67 and 0.83)
+whereas the survival forests did not (0.40 and 0.57; $P<0.01$ and
+$P<0.05$).
 LLMs that read routine data and an automated morphology report are
 therefore a credible starting point before local data
 accrue, and remain complementary afterwards.
@@ -210,8 +213,9 @@ always an outcome and never an input.
 We compare an ensemble of five LLMs (Phase~1) with decision trees,
 random forests and random survival forests trained on the
 growing case database under temporal splits (Phase~2), add to both an
-automated morphology profile of the Day-1 marrow smear, test both on
-an external cohort from two hospitals without retraining, and add a
+automated morphology profile of the Day-1 marrow smear, test both
+without retraining on two external cohorts, a routine series and a
+series in which every patient relapsed, and add a
 retrieval-based belief revision that uses the accumulated cases to
 revise model probabilities and to ground LLM-generated clinical
 narratives.
@@ -233,9 +237,9 @@ to 0.71 for EFS).
 accumulating local data: the LLM ensemble matched random forests
 trained on about 50 and 100 local patients for Final Risk and day-19
 MRD, was not reached for EFS and OS by locally trained survival
-forests at any training size, nor with morphology added, and kept its
-survival discrimination at two external hospitals where the trained
-models lost theirs.
+forests at any training size, nor with morphology added, and, in an
+external cohort in which every patient relapsed, ordered the time to
+relapse and to death where the trained survival forests did not.
 (\textit{iv})~A retrieval-based belief revision extended to censored
 survival outcomes, with LLM-generated narratives for physician review.
 
@@ -297,13 +301,15 @@ Prediction targets span the treatment timeline: Day~19 MRD positivity
 Final Risk (LR versus IR/HR; 159 LR, 142 IR/HR), relapse (44 of 301,
 14.6\%), event-free survival (EFS; relapse, induction failure or death;
 75 events, 24.9\%) and overall survival (OS; 24 deaths, 8.0\%).
-The external cohort pooled 41 patients from two hospitals: Lianyungang
-First People's Hospital (20 patients, diagnosed 2019--2023) and
-Children's Hospital of Fudan University, Shanghai (21 patients,
-2017--2021).
-The Fudan patients form a relapse-enriched referral series in which
-every patient relapsed, so the pooled external relapse rate (23 of 41)
-is far above that of an unselected ALL population.
+Two external hospitals provided separate cohorts.
+The Lianyungang cohort (Lianyungang First People's Hospital, 20
+patients diagnosed 2019--2023) is a routine series with two
+relapses.
+The Fudan relapse cohort (Children's Hospital of Fudan University,
+Shanghai, 21 patients, 2017--2021) is a referral series in which every
+patient relapsed; we use it to ask whether relapse can be anticipated
+at diagnosis, and whether the predicted risk orders the time to relapse
+and death after relapse.
 No external data were used for training.
 
 Figure~\ref{fig:overview} summarises the design.
@@ -334,46 +340,50 @@ An automated pipeline segmented the nucleated cells on the smear
 images, measured their size, cytoplasm, chromatin, nucleoli and
 vacuoles, and summarised them per patient as a morphology profile.
 The profile rests on 46,964 cells (median 135 per patient) and was
-available for 293 of the 300 internal patients in the temporal splits.
+available for 293 of the 300 internal patients in the temporal splits
+and for 40 of the 41 external patients.
 The LLMs received morphology as a short text report appended to the
 clinical features, never as images, and the trained models received
 the same measures as additional variables.
 Morphology-augmented predictions also use only data available by
 Day~7--10, before any MRD assessment.
-The pipeline was applied to the internal smears, so external
-comparisons use clinical features.
+The same pipeline was applied to the external smears, with
+percentiles computed within each hospital (Methods).
 
 \begin{table}[ht]
 \caption{Cohort characteristics and prediction target distributions.
-The External cohort pools patients from two independent hospitals
-(see Methods for site details).
+The two external cohorts come from different hospitals and are
+analysed separately (Methods).
 $\dagger$~patients with complete labels
 for all four classification targets.
 MRD percentages are of patients with a recorded value (internal
-D19MRD $n=299$, D46MRD $n=298$; external $n=29$ and $n=31$).}
+D19MRD $n=299$, D46MRD $n=298$; Lianyungang $n=8$ and $n=10$; Fudan
+$n=21$ and $n=21$).}
 \label{tab:cohort}
 \centering
 \small
-\begin{tabular}{lcc}
+\begin{tabular}{lccc}
 \toprule
 \textbf{Characteristic}
-  & \textbf{Internal} ($n=301$)
-  & \textbf{External} ($n=41$) \\
+  & \textbf{Internal}
+  & \textbf{Lianyungang}
+  & \textbf{Fudan relapse} \\
+ & ($n=301$) & ($n=20$) & ($n=21$) \\
 \midrule
-Enrolment years & 2015--2019 & 2017--2023 \\
-B-ALL & 263 (87.4\%) & 38 (92.7\%) \\
-Patients with complete labels$^\dagger$ & 298 & 29 \\
+Enrolment years & 2015--2019 & 2019--2023 & 2017--2021 \\
+B-ALL & 263 (87.4\%) & 20 (100\%) & 18 (85.7\%) \\
+Patients with complete labels$^\dagger$ & 298 & 8 & 21 \\
 \midrule
-\multicolumn{3}{l}{\textit{Classification targets}} \\
-Final Risk: LR & 159 (52.8\%) & 17 (41.5\%) \\
-Final Risk: IR/HR & 142 (47.2\%) & 24 (58.5\%) \\
-Relapse: Yes & 44 (14.6\%) & 23 (56.1\%) \\
-D19MRD $\geq 1\%$ & 42 (14.0\%) & 4 \\
-D46MRD $\geq 0.01\%$ & 29 (9.7\%) & 1 \\
+\multicolumn{4}{l}{\textit{Classification targets}} \\
+Final Risk: LR & 159 (52.8\%) & 11 (55.0\%) & 6 (28.6\%) \\
+Final Risk: IR/HR & 142 (47.2\%) & 9 (45.0\%) & 15 (71.4\%) \\
+Relapse: Yes & 44 (14.6\%) & 2 (10.0\%) & 21 (100\%) \\
+D19MRD $\geq 1\%$ & 42 (14.0\%) & 0 & 4 (19.0\%) \\
+D46MRD $\geq 0.01\%$ & 29 (9.7\%) & 1 & 0 \\
 \midrule
-\multicolumn{3}{l}{\textit{Survival endpoints}} \\
-EFS events & 75 (24.9\%) & 24 (58.5\%) \\
-OS events & 24 (8.0\%) & 7 (17.1\%) \\
+\multicolumn{4}{l}{\textit{Survival endpoints}} \\
+EFS events & 75 (24.9\%) & 3 (15.0\%) & 21 (100\%) \\
+OS events & 24 (8.0\%) & 1 (5.0\%) & 6 (28.6\%) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -389,7 +399,8 @@ $\mathcal{F}_6$, before the first MRD assessment, so MRD is never an
 input.
 \textbf{b,}~Trained models learn from earlier enrolment years and are
 tested on later years (three temporal splits) and, without retraining,
-on an external cohort from two hospitals.
+on two external cohorts: the Lianyungang cohort and the Fudan relapse
+cohort, in which every patient relapsed.
 \textbf{c,}~At each level, predictions come either from five LLMs,
 combined by equal-weight averaging, or from decision trees,
 random forests and random survival forests trained on the accumulating
@@ -404,8 +415,9 @@ models' probabilities and grounds an LLM-generated clinical narrative.}
 %%--------------------------------------------------------------%%
 
 Figure~\ref{fig:when} shows discrimination for every target at every
-feature level, in the internal test set and at the external hospitals.
-Three patterns stand out.
+feature level, in the internal test set and in the two external
+cohorts.
+Four patterns stand out.
 
 \textbf{Final Risk is largely fixed by Initial Risk.}
 Trained RF reached an AUROC of 0.87 from white blood cell count and age
@@ -415,7 +427,8 @@ This follows from how Final Risk is defined.
 In our cohort Initial Risk alone reproduced Final Risk in 90.7\% of
 internal patients, and a three-condition rule—Initial Risk of IR or HR,
 D19 MRD $\geq 1\%$, or D46 MRD $\geq 0.01\%$—reproduced it in 299 of
-301 internal patients (99.3\%) and in 40 of 41 external patients.
+301 internal patients (99.3\%), in 19 of the 20 Lianyungang patients
+and in all 21 Fudan patients.
 At $\mathcal{F}_6$ both approaches performed close to Initial Risk
 alone (balanced accuracy 0.901 for the LLM ensemble and 0.899 for the
 RF, versus 0.906 in the 2018--19 test set).
@@ -452,14 +465,19 @@ Tables~\ref{tab:phase1_full}--\ref{tab:phase2_ext}.
 \caption{\textbf{What becomes predictable, and when.}
 Discrimination of each target at each feature level ($\mathcal{F}_1$--$\mathcal{F}_6$,
 with the day on which the level becomes available) for the LLM
-ensemble (\textbf{a}, \textbf{b}) and for trained random forests
+ensemble (\textbf{a}--\textbf{c}) and for trained random forests
 (classification) or random survival forests (survival)
-(\textbf{c}, \textbf{d}), in the internal 2018--19 test set
-(\textbf{a}, \textbf{c}; trained on 2015--17) and in the external
-cohort (\textbf{b}, \textbf{d}; trained on all internal patients).
+(\textbf{d}--\textbf{f}), in the internal 2018--19 test set
+(\textbf{a}, \textbf{d}; trained on 2015--17), the Lianyungang cohort
+(\textbf{b}, \textbf{e}) and the Fudan relapse cohort (\textbf{c},
+\textbf{f}) (both trained on all internal patients).
 Values are AUROC for Final Risk, D19 MRD, D46 MRD and relapse, and
-Harrell's C-index for EFS and OS. --, not evaluable (only one D46
-MRD-positive external patient).}
+Harrell's C-index for EFS and OS; in the Fudan relapse cohort, where
+every patient relapsed, relapse is shown as the share of patients
+predicted to relapse (italic), EFS measures the ordering of the time to
+relapse, and OS that of death after relapse.
+--, not evaluable (fewer than two positive patients or events:
+Lianyungang D19 MRD, D46 MRD and OS; Fudan D46 MRD).}
 \label{fig:when}
 \end{figure}
 
@@ -565,23 +583,25 @@ with morphology ($+$M), clinical features up to $\mathcal{F}_6$
 together with the Day-1 marrow-morphology features (LLM$+$M,
 Trained$+$M).
 The configuration used for each $+$M value is given in Supplementary
-Table~\ref{tab:morph_config}.
+Tables~\ref{tab:morph_config} and~\ref{tab:morph_config_ext}.
 Internal: 2018--19 enrolment test set (Split~2; models trained on
-2015--17). External: two hospitals (models trained on all internal
-patients; clinical features only).
+2015--17). Lianyungang (routine series, $n=20$) and Fudan (relapse
+cohort, $n=21$): external cohorts, models trained on all 301 internal
+patients.
 LLM, equal-weight ensemble of five LLMs; Trained, random
 forest (classification) or random survival forest (survival).
 AUROC for Final Risk, D19 MRD, D46 MRD and relapse; Harrell's C-index
-for EFS and OS. $\Delta$, LLM ensemble minus trained model (internal:
-LLM$+$M minus Trained$+$M; external: clinical features), with 95\%
+for EFS and OS (in the Fudan cohort, time to relapse and to death after
+relapse). $\Delta$, LLM$+$M minus Trained$+$M, with 95\%
 bootstrap CI (2,000 resamples); $^{*}p<0.05$.
 Equiv.\ $n$, number of local training patients at which the trained
 model's mean learning curve reaches the LLM ensemble (clinical
 features, Fig.~\ref{fig:worth}); $>$186, not reached with all 186
 training patients; n.a., both approaches near chance.
-$^{\dagger}$Four positive patients.
-$^{\ddagger}$Relapse status almost coincides with hospital of origin,
-because one hospital contributed only relapsed patients.
+$^{\S}$Every Fudan patient relapsed: share of patients predicted to
+relapse (detection rate), with $\Delta$ in percentage points; the
+detection rate has no specificity counterpart in this cohort
+(Supplementary Table~\ref{tab:relapse_detection}).
 Initial Risk alone reproduces Final Risk in 90.7\% of patients
 (Section~\ref{sec:when}).
 All test sets, balanced accuracies and sensitivity analyses for the
@@ -589,79 +609,121 @@ clinical features are in Supplementary Table~\ref{tab:supp_decision}.}
 \label{tab:main}
 \centering
 \footnotesize
-\setlength{\tabcolsep}{3.2pt}
+\setlength{\tabcolsep}{2.9pt}
 \begin{tabular}{@{}llcccccc@{}}
 \toprule
 \textbf{Target} & \textbf{Test set} & \textbf{LLM} & \textbf{LLM$+$M} & \textbf{Trained} & \textbf{Trained$+$M} & \textbf{$\Delta$ [95\% CI]} & \textbf{Equiv.\ $n$} \\
 \midrule
 Final Risk & Internal & 0.932 & 0.952 & 0.951 & 0.953 & $-$0.001 [$-$0.030, +0.024] & $\approx$49 \\
- & External & 0.842 & -- & 0.936 & -- & $-$0.094 [$-$0.265, +0.029] & \\
+ & Lianyungang & 0.859 & 0.934 & 0.939 & 0.889 & +0.045 [+0.000, +0.147] & \\
+ & Fudan & 0.850 & 0.900 & 0.944 & 0.978 & $-$0.078 [$-$0.194, +0.000] & \\
 \addlinespace[2pt]
 D19 MRD & Internal & 0.784 & 0.812 & 0.834 & 0.842 & $-$0.030 [$-$0.133, +0.057] & $\approx$103 \\
- & External & 0.455$^{\dagger}$ & -- & 0.350$^{\dagger}$ & -- & +0.105 [$-$0.178, +0.421] & \\
+ & Lianyungang & \multicolumn{5}{l}{not evaluable (no positive patient)} & \\
+ & Fudan & 0.419 & 0.404 & 0.478 & 0.551 & $-$0.147 [$-$0.509, +0.300] & \\
 \addlinespace[2pt]
 D46 MRD & Internal & 0.599 & 0.667 & 0.697 & 0.635 & +0.032 [$-$0.185, +0.242] & n.a. \\
- & External & \multicolumn{5}{l}{not evaluable (1 positive)} & \\
+ & Lianyungang & \multicolumn{5}{l}{not evaluable (1 positive patient)} & \\
+ & Fudan & \multicolumn{5}{l}{not evaluable (no positive patient)} & \\
 \addlinespace[2pt]
 Relapse & Internal & 0.631 & 0.663 & 0.623 & 0.613 & +0.051 [$-$0.164, +0.268] & n.a. \\
- & External & 0.652$^{\ddagger}$ & -- & 0.210$^{\ddagger}$ & -- & +0.442 [+0.160, +0.703]$^{*}$ & \\
+ & Lianyungang & 0.542 & 0.722 & 0.514 & 0.875 & $-$0.153 [$-$0.611, +0.316] & \\
+ & Fudan$^{\S}$ & 29\% & 33\% & 38\% & 71\% & $-$38 [$-$57, $-$19]$^{*}$ & \\
 \addlinespace[2pt]
 EFS & Internal & 0.682 & 0.705 & 0.599 & 0.575 & +0.130 [+0.000, +0.261] & $>$186 \\
- & External & 0.692 & -- & 0.435 & -- & +0.256 [+0.139, +0.403]$^{*}$ & \\
+ & Lianyungang & 0.786 & 0.810 & 0.762 & 0.738 & +0.071 [$-$0.047, +0.234] & \\
+ & Fudan & 0.665 & 0.702 & 0.404 & 0.591 & +0.111 [$-$0.080, +0.307] & \\
 \addlinespace[2pt]
 OS & Internal & 0.713 & 0.719 & 0.599 & 0.607 & +0.112 [$-$0.027, +0.264] & $>$186 \\
- & External & 0.843 & -- & 0.536 & -- & +0.307 [+0.104, +0.540]$^{*}$ & \\
+ & Lianyungang & \multicolumn{5}{l}{not evaluable (1 death)} & \\
+ & Fudan & 0.833 & 0.857 & 0.571 & 0.771 & +0.086 [$-$0.149, +0.299] & \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 %%--------------------------------------------------------------%%
-\subsection{Robustness at external hospitals}
+\subsection{External cohorts: a routine series and a relapse cohort}
 \label{sec:external}
 %%--------------------------------------------------------------%%
 
-Applied without retraining to the external cohort
-(Fig.~\ref{fig:external}a and Table~\ref{tab:main}), where only
-clinical features were used because morphology profiles were available
-for 13 of the 41 patients, the trained RSF lost discrimination for EFS
-(C-index 0.599 internally, 0.435 externally) and OS (0.599 and 0.536),
-whereas the LLM ensemble did not (EFS 0.682 and 0.692; OS 0.713 and
-0.843).
-The external differences were $+0.256$ (95\% CI 0.139 to 0.403) for
-EFS and $+0.307$ (0.104 to 0.540) for OS.
-Because one source hospital contributed only relapsed patients, we
-repeated the survival comparison counting only patient pairs from the
-same hospital; the LLM ensemble remained ahead (EFS 0.686 versus 0.465,
-difference $+0.220$, 0.072 to 0.411; OS 0.850 versus 0.626, $+0.224$,
-0.036 to 0.480).
-Final Risk transferred for both approaches (AUROC 0.842 for the LLM
-ensemble and 0.936 for the RF; difference not significant).
-The external D19 MRD, D46 MRD and relapse comparisons are not
-informative: they rest on four positive patients, one positive patient,
-and a relapse label that almost coincides with hospital of origin,
-respectively; the significant relapse difference (0.652 versus 0.210)
-therefore reflects the hospital mix rather than relapse prediction.
-Kaplan--Meier curves split at the median predicted risk separated EFS
-for the LLM ensemble internally (log-rank $p=0.008$) and externally
-($p=0.010$), but not for the RSF ($p=0.124$ and $p=0.799$;
-Fig.~\ref{fig:external}b--e).
+\textbf{Lianyungang cohort.}
+Applied without retraining to the 20 Lianyungang patients
+(Table~\ref{tab:main}, Fig.~\ref{fig:external}a), both approaches
+transferred for Final Risk (AUROC 0.859 for the LLM ensemble and 0.939
+for the RF; difference $-0.081$, 95\% CI $-0.238$ to 0.000) and EFS
+(C-index 0.786 and 0.762; $+0.024$, $-0.112$ to 0.137).
+With two relapses, three EFS events, one death and no D19
+MRD-positive patient, this routine series cannot test relapse, OS or
+MRD prediction; the relapse AUROCs (0.542 and 0.514) rest on two
+patients.
+It does show how the relapse rules behave outside the training
+hospital: at the decision level the RF predicted relapse for 16 of the
+18 patients who did not relapse, the LLM ensemble for 4
+(Supplementary Table~\ref{tab:relapse_detection}).
+
+\textbf{Fudan relapse cohort.}
+Every one of the 21 Fudan patients relapsed, so this cohort asks
+whether a high predicted risk at diagnosis identifies children who will
+relapse, and whether it orders when they relapse and die.
+At the decision level the LLM ensemble predicted relapse for 6 of the
+21 patients (29\%, 95\% CI 14\% to 50\%) and the RF for 8 (38\%, 21\%
+to 59\%; McNemar $p=0.73$), close to the sensitivities of the same
+rules in the internal 2018--19 test set (24\% and 41\%, at
+specificities of 89\% and 66\%; Supplementary
+Table~\ref{tab:relapse_detection}).
+From data available at diagnosis, neither approach therefore flagged
+most of the children who went on to relapse.
+The predicted risk did, however, order the events.
+The LLM ensemble ordered the time to relapse (C-index 0.665 versus
+0.404 for the RSF; difference $+0.261$, 95\% CI 0.077 to 0.462;
+$p=0.005$) and the time to death, all of which followed relapse (0.833
+versus 0.571; $+0.262$, 0.034 to 0.548; $p=0.028$).
+Split at the median predicted risk, the children the LLM ensemble
+placed at higher risk relapsed earlier (log-rank $p=0.037$;
+Fig.~\ref{fig:external}c), whereas the RSF's higher-risk group relapsed
+later (C-index below 0.5; $p=0.078$; Fig.~\ref{fig:external}e).
+Final Risk transferred for both approaches (AUROC 0.850 and 0.944),
+and D19 MRD, with four positive patients, was near or below chance for
+both (0.419 and 0.478).
+
+\textbf{Morphology at the external hospitals.}
+The morphology pipeline produced profiles for 19 of the 20 Lianyungang
+and all 21 Fudan patients (Methods).
+With morphology, the LLM ensemble rose in seven of the eight evaluable
+external comparisons, for example Final Risk from 0.859 to 0.934 in
+Lianyungang and the time to relapse from 0.665 to 0.702 and to death
+from 0.833 to 0.857 in Fudan (Supplementary
+Table~\ref{tab:morph_config_ext}).
+The survival forests gained more in the Fudan cohort (time to relapse
+0.404 to 0.591, death 0.571 to 0.771), so that with morphology the LLM
+ensemble stayed ahead but no longer significantly ($+0.111$, $-0.080$
+to 0.307; $+0.086$, $-0.149$ to 0.299; Table~\ref{tab:main}).
+With morphology the RF predicted relapse for 15 of the 21 Fudan
+patients (71\%) and the LLM ensemble for 7 (33\%); because this cohort
+has no patient without relapse, a higher detection rate here cannot be
+separated from a higher rate of flagging in general.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{fig4_external_km}
 \caption{\textbf{Internal versus external performance.}
-\textbf{a,}~Discrimination at the decision level (95\% bootstrap CI)
-for the LLM ensemble and trained random forests or random
-survival forests, in the internal 2018--19 test set (filled) and the
-external cohort (open). External D46 MRD (one positive patient) is
-omitted; external D19 MRD (four positives) and relapse (confounded with
-hospital of origin) should not be interpreted.
-\textbf{b--e,}~Event-free survival by predicted risk (above versus
+\textbf{a,}~Discrimination at the decision level (clinical features,
+95\% bootstrap CI) for the LLM ensemble and trained random forests or
+random survival forests, in the internal 2018--19 test set (filled
+circles), the Lianyungang cohort (open squares) and the Fudan relapse
+cohort (open diamonds). Not shown: targets that are not evaluable
+(Lianyungang D19 MRD, D46 MRD and OS; Fudan D46 MRD) and relapse in
+the Fudan cohort, where every patient relapsed (detection rates in
+Table~\ref{tab:main}). In the Fudan cohort, EFS is the time to relapse
+and OS the time to death after relapse; Fudan D19 MRD rests on four
+positive patients.
+\textbf{b--e,}~Kaplan--Meier curves by predicted risk (above versus
 below the median within each cohort) for the LLM ensemble
 (\textbf{b}, \textbf{c}) and the random survival forest
-(\textbf{d}, \textbf{e}), internally (\textbf{b}, \textbf{d}) and
-externally (\textbf{c}, \textbf{e}); $p$, log-rank test; $n$, patients
-per group.}
+(\textbf{d}, \textbf{e}): event-free survival in the internal test set
+(\textbf{b}, \textbf{d}) and time to relapse in the Fudan relapse
+cohort (\textbf{c}, \textbf{e}); $p$, log-rank test; $n$, patients per
+group (lower/higher predicted risk).}
 \label{fig:external}
 \end{figure}
 
@@ -671,16 +733,16 @@ per group.}
 %%--------------------------------------------------------------%%
 
 Revising RF probabilities towards the outcomes of the five most similar
-training cases (Methods) changed classification AUROC by $-0.062$ to
-$+0.073$ in the 2017--19 and 2018--19 test sets and the external
-cohort; in the 17-patient 2019 test set, which contains only three
+training cases (Methods) changed classification AUROC by $-0.066$ to
+$+0.073$ in the 2017--19 and 2018--19 test sets and the two external
+cohorts; in the 17-patient 2019 test set, which contains only three
 positives for relapse and each MRD target, the changes ranged from
 $-0.062$ to $+0.226$ (Supplementary Table~\ref{tab:belief_revision}).
 For survival, a censoring-aware variant that replaces neighbour
 outcomes with a similarity-weighted Kaplan--Meier event probability
-gave small but consistent gains (mean C-index change $+0.007$ over 42
+gave small but consistent gains (mean C-index change $+0.006$ over 48
 combinations of feature level $\mathcal{F}_1$--$\mathcal{F}_6$, test
-set and endpoint, 25 of them positive; Wilcoxon $p=0.010$).
+set and endpoint, 28 of them positive; Wilcoxon $p=0.022$).
 For each of the 17 patients in the 2019 test set and each
 classification target, an LLM (Gemini-4-Argon) then produced a short
 narrative combining the prediction, the decision-tree path and the
@@ -700,9 +762,9 @@ Predicting every decision at the end of diagnostic work-up, before any
 MRD result, an ensemble of five LLMs matched random forests trained on about 50 and 100 local patients for
 Final Risk and D19 MRD.
 For EFS and OS it was not reached by survival forests trained on any
-available number of local patients, and it kept its discrimination at
-two other hospitals, where the trained survival models fell to or below
-chance.
+available number of local patients, and in an external cohort in which
+every patient relapsed it ordered the time to relapse and to death,
+where the trained survival forests did not.
 A short, automatically generated report of the Day-1 marrow smear,
 given to the LLMs as text, improved the ensemble for every target and
 brought it level with fully trained random forests for Final Risk,
@@ -719,8 +781,9 @@ Our learning curves locate the crossover within a single disease: about
 available data for EFS and OS, where only 8 to 13 deaths were
 available for training.
 The LLMs' advantage is largest where local events are scarce and where
-the case mix shifts, the two situations in which a locally trained
-model has least to learn from or most to unlearn.
+the case mix shifts, as in a referral series of relapsed patients, the
+two situations in which a locally trained model has least to learn
+from or most to unlearn.
 In practice, a centre starting a new protocol could use an LLM ensemble,
 with the automated morphology report, for survival risk from
 the first patient, and move to, or
@@ -745,12 +808,17 @@ Each statement can be checked against the smear and against the
 haematologist's reading, which let us drop the measures that did not
 agree (size variation and nuclear shape); expressing each measure as a
 percentile within its imaging batch put batches with different
-staining and image acquisition on a common scale without retraining;
+staining and image acquisition on a common scale without retraining,
+and carried the pipeline to smears from two other hospitals after
+rescaling to a common red-cell diameter;
 and a text-only model can use the report at a cost of a few hundred
 tokens per patient.
 A forest, by contrast, has to learn the role of each added variable
 from 186 training patients, which may explain why the same measures
-helped the trained models little.
+helped the trained models little internally.
+In the Fudan relapse cohort the survival forests gained more from
+morphology than the LLM ensemble did, a result that rests on 21
+patients and needs confirmation.
 
 \textbf{MRD and the limits of routine data.}
 Because all predictions were made before treatment response was
@@ -766,6 +834,10 @@ LLM ensemble reached AUROCs of 0.66 and 0.67, consistent with the
 failure of computational flow cytometry at
 diagnosis~\cite{[CITE:Martinez2025]} and the modest discrimination of
 a large clinical relapse model~\cite{[CITE:Saravanan2026]}.
+The Fudan relapse cohort makes the same point from the other side: of
+21 children who went on to relapse, the LLM ensemble flagged 6 and the
+random forest 8 at diagnosis, although the LLM ensemble's predicted
+risk did order when they relapsed.
 Stronger relapse signal has so far come mainly from single-cell and
 molecular profiles~\cite{[CITE:Good2018],[CITE:Mosquera2024]}, which
 our routine feature set does not include; adding such data at the
@@ -787,11 +859,14 @@ analysed retrospectively; prospective deployment, as reported for a
 clinical language model in adult care~\cite{[CITE:Jiang2023NYUTron]},
 remains a stronger standard of validation than our temporal and
 external evaluation.
-The external cohort is small (41 patients) and includes a
-relapse-enriched referral series, so external relapse and MRD results
-are not interpretable and the confidence intervals of the survival
-differences are wide; larger, prospectively collected external cohorts
-are needed to confirm the robustness of the LLM ensemble.
+The external cohorts are small (20 and 21 patients).
+The Lianyungang cohort has too few events to test relapse, OS or MRD
+prediction, and the Fudan cohort, in which every patient relapsed,
+tests whether relapse is flagged and whether event times are ordered,
+but not whether patients who do not relapse are spared a false alarm;
+the confidence intervals of the external differences are wide, and
+larger, prospectively collected external cohorts are needed to confirm
+the robustness of the LLM ensemble.
 Internally, the survival advantage of the LLM ensemble did not reach
 statistical significance in any single test set, and most of the
 morphology gains have confidence intervals that include zero.
@@ -801,8 +876,10 @@ as the leukaemic population; batch differences in staining and imaging
 were handled by within-batch percentiles rather than by stain
 normalisation; and only some measures agreed with the haematologists'
 reports.
-The pipeline was applied to the internal smears only, so the value of
-morphology at other hospitals remains to be tested.
+The external smears were few (two images per patient in Lianyungang)
+and were brought to the internal scale only by rescaling to a common
+red-cell diameter, so the external morphology results are indicative
+only.
 Learning curves were estimated on one temporal split, the 2019 test set
 contains only 17 patients, and no correction was made for multiple
 comparisons.
@@ -837,14 +914,18 @@ haematological indices, immunophenotype, 51-marker flow cytometry panel,
 cytogenetics, MRD values), digitised images of the diagnostic (Day~1)
 bone marrow smear and the haematologist's written morphology report.
 
-The external validation cohort ($n=41$) was supplied as a single
-merged file spanning two source hospitals, distinguished by the
-recorded hospital field: Lianyungang First People's Hospital (20
-patients, 2019--2023) and Children's Hospital of Fudan University,
-Shanghai (21 patients, 2017--2021, a relapse-enriched referral cohort
-in which all patients relapsed); ethics approval: [ETHICS NUMBERS,
-external cohort]. We pool the two hospitals and evaluate the external
-cohort as a single group throughout (Section~\ref{sec:ood}).
+Two external hospitals provided 41 patients in a single file with a
+recorded hospital field, and the two hospitals are analysed as separate
+cohorts (Section~\ref{sec:ood}).
+The Lianyungang cohort is a routine series of 20 patients from
+Lianyungang First People's Hospital (2019--2023), two of whom relapsed.
+The Fudan relapse cohort comprises 21 patients from Children's
+Hospital of Fudan University, Shanghai (2017--2021), a referral series
+in which every patient relapsed; ethics approval: [ETHICS NUMBERS,
+external cohorts].
+Each external record contains the same structured variables and
+digitised images of the diagnostic marrow smear (two images per
+patient in Lianyungang, 20 in Fudan).
 No external data were used in any model training.
 
 \subsection{Temporally-structured feature hierarchy}\label{sec:features}
@@ -939,7 +1020,8 @@ was expressed as a percentile among the patients of the same batch; no
 outcome information enters this step.
 Patients with fewer than 20 measured cells received no profile.
 The profile rests on 46,964 cells (median 135 per patient) and covers
-293 of the 300 internal patients in the temporal splits.
+293 of the 300 internal patients in the temporal splits; the external
+smears were processed in the same way (Section~\ref{sec:ood}).
 
 \textbf{Morphology as model input.}
 For the LLMs, morphology was appended to the serialised clinical
@@ -1040,16 +1122,36 @@ time-dependent AUC (Eq.~\ref{eq:itauc}) at $t^*\in\{12,24,36\}$
 months, and the log-rank test on Kaplan-Meier curves dichotomised at
 the median risk score.
 
-\subsection{External OOD evaluation}\label{sec:ood}
+\subsection{External evaluation}\label{sec:ood}
 
-For external validation, all $n=301$ internal patients served as the
-training set and external patients served as the test set; no
-site-specific fine-tuning was performed.
-DT and RF were trained on the full internal set using the same
-preprocessing pipeline (Eq.~\ref{eq:zscore}).
-RSF was trained identically.
-For Phase~1, the same prompts were applied to the external patients'
-features.
+For both external cohorts, all $n=301$ internal patients served as the
+training set; no site-specific fine-tuning or recalibration was
+performed.
+DT, RF and RSF were trained on the full internal set with the same
+preprocessing (Eq.~\ref{eq:zscore}), and the same prompts were applied
+to the external patients.
+Each cohort was evaluated on all of its patients with a label for the
+target.
+A target was evaluated by AUROC only when the cohort contained at least
+two positive and two negative patients, and by C-index only with at
+least two events; this excludes D19 MRD (no positive patient), D46 MRD
+(one) and OS (one death) in the Lianyungang cohort and D46 MRD (none) in
+the Fudan relapse cohort.
+Because every Fudan patient relapsed, relapse was evaluated there as a
+detection rate, the share of patients predicted to relapse at the
+decision level, using the thresholds of the balanced accuracy (at least
+three of the five LLMs; RF probability at or above the training
+prevalence), with Wilson 95\% intervals and an exact McNemar test for
+the paired comparison; the same rules applied to the internal
+2018--19 test set give the reference sensitivity and specificity.
+In this cohort the EFS C-index measures how well the predicted risk
+orders the time to relapse, and the OS C-index how well it orders death
+after relapse.
+For morphology, the pipeline of Section~\ref{sec:morph} was applied to
+the external smears after the images of each hospital had been rescaled
+so that their median red-cell diameter matched the internal median
+(43.5 pixels), and percentiles were computed within each hospital,
+which plays the role of an imaging batch.
 
 \subsection{Decision levels, learning curves and protocol baseline}\label{sec:comparison}
 
@@ -1170,9 +1272,6 @@ Differences between the LLM ensemble and trained models, and between
 each model with and without morphology, were computed on the same
 resamples, with two-sided $p$-values given by twice the smaller tail of
 the bootstrap distribution of the difference.
-In the external cohort we also computed a within-hospital C-index that
-counts only patient pairs from the same hospital, with bootstrap
-resampling stratified by hospital.
 Kaplan--Meier curves were compared by the log-rank test after splitting
 patients at the median predicted risk within each cohort.
 Split~3 contains only 17 test patients (8 IR/HR, and 3 positives each
@@ -1384,8 +1483,12 @@ bootstrap CI (2,000 resamples), followed by balanced accuracy (BA; LLM
 ensemble: majority of the five models, i.e.\ at least three; trained: threshold at the
 training-set prevalence). Trained, random forest (classification) or
 random survival forest (survival). Notes: for Final Risk, BA of Initial Risk alone; for survival,
-C-index of the rank-mean ensemble (sensitivity analysis) and, in the
-external cohort, within-hospital C-index (LLM ensemble vs trained).
+C-index of the rank-mean ensemble (sensitivity analysis).
+Lianyungang and Fudan: external cohorts, models trained on all 301
+internal patients. In the Fudan cohort every patient relapsed, so
+relapse is reported as the number of patients predicted to relapse
+(LLM ensemble vs RF, exact McNemar test), EFS orders the time to
+relapse and OS the time to death after relapse.
 ($n$, patients and positives or events.)}
 \label{tab:supp_decision}
 \centering
@@ -1399,40 +1502,83 @@ external cohort, within-hospital C-index (LLM ensemble vs trained).
 \quad Split 1 (2017--19) ($n$=200, 100) & 0.910 [0.865, 0.951] & 0.918 [0.872, 0.957] & 0.890 & 0.895 & Initial Risk 0.895 \\
 \quad Split 2 (2018--19) ($n$=113, 48) & 0.932 [0.876, 0.981] & 0.951 [0.904, 0.986] & 0.901 & 0.899 & Initial Risk 0.906 \\
 \quad Split 3 (2019) ($n$=17, 8) & 0.896 [0.727, 1.000] & 0.854 [0.639, 1.000] & 0.819 & 0.757 & Initial Risk 0.812 \\
-\quad External ($n$=29, 20) & 0.842 [0.672, 0.967] & 0.936 [0.825, 1.000] & 0.844 & 0.864 & Initial Risk 0.900 \\
+\quad Lianyungang ($n$=20, 9) & 0.859 [0.635, 1.000] & 0.939 [0.792, 1.000] & 0.843 & 0.818 & Initial Risk 0.889 \\
+\quad Fudan ($n$=21, 15) & 0.850 [0.618, 1.000] & 0.944 [0.812, 1.000] & 0.850 & 0.967 & Initial Risk 0.933 \\
 \addlinespace[2pt]
 \multicolumn{6}{@{}l}{\textit{D19 MRD ($\mathcal{F}_6$)}} \\
 \quad Split 1 (2017--19) ($n$=200, 31) & 0.710 [0.607, 0.810] & 0.687 [0.566, 0.802] & 0.639 & 0.636 & \\
 \quad Split 2 (2018--19) ($n$=113, 13) & 0.784 [0.622, 0.915] & 0.834 [0.726, 0.924] & 0.733 & 0.758 & \\
 \quad Split 3 (2019) ($n$=17, 3) & 0.548 [0.183, 0.906] & 0.679 [0.375, 0.933] & 0.524 & 0.583 & \\
-\quad External ($n$=29, 4) & 0.455 [0.107, 1.000] & 0.350 [0.135, 0.594] & 0.465 & 0.405 & \\
+\quad Lianyungang ($n$=8, 0) & \multicolumn{5}{l}{not evaluable} \\
+\quad Fudan ($n$=21, 4) & 0.419 [0.083, 1.000] & 0.478 [0.207, 0.763] & 0.419 & 0.478 & \\
 \addlinespace[2pt]
 \multicolumn{6}{@{}l}{\textit{D46 MRD ($\mathcal{F}_6$)}} \\
 \quad Split 1 (2017--19) ($n$=200, 21) & 0.504 [0.380, 0.629] & 0.584 [0.462, 0.707] & 0.517 & 0.556 & \\
 \quad Split 2 (2018--19) ($n$=113, 11) & 0.599 [0.400, 0.792] & 0.697 [0.518, 0.847] & 0.618 & 0.643 & \\
 \quad Split 3 (2019) ($n$=17, 3) & 0.607 [0.375, 0.821] & 0.393 [0.000, 0.867] & 0.357 & 0.488 & \\
-\quad External & \multicolumn{5}{l}{not evaluable} \\
+\quad Lianyungang ($n$=10, 1) & \multicolumn{5}{l}{not evaluable} \\
+\quad Fudan ($n$=21, 0) & \multicolumn{5}{l}{not evaluable} \\
 \addlinespace[2pt]
 \multicolumn{6}{@{}l}{\textit{Relapse ($\mathcal{F}_6$)}} \\
 \quad Split 1 (2017--19) ($n$=200, 28) & 0.652 [0.552, 0.749] & 0.542 [0.422, 0.661] & 0.516 & 0.536 & \\
 \quad Split 2 (2018--19) ($n$=113, 17) & 0.631 [0.495, 0.759] & 0.623 [0.455, 0.768] & 0.560 & 0.534 & \\
 \quad Split 3 (2019) ($n$=17, 3) & 0.798 [0.575, 1.000] & 0.417 [0.078, 0.750] & 0.631 & 0.512 & \\
-\quad External ($n$=29, 23) & 0.652 [0.414, 0.860] & 0.210 [0.065, 0.389] & 0.569 & 0.217 & \\
+\quad Lianyungang ($n$=20, 2) & 0.542 [0.079, 1.000] & 0.514 [0.111, 0.921] & 0.639 & 0.556 & \\
+\quad Fudan ($n$=21, 21) & \multicolumn{4}{l}{predicted to relapse: 6/21 (29\%) vs 8/21 (38\%)} & McNemar $p$=0.73 \\
 \addlinespace[2pt]
 \multicolumn{6}{@{}l}{\textit{EFS ($\mathcal{F}_6$)}} \\
 \quad Split 1 (2017--19) ($n$=201, 43) & 0.609 [0.529, 0.694] & 0.557 [0.476, 0.641] & -- & -- & rank mean 0.608 \\
 \quad Split 2 (2018--19) ($n$=114, 25) & 0.682 [0.579, 0.782] & 0.599 [0.479, 0.720] & -- & -- & rank mean 0.673 \\
 \quad Split 3 (2019) ($n$=17, 5) & 0.728 [0.476, 0.927] & 0.676 [0.429, 0.894] & -- & -- & rank mean 0.706 \\
-\quad External ($n$=41, 24) & 0.692 [0.573, 0.809] & 0.435 [0.298, 0.564] & -- & -- & rank mean 0.693; within hospital 0.686 vs 0.465 \\
+\quad Lianyungang ($n$=20, 3) & 0.786 [0.500, 1.000] & 0.762 [0.494, 1.000] & -- & -- & rank mean 0.809 \\
+\quad Fudan ($n$=21, 21) & 0.665 [0.513, 0.799] & 0.404 [0.204, 0.606] & -- & -- & rank mean 0.692 \\
 \addlinespace[2pt]
 \multicolumn{6}{@{}l}{\textit{OS ($\mathcal{F}_6$)}} \\
 \quad Split 1 (2017--19) ($n$=201, 15) & 0.680 [0.532, 0.816] & 0.616 [0.465, 0.761] & -- & -- & rank mean 0.682 \\
 \quad Split 2 (2018--19) ($n$=114, 10) & 0.713 [0.555, 0.858] & 0.599 [0.403, 0.782] & -- & -- & rank mean 0.713 \\
 \quad Split 3 (2019) & \multicolumn{5}{l}{not evaluable} \\
-\quad External ($n$=41, 7) & 0.843 [0.722, 0.947] & 0.536 [0.274, 0.793] & -- & -- & rank mean 0.845; within hospital 0.850 vs 0.626 \\
+\quad Lianyungang ($n$=20, 1) & \multicolumn{5}{l}{not evaluable} \\
+\quad Fudan ($n$=21, 6) & 0.833 [0.641, 0.980] & 0.571 [0.288, 0.842] & -- & -- & rank mean 0.838 \\
 \bottomrule
 \end{tabular}
 \end{sidewaystable}
+
+\begin{table}[ht]
+\caption{\textbf{Relapse predicted at the decision level
+$\mathcal{F}_6$ (clinical features).} A patient counts as predicted
+to relapse when at least three of the five LLMs answer yes (LLM
+ensemble), when the LLM answers yes (single LLMs), or when the RF
+probability is at or above the training-set prevalence (the thresholds
+of the balanced accuracy). Relapsed, patients who relapsed and were
+predicted to relapse (sensitivity; in the Fudan cohort, where every
+patient relapsed, the detection rate); not relapsed, patients who did
+not relapse and were not predicted to (specificity). Internal,
+2018--19 test set (Split~2). In the Fudan cohort the LLM ensemble and
+the RF disagreed on 8 patients (exact McNemar $p=0.73$). Detection
+rate in the Fudan cohort at $\mathcal{F}_1$--$\mathcal{F}_6$: LLM
+ensemble 19\%, 19\%, 10\%, 14\%, 29\%, 29\%; RF 43\%, 38\%, 33\%,
+29\%, 43\%, 38\%.}
+\label{tab:relapse_detection}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+ & \multicolumn{2}{c}{\textbf{Internal}} & \multicolumn{2}{c}{\textbf{Lianyungang}} & \textbf{Fudan} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-6}
+\textbf{Method} & Relapsed & Not relapsed & Relapsed & Not relapsed & Relapsed \\
+\midrule
+LLM ensemble & 4/17 (24\%) & 85/96 (89\%) & 1/2 & 14/18 (78\%) & 6/21 (29\%) \\
+RF & 7/17 (41\%) & 63/96 (66\%) & 2/2 & 2/18 (11\%) & 8/21 (38\%) \\
+\addlinespace[2pt]
+GPT-6.1-Sol & 3/17 (18\%) & 91/96 (95\%) & 1/2 & 16/18 (89\%) & 2/21 (10\%) \\
+Gemini-4-Argon & 4/17 (24\%) & 85/96 (89\%) & 1/2 & 13/18 (72\%) & 5/21 (24\%) \\
+Gemma-4-31B-it & 4/17 (24\%) & 77/96 (80\%) & 1/2 & 13/18 (72\%) & 10/21 (48\%) \\
+InternVL3.5-30B-A3B & 12/17 (71\%) & 55/96 (57\%) & 1/2 & 6/18 (33\%) & 16/21 (76\%) \\
+Qwen3.6-35B-A3B & 4/17 (24\%) & 87/96 (91\%) & 1/2 & 15/18 (83\%) & 4/21 (19\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 
 \clearpage
@@ -1461,6 +1607,13 @@ configuration, the number of test patients with a profile of that
 version, the same method's value with clinical features at
 $\mathcal{F}_6$, and the difference between the two with its 95\%
 bootstrap CI.
+The same procedure was applied separately in each external cohort, on
+all of its patients, with the detection rate as the criterion for
+relapse in the Fudan cohort (Supplementary
+Table~\ref{tab:morph_config_ext}).
+On the external smears the M3 profile was available for 40 of the 41
+patients, M1 for 13 and M2 for 11; patients without a profile of the
+chosen version were scored without morphology.
 
 \begin{table}[ht]
 \caption{\textbf{Configuration behind each morphology-augmented
@@ -1498,6 +1651,48 @@ EFS & LLM & $\mathcal{F}_6$ + M1 & 90/114 & 0.682 & 0.705 & +0.023 [+0.001, +0.0
 \addlinespace[2pt]
 OS & LLM & $\mathcal{F}_5$ + M3 & 111/114 & 0.713 & 0.719 & +0.006 [$-$0.037, +0.050] \\
  & RSF & $\mathcal{F}_6$ + M3 & 111/114 & 0.599 & 0.607 & +0.008 [$-$0.131, +0.144] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\caption{\textbf{Configuration behind each morphology-augmented
+($+$M) external result in Table~\ref{tab:main}} (Lianyungang, $n=20$;
+Fudan relapse cohort, $n=21$; models trained on all 301 internal
+patients). Columns as in Supplementary Table~\ref{tab:morph_config}.
+Targets that are not evaluable are omitted (Lianyungang D19 MRD, D46
+MRD and OS; Fudan D46 MRD). Fudan relapse: share of patients predicted
+to relapse (every patient relapsed), $\Delta$ in proportion. In the
+Fudan cohort, EFS orders the time to relapse and OS the time to death
+after relapse.}
+\label{tab:morph_config_ext}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2.2pt}
+\begin{tabular}{@{}lllccccc@{}}
+\toprule
+\textbf{Target} & \textbf{Cohort} & \textbf{Method} & \textbf{Configuration} & \textbf{With M} & \textbf{Clinical} & \textbf{$+$M} & \textbf{$\Delta$ [95\% CI]} \\
+\midrule
+Final Risk & Lianyungang & LLM & $\mathcal{F}_5$ + M1 & 8/20 & 0.859 & 0.934 & +0.076 [+0.000, +0.214] \\
+ &  & RF & $\mathcal{F}_5$ + M3 & 19/20 & 0.939 & 0.889 & $-$0.051 [$-$0.198, +0.030] \\
+ & Fudan & LLM & $\mathcal{F}_5$ + M3 & 21/21 & 0.850 & 0.900 & +0.050 [$-$0.037, +0.199] \\
+ &  & RF & $\mathcal{F}_6$ + M1 & 5/21 & 0.944 & 0.978 & +0.033 [+0.000, +0.132] \\
+\addlinespace[2pt]
+D19 MRD & Fudan & LLM & $\mathcal{F}_6$ + M2 & 4/21 & 0.419 & 0.404 & $-$0.015 [$-$0.059, +0.000] \\
+ &  & RF & $\mathcal{F}_3$ + M3 & 21/21 & 0.478 & 0.551 & +0.074 [$-$0.200, +0.378] \\
+\addlinespace[2pt]
+Relapse & Lianyungang & LLM & $\mathcal{F}_3$ + M3 & 19/20 & 0.542 & 0.722 & +0.181 [+0.000, +0.395] \\
+ &  & RF & $\mathcal{F}_6$ + M3 & 19/20 & 0.514 & 0.875 & +0.361 [+0.000, +0.737] \\
+ & Fudan & LLM & $\mathcal{F}_6$ + M3 & 21/21 & 29\% & 33\% & +0.048 [$-$0.095, +0.190] \\
+ &  & RF & $\mathcal{F}_6$ + M2 & 4/21 & 38\% & 71\% & +0.333 [+0.143, +0.525]$^{*}$ \\
+\addlinespace[2pt]
+EFS & Lianyungang & LLM & $\mathcal{F}_6$ + M1 & 8/20 & 0.786 & 0.810 & +0.024 [+0.000, +0.111] \\
+ &  & RSF & $\mathcal{F}_5$ + M2 & 7/20 & 0.762 & 0.738 & $-$0.024 [$-$0.164, +0.067] \\
+ & Fudan & LLM & $\mathcal{F}_6$ + M1 & 5/21 & 0.665 & 0.702 & +0.037 [$-$0.015, +0.101] \\
+ &  & RSF & $\mathcal{F}_4$ + M3 & 21/21 & 0.404 & 0.591 & +0.187 [+0.000, +0.414] \\
+\addlinespace[2pt]
+OS & Fudan & LLM & $\mathcal{F}_6$ + M3 & 21/21 & 0.833 & 0.857 & +0.024 [$-$0.041, +0.114] \\
+ &  & RSF & $\mathcal{F}_4$ + M3 & 21/21 & 0.571 & 0.771 & +0.200 [$-$0.059, +0.495] \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1572,58 +1767,53 @@ $\mathcal{F}_6$ & \textbf{0.567} & 0.547 & 0.539 & 0.523 & 0.510 & $\mathcal{F}_
 \clearpage
 
 \begin{table}[p]
-\caption{\textbf{Phase~1 LLMs on the pooled external cohort, all feature levels} (GPT, GPT-6.1-Sol; Arg., Gemini-4-Argon; Gma., Gemma-4-31B-it; Int., InternVL3.5-30B-A3B; Qw., Qwen3.6-35B-A3B). The two source hospitals are pooled into a single external cohort ($n$=41 for survival; classification targets use the $n$=29 subset with available labels). Classification: BA ($^*$~= accuracy; D46MRD has only one positive class after pooling, so accuracy is reported instead). Survival (EFS, OS): C-index. \textbf{Bold}: best feature level per column within each task block (ties all bolded). External pooled cohort; exploratory, indicative only.}
+\caption{\textbf{Phase~1 LLMs in the two external cohorts, all feature levels} (GPT, GPT-6.1-Sol; Arg., Gemini-4-Argon; Gma., Gemma-4-31B-it; Int., InternVL3.5-30B-A3B; Qw., Qwen3.6-35B-A3B). Lianyungang, routine series ($n$=20); Fudan, relapse cohort in which every patient relapsed ($n$=21). Classification: BA; for relapse in the Fudan cohort, the share of patients predicted to relapse. Survival: C-index (in the Fudan cohort, EFS orders the time to relapse and OS the time to death after relapse). \textemdash, not evaluable (Lianyungang: no D19 MRD-positive patient, one death); D46 MRD is omitted (one positive patient in Lianyungang, none in Fudan). \textbf{Bold}: best feature level per column within each task block (ties all bolded). Small cohorts; indicative only.}
 \label{tab:phase1_ext}
 \centering
 \footnotesize
-\renewcommand{\arraystretch}{0.8}
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}l ccccc@{}}
+\renewcommand{\arraystretch}{0.85}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}l ccccc ccccc@{}}
 \toprule
-\textbf{Lv.} & GPT & Arg. & Gma. & Int. & Qw. \\
+ & \multicolumn{5}{c}{\textbf{Lianyungang}} & \multicolumn{5}{c}{\textbf{Fudan relapse cohort}} \\
+\cmidrule(lr){2-6}\cmidrule(lr){7-11}
+\textbf{Lv.} & GPT & Arg. & Gma. & Int. & Qw. & GPT & Arg. & Gma. & Int. & Qw. \\
 \midrule
-\multicolumn{6}{l}{\textit{Final Risk (BA)}} \\
-$\mathcal{F}_1$ & 0.739 & 0.819 & 0.794 & 0.714 & 0.794 \\
-$\mathcal{F}_2$ & 0.794 & 0.794 & 0.819 & 0.450 & 0.794 \\
-$\mathcal{F}_3$ & 0.794 & 0.789 & 0.819 & 0.531 & 0.794 \\
-$\mathcal{F}_4$ & 0.794 & 0.733 & 0.819 & 0.697 & 0.794 \\
-$\mathcal{F}_5$ & 0.814 & 0.703 & \textbf{0.894} & 0.536 & 0.739 \\
-$\mathcal{F}_6$ & \textbf{0.869} & \textbf{0.844} & 0.844 & \textbf{0.733} & \textbf{0.819} \\
-\multicolumn{6}{l}{\textit{D19 MRD (BA)}} \\
-$\mathcal{F}_1$ & 0.440 & 0.400 & 0.425 & 0.490 & 0.380 \\
-$\mathcal{F}_2$ & 0.400 & 0.420 & 0.405 & 0.500 & \textbf{0.550} \\
-$\mathcal{F}_3$ & 0.400 & 0.460 & 0.405 & 0.500 & 0.340 \\
-$\mathcal{F}_4$ & 0.380 & 0.440 & 0.405 & 0.500 & 0.445 \\
-$\mathcal{F}_5$ & \textbf{0.505} & 0.525 & \textbf{0.465} & 0.395 & 0.445 \\
-$\mathcal{F}_6$ & 0.485 & \textbf{0.605} & 0.405 & \textbf{0.515} & 0.545 \\
-\multicolumn{6}{l}{\textit{D46 MRD (accuracy; single positive)}} \\
-$\mathcal{F}_1$ & \textbf{0.931$^*$} & 0.828$^*$ & 0.586$^*$ & \textbf{0.586$^*$} & 0.621$^*$ \\
-$\mathcal{F}_2$ & 0.897$^*$ & 0.793$^*$ & 0.552$^*$ & 0.035$^*$ & 0.655$^*$ \\
-$\mathcal{F}_3$ & 0.897$^*$ & \textbf{0.931$^*$} & 0.586$^*$ & 0.035$^*$ & 0.690$^*$ \\
-$\mathcal{F}_4$ & 0.897$^*$ & 0.897$^*$ & 0.586$^*$ & 0.035$^*$ & \textbf{0.724$^*$} \\
-$\mathcal{F}_5$ & 0.828$^*$ & 0.828$^*$ & \textbf{0.621$^*$} & 0.138$^*$ & 0.690$^*$ \\
-$\mathcal{F}_6$ & 0.793$^*$ & 0.828$^*$ & 0.586$^*$ & 0.207$^*$ & 0.655$^*$ \\
-\multicolumn{6}{l}{\textit{Relapse (BA)}} \\
-$\mathcal{F}_1$ & 0.500 & 0.565 & 0.634 & \textbf{0.699} & 0.482 \\
-$\mathcal{F}_2$ & 0.500 & 0.609 & 0.612 & 0.500 & 0.482 \\
-$\mathcal{F}_3$ & 0.500 & 0.438 & 0.551 & 0.562 & 0.543 \\
-$\mathcal{F}_4$ & 0.500 & 0.460 & 0.551 & 0.685 & 0.565 \\
-$\mathcal{F}_5$ & 0.500 & \textbf{0.674} & 0.612 & 0.620 & 0.587 \\
-$\mathcal{F}_6$ & \textbf{0.565} & 0.547 & \textbf{0.656} & 0.536 & \textbf{0.609} \\
-\multicolumn{6}{l}{\textit{EFS (C-index)}} \\
-$\mathcal{F}_1$ & \textbf{0.663} & 0.622 & \textbf{0.669} & 0.627 & 0.634 \\
-$\mathcal{F}_2$ & 0.645 & 0.608 & 0.659 & 0.551 & \textbf{0.645} \\
-$\mathcal{F}_3$ & 0.586 & 0.611 & 0.590 & 0.615 & 0.638 \\
-$\mathcal{F}_4$ & 0.605 & 0.603 & 0.590 & 0.615 & 0.638 \\
-$\mathcal{F}_5$ & 0.650 & \textbf{0.636} & 0.656 & 0.639 & 0.542 \\
-$\mathcal{F}_6$ & 0.633 & 0.603 & 0.651 & \textbf{0.709} & 0.567 \\
-\multicolumn{6}{l}{\textit{OS (C-index)}} \\
-$\mathcal{F}_1$ & 0.784 & 0.728 & \textbf{0.821} & 0.802 & 0.714 \\
-$\mathcal{F}_2$ & 0.784 & 0.667 & 0.792 & 0.633 & 0.744 \\
-$\mathcal{F}_3$ & 0.752 & 0.722 & 0.780 & 0.710 & 0.548 \\
-$\mathcal{F}_4$ & 0.694 & 0.698 & 0.780 & 0.710 & 0.548 \\
-$\mathcal{F}_5$ & 0.718 & 0.694 & 0.807 & \textbf{0.816} & 0.694 \\
-$\mathcal{F}_6$ & \textbf{0.837} & \textbf{0.798} & 0.603 & 0.814 & \textbf{0.806} \\
+\multicolumn{11}{l}{\textit{Final Risk (BA)}} \\
+$\mathcal{F}_1$ & 0.788 & 0.833 & 0.788 & 0.641 & 0.778 & 0.783 & 0.817 & 0.783 & 0.700 & 0.783 \\
+$\mathcal{F}_2$ & 0.833 & 0.833 & 0.788 & 0.545 & \textbf{0.833} & 0.783 & 0.783 & 0.817 & 0.433 & 0.783 \\
+$\mathcal{F}_3$ & 0.833 & \textbf{0.899} & 0.889 & 0.500 & \textbf{0.833} & 0.783 & 0.733 & 0.783 & 0.550 & 0.783 \\
+$\mathcal{F}_4$ & 0.833 & 0.717 & 0.889 & 0.490 & \textbf{0.833} & 0.783 & 0.733 & 0.783 & \textbf{0.717} & 0.783 \\
+$\mathcal{F}_5$ & \textbf{0.889} & 0.843 & \textbf{0.899} & 0.626 & \textbf{0.833} & 0.800 & 0.633 & \textbf{0.883} & 0.600 & 0.700 \\
+$\mathcal{F}_6$ & 0.843 & 0.843 & 0.843 & \textbf{0.798} & 0.798 & \textbf{0.883} & \textbf{0.850} & 0.850 & 0.683 & \textbf{0.817} \\
+\multicolumn{11}{l}{\textit{D19 MRD (BA)}} \\
+$\mathcal{F}_1$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & 0.412 & 0.412 & 0.390 & 0.426 & 0.412 \\
+$\mathcal{F}_2$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & 0.382 & 0.412 & 0.360 & \textbf{0.500} & 0.515 \\
+$\mathcal{F}_3$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & 0.382 & 0.471 & 0.360 & \textbf{0.500} & 0.353 \\
+$\mathcal{F}_4$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & 0.353 & 0.441 & 0.360 & \textbf{0.500} & 0.419 \\
+$\mathcal{F}_5$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.478} & 0.478 & \textbf{0.449} & 0.404 & 0.449 \\
+$\mathcal{F}_6$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & 0.449 & \textbf{0.596} & 0.360 & 0.493 & \textbf{0.537} \\
+\multicolumn{11}{l}{\textit{Relapse (BA; Fudan: share predicted to relapse)}} \\
+$\mathcal{F}_1$ & 0.500 & 0.472 & \textbf{0.667} & \textbf{0.583} & 0.722 & 0.000 & 0.143 & 0.429 & 0.571 & 0.095 \\
+$\mathcal{F}_2$ & 0.500 & \textbf{0.694} & 0.639 & 0.528 & 0.694 & 0.000 & 0.190 & 0.381 & \textbf{1.000} & 0.095 \\
+$\mathcal{F}_3$ & 0.500 & 0.417 & 0.611 & 0.528 & \textbf{0.750} & 0.000 & 0.048 & 0.429 & 0.952 & 0.048 \\
+$\mathcal{F}_4$ & 0.500 & 0.389 & 0.639 & \textbf{0.583} & 0.722 & 0.000 & 0.095 & 0.429 & 0.857 & 0.095 \\
+$\mathcal{F}_5$ & 0.500 & \textbf{0.694} & 0.639 & 0.389 & \textbf{0.750} & 0.000 & \textbf{0.333} & 0.381 & 0.762 & 0.143 \\
+$\mathcal{F}_6$ & \textbf{0.694} & 0.611 & 0.611 & 0.417 & 0.667 & \textbf{0.095} & 0.238 & \textbf{0.476} & 0.762 & \textbf{0.190} \\
+\multicolumn{11}{l}{\textit{EFS (C-index; Fudan: time to relapse)}} \\
+$\mathcal{F}_1$ & \textbf{0.786} & 0.559 & 0.595 & 0.488 & 0.583 & 0.685 & \textbf{0.712} & 0.704 & \textbf{0.677} & \textbf{0.653} \\
+$\mathcal{F}_2$ & 0.595 & 0.726 & 0.500 & 0.548 & 0.619 & \textbf{0.700} & 0.640 & \textbf{0.712} & 0.483 & 0.645 \\
+$\mathcal{F}_3$ & 0.583 & 0.667 & 0.559 & 0.619 & 0.655 & 0.638 & 0.685 & 0.653 & 0.539 & 0.643 \\
+$\mathcal{F}_4$ & 0.607 & \textbf{0.786} & 0.559 & 0.619 & 0.655 & 0.692 & 0.623 & 0.653 & 0.539 & 0.643 \\
+$\mathcal{F}_5$ & 0.619 & 0.774 & 0.583 & 0.571 & 0.500 & 0.640 & 0.618 & 0.643 & 0.596 & 0.539 \\
+$\mathcal{F}_6$ & 0.702 & 0.702 & \textbf{0.750} & \textbf{0.750} & \textbf{0.667} & 0.670 & 0.599 & 0.581 & 0.633 & 0.603 \\
+\multicolumn{11}{l}{\textit{OS (C-index; Fudan: death after relapse)}} \\
+$\mathcal{F}_1$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & 0.743 & 0.700 & 0.757 & \textbf{0.724} & 0.662 \\
+$\mathcal{F}_2$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & 0.719 & 0.662 & 0.733 & 0.567 & 0.671 \\
+$\mathcal{F}_3$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & 0.719 & 0.686 & \textbf{0.776} & 0.605 & 0.538 \\
+$\mathcal{F}_4$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & 0.629 & 0.667 & \textbf{0.776} & 0.605 & 0.538 \\
+$\mathcal{F}_5$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & 0.600 & 0.681 & 0.757 & 0.710 & 0.557 \\
+$\mathcal{F}_6$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textbf{0.829} & \textbf{0.757} & 0.562 & 0.700 & \textbf{0.752} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1698,67 +1888,65 @@ $\mathcal{F}_6$ & \textbf{0.562} & 0.616 & 0.508 & 0.599 & \textemdash & \textem
 \clearpage
 
 \begin{table}[p]
-\caption{\textbf{Phase~2 out-of-distribution results on the pooled
-external cohort, across all feature levels} (train~=~all 301 internal
-patients; test~=~the two source hospitals pooled into a single
-external cohort, $n$=41; D19MRD and D46MRD use the 29 and 31 patients
-with a recorded value). Classification: DT / RF AUROC; $^*$~=
-accuracy (D46MRD has only one positive case after pooling, so accuracy
-is reported instead). Survival (EFS, OS): survival-tree (DT) /
-random-survival-forest (RSF) C-index. \textbf{Bold} marks the best
-feature level in each column (ties all bolded). Pooled external cohort; small, indicative
+\caption{\textbf{Phase~2 results in the two external cohorts, across
+all feature levels} (train~=~all 301 internal patients; test~=~the
+Lianyungang cohort, $n$=20, or the Fudan relapse cohort, $n$=21; D19
+MRD in Lianyungang uses the 8 patients with a recorded value).
+Classification: DT / RF AUROC. Survival: survival-tree (DT) / RSF
+C-index (in the Fudan cohort, EFS orders the time to relapse and OS the
+time to death after relapse). \textbf{Bold} marks the best feature
+level in each column (ties all bolded). \textemdash, not evaluable
+(Lianyungang: no D19 MRD-positive patient, one death; Fudan relapse:
+every patient relapsed, see Supplementary
+Table~\ref{tab:relapse_detection}). D46 MRD is omitted (one positive
+patient in Lianyungang, none in Fudan). Small cohorts; indicative
 only.}
 \label{tab:phase2_ext}
 \centering
 \footnotesize
 \renewcommand{\arraystretch}{0.84}
 \setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}l cc@{}}
+\begin{tabular}{@{}l cc cc@{}}
 \toprule
-\textbf{Lv.} & DT & RF \\
+ & \multicolumn{2}{c}{\textbf{Lianyungang}} & \multicolumn{2}{c}{\textbf{Fudan relapse cohort}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{Lv.} & DT & RF & DT & RF \\
 \midrule
-\multicolumn{3}{l}{\textit{Final Risk (DT / RF)}} \\
-$\mathcal{F}_1$ & 0.805 & 0.878 \\
-$\mathcal{F}_2$ & 0.827 & 0.863 \\
-$\mathcal{F}_3$ & 0.779 & 0.843 \\
-$\mathcal{F}_4$ & 0.778 & 0.750 \\
-$\mathcal{F}_5$ & \textbf{0.912} & 0.930 \\
-$\mathcal{F}_6$ & \textbf{0.912} & \textbf{0.940} \\
-\multicolumn{3}{l}{\textit{D19 MRD (DT / RF)}} \\
-$\mathcal{F}_1$ & \textbf{0.630} & 0.590 \\
-$\mathcal{F}_2$ & 0.505 & \textbf{0.650} \\
-$\mathcal{F}_3$ & 0.385 & 0.265 \\
-$\mathcal{F}_4$ & 0.385 & 0.285 \\
-$\mathcal{F}_5$ & 0.385 & 0.305 \\
-$\mathcal{F}_6$ & 0.385 & 0.350 \\
-\multicolumn{3}{l}{\textit{D46 MRD (DT / RF)}} \\
-$\mathcal{F}_1$ & \textbf{0.742$^*$} & \textbf{0.968$^*$} \\
-$\mathcal{F}_2$ & 0.581$^*$ & \textbf{0.968$^*$} \\
-$\mathcal{F}_3$ & 0.323$^*$ & \textbf{0.968$^*$} \\
-$\mathcal{F}_4$ & 0.290$^*$ & \textbf{0.968$^*$} \\
-$\mathcal{F}_5$ & 0.323$^*$ & \textbf{0.968$^*$} \\
-$\mathcal{F}_6$ & 0.323$^*$ & \textbf{0.968$^*$} \\
-\multicolumn{3}{l}{\textit{Relapse (DT / RF)}} \\
-$\mathcal{F}_1$ & \textbf{0.583} & \textbf{0.528} \\
-$\mathcal{F}_2$ & 0.397 & 0.494 \\
-$\mathcal{F}_3$ & 0.333 & 0.300 \\
-$\mathcal{F}_4$ & 0.525 & 0.272 \\
-$\mathcal{F}_5$ & 0.333 & 0.384 \\
-$\mathcal{F}_6$ & 0.219 & 0.246 \\
-\multicolumn{3}{l}{\textit{EFS (DT / RSF C-index)}} \\
-$\mathcal{F}_1$ & \textbf{0.603} & 0.567 \\
-$\mathcal{F}_2$ & 0.552 & \textbf{0.572} \\
-$\mathcal{F}_3$ & 0.507 & 0.434 \\
-$\mathcal{F}_4$ & 0.509 & 0.475 \\
-$\mathcal{F}_5$ & 0.419 & 0.430 \\
-$\mathcal{F}_6$ & 0.419 & 0.435 \\
-\multicolumn{3}{l}{\textit{OS (DT / RSF C-index)}} \\
-$\mathcal{F}_1$ & 0.619 & \textbf{0.718} \\
-$\mathcal{F}_2$ & 0.657 & \textbf{0.718} \\
-$\mathcal{F}_3$ & 0.571 & 0.468 \\
-$\mathcal{F}_4$ & \textbf{0.702} & 0.512 \\
-$\mathcal{F}_5$ & 0.647 & 0.540 \\
-$\mathcal{F}_6$ & 0.647 & 0.536 \\
+\multicolumn{5}{l}{\textit{Final Risk (DT / RF AUROC)}} \\
+$\mathcal{F}_1$ & 0.778 & 0.909 & 0.783 & 0.867 \\
+$\mathcal{F}_2$ & 0.788 & 0.849 & 0.817 & 0.878 \\
+$\mathcal{F}_3$ & 0.697 & 0.884 & 0.794 & 0.844 \\
+$\mathcal{F}_4$ & 0.702 & 0.798 & 0.806 & 0.806 \\
+$\mathcal{F}_5$ & \textbf{0.939} & 0.919 & \textbf{0.900} & \textbf{0.950} \\
+$\mathcal{F}_6$ & \textbf{0.939} & \textbf{0.939} & \textbf{0.900} & 0.944 \\
+\multicolumn{5}{l}{\textit{D19 MRD (DT / RF AUROC)}} \\
+$\mathcal{F}_1$ & \textemdash & \textemdash & \textbf{0.706} & 0.647 \\
+$\mathcal{F}_2$ & \textemdash & \textemdash & 0.596 & \textbf{0.750} \\
+$\mathcal{F}_3$ & \textemdash & \textemdash & 0.463 & 0.316 \\
+$\mathcal{F}_4$ & \textemdash & \textemdash & 0.463 & 0.360 \\
+$\mathcal{F}_5$ & \textemdash & \textemdash & 0.522 & 0.390 \\
+$\mathcal{F}_6$ & \textemdash & \textemdash & 0.522 & 0.478 \\
+\multicolumn{5}{l}{\textit{Relapse (DT / RF AUROC)}} \\
+$\mathcal{F}_1$ & \textbf{0.708} & 0.847 & \textemdash & \textemdash \\
+$\mathcal{F}_2$ & 0.431 & \textbf{0.861} & \textemdash & \textemdash \\
+$\mathcal{F}_3$ & 0.472 & 0.556 & \textemdash & \textemdash \\
+$\mathcal{F}_4$ & 0.667 & 0.556 & \textemdash & \textemdash \\
+$\mathcal{F}_5$ & 0.472 & 0.708 & \textemdash & \textemdash \\
+$\mathcal{F}_6$ & 0.528 & 0.514 & \textemdash & \textemdash \\
+\multicolumn{5}{l}{\textit{EFS (survival tree / RSF C-index; Fudan: time to relapse)}} \\
+$\mathcal{F}_1$ & \textbf{0.667} & 0.762 & 0.483 & 0.562 \\
+$\mathcal{F}_2$ & \textbf{0.667} & 0.738 & 0.517 & \textbf{0.586} \\
+$\mathcal{F}_3$ & 0.512 & \textbf{0.833} & 0.475 & 0.493 \\
+$\mathcal{F}_4$ & 0.559 & 0.643 & \textbf{0.571} & 0.542 \\
+$\mathcal{F}_5$ & 0.488 & 0.667 & 0.438 & 0.497 \\
+$\mathcal{F}_6$ & 0.488 & 0.762 & 0.438 & 0.404 \\
+\multicolumn{5}{l}{\textit{OS (survival tree / RSF C-index; Fudan: death after relapse)}} \\
+$\mathcal{F}_1$ & \textemdash & \textemdash & \textbf{0.705} & \textbf{0.686} \\
+$\mathcal{F}_2$ & \textemdash & \textemdash & 0.676 & 0.610 \\
+$\mathcal{F}_3$ & \textemdash & \textemdash & 0.681 & 0.562 \\
+$\mathcal{F}_4$ & \textemdash & \textemdash & 0.681 & 0.619 \\
+$\mathcal{F}_5$ & \textemdash & \textemdash & 0.657 & 0.552 \\
+$\mathcal{F}_6$ & \textemdash & \textemdash & 0.657 & 0.571 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1770,22 +1958,26 @@ $\mathcal{F}_6$ & 0.647 & 0.536 \\
 after ($p_\text{rev}$) belief revision ($K=5$, $\alpha_\text{base}=0.6$),
 at the feature level used per task ($\mathcal{F}_6$ for Final Risk,
 relapse, EFS and OS; $\mathcal{F}_3$ for D19 MRD; $\mathcal{F}_2$ for
-D46 MRD). Internal results are reported per temporal split; external results use the pooled external cohort, as the per-site
-external cohorts are too small or single-class for this analysis.
+D46 MRD). Internal results are reported per temporal split and
+external results per cohort (models trained on all 301 internal
+patients); in the Fudan relapse cohort EFS orders the time to relapse
+and OS the time to death after relapse.
 For the survival endpoints (EFS, OS) the values are Harrell's C-index:
 base is the RSF risk score and the revision replaces the
 similarity-weighted binary-outcome mean by a similarity-weighted
 Kaplan--Meier neighbourhood event probability at 24 months.
 \textbf{Bold}: largest gain (Split~3 has 17 test patients, 3 of them
 D46MRD-positive; indicative only). $\dagger$~insufficient positives; not
-computed. \textemdash: too few events (OS, 2019 test split).}
+computed (Lianyungang D19 and D46 MRD, Fudan D46 MRD; Fudan relapse,
+every patient relapsed). \textemdash: too few events (OS, 2019 test
+split; OS, Lianyungang).}
 \label{tab:belief_revision}
 \centering
 \small
 \setlength{\tabcolsep}{7pt}
 \begin{tabular}{@{}ll ccc@{}}
 \toprule
-\textbf{Task} & \textbf{Split} & $p_\text{RF}$ & $p_\text{rev}$ & \textbf{$\Delta$} \\
+\textbf{Task} & \textbf{Test set} & $p_\text{RF}$ & $p_\text{rev}$ & \textbf{$\Delta$} \\
 \midrule
 \multicolumn{5}{l}{\textit{Internal (temporal splits)}} \\
 Final Risk & Split~1 & 0.919 & 0.910 & $-0.008$ \\
@@ -1809,15 +2001,21 @@ OS & Split~1 & 0.616 & 0.632 & $+0.017$ \\
 OS & Split~2 & 0.599 & 0.600 & $+0.001$ \\
 OS & Split~3 & \multicolumn{3}{c}{\textemdash} \\
 \midrule
-\multicolumn{5}{l}{\textit{External (pooled cohort)}} \\
-Final Risk & --- & 0.940 & 0.953 & $+0.013$ \\
-D19MRD & --- & 0.265 & 0.230 & $-0.035$ \\
-D46MRD & --- & \multicolumn{3}{c}{$\dagger$ ($n_\text{pos}=1$)} \\
-Relapse & --- & 0.246 & 0.261 & $+0.015$ \\
+\multicolumn{5}{l}{\textit{External cohorts}} \\
+Final Risk & Lianyungang & 0.939 & 0.980 & $+0.040$ \\
+Final Risk & Fudan & 0.944 & 0.933 & $-0.011$ \\
+D19MRD & Lianyungang & \multicolumn{3}{c}{$\dagger$ ($n_\text{pos}=0$)} \\
+D19MRD & Fudan & 0.316 & 0.250 & $-0.066$ \\
+D46MRD & Lianyungang & \multicolumn{3}{c}{$\dagger$ ($n_\text{pos}=1$)} \\
+D46MRD & Fudan & \multicolumn{3}{c}{$\dagger$ ($n_\text{pos}=0$)} \\
+Relapse & Lianyungang & 0.514 & 0.528 & $+0.014$ \\
+Relapse & Fudan & \multicolumn{3}{c}{$\dagger$ (all relapsed)} \\
 \addlinespace[2pt]
 \multicolumn{5}{l}{\quad\textit{Survival endpoints (C-index; RSF base vs KM revision)}} \\
-EFS & --- & 0.435 & 0.421 & $-0.014$ \\
-OS & --- & 0.536 & 0.556 & $+0.020$ \\
+EFS & Lianyungang & 0.762 & 0.714 & $-0.048$ \\
+EFS & Fudan & 0.404 & 0.443 & $+0.039$ \\
+OS & Lianyungang & \multicolumn{3}{c}{\textemdash} \\
+OS & Fudan & 0.571 & 0.610 & $+0.038$ \\
 \bottomrule
 \end{tabular}
 \end{table}
