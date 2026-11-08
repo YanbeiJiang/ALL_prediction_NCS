@@ -58,7 +58,7 @@ In 301 patients split by enrolment year, a routine external cohort of
 20 patients and an external cohort of 21 patients who all relapsed, we
 predicted Final Risk, day-19 and day-46 minimal
 residual disease (MRD), relapse, event-free survival (EFS) and overall
-survival (OS) from six nested feature sets available before any MRD
+survival (OS) from six timeline-ordered feature sets available before any MRD
 assessment.
 Cell size, cytoplasm, chromatin, nucleoli and vacuoles were measured
 automatically on the Day-1 smear and given to the LLMs as a short
@@ -392,9 +392,10 @@ OS events & 24 (8.0\%) & 1 (5.0\%) & 6 (28.6\%) \\
 \centering
 \includegraphics[width=\textwidth]{fig1_design}
 \caption{\textbf{Study design along three timelines.}
-\textbf{a,}~Six nested feature levels follow the clinical order of
+\textbf{a,}~Six feature levels follow the clinical order of
 data acquisition from admission (Day~0) to the completion of diagnostic
-work-up (Day~7--10); all six targets are predicted from
+work-up (Day~7--10); five are strictly nested and $\mathcal{F}_4$ is a
+Day-1 branch of $\mathcal{F}_3$; all six targets are predicted from
 $\mathcal{F}_6$, before the first MRD assessment, so MRD is never an
 input.
 \textbf{b,}~Trained models learn from earlier enrolment years and are
@@ -417,12 +418,17 @@ models' probabilities and grounds an LLM-generated clinical narrative.}
 Figure~\ref{fig:when} shows discrimination for every target at every
 feature level, in the internal test set and in the two external
 cohorts.
-Four patterns stand out.
+Four patterns stand out in the internal test set
+(Fig.~\ref{fig:when}a,d); for each we note whether the external
+cohorts (Fig.~\ref{fig:when}b,c,e,f) agree.
 
 \textbf{Final Risk is largely fixed by Initial Risk.}
-Trained RF reached an AUROC of 0.87 from white blood cell count and age
-alone and 0.95 once Initial Risk entered at $\mathcal{F}_5$; the
-LLM ensemble rose from 0.79 to 0.93 over the same levels.
+In the internal test set, trained RF reached an AUROC of 0.87 from
+white blood cell count and age alone and 0.95 once Initial Risk entered
+at $\mathcal{F}_5$; the LLM ensemble rose from 0.79 to 0.93 over the
+same levels.
+Both external cohorts agreed: at $\mathcal{F}_6$ the RF reached 0.94 in
+each, and the LLM ensemble 0.86 in Lianyungang and 0.85 in Fudan.
 This follows from how Final Risk is defined.
 In our cohort Initial Risk alone reproduced Final Risk in 90.7\% of
 internal patients, and a three-condition rule—Initial Risk of IR or HR,
@@ -437,25 +443,41 @@ patients will be upgraded (28 patients, 26 of them MRD-positive), which
 is the MRD prediction problem.
 
 \textbf{D19 MRD becomes predictable with immunophenotype.}
-RF AUROC was 0.42 and 0.51 at $\mathcal{F}_1$ and $\mathcal{F}_2$ and
-0.75--0.83 from $\mathcal{F}_3$, when immunophenotype and flow
-cytometry markers entered; the LLM ensemble reached 0.68--0.69 at
-$\mathcal{F}_3$ and $\mathcal{F}_4$ and 0.78--0.79 from
-$\mathcal{F}_5$.
+In the internal test set, RF AUROC was 0.42 and 0.50 at
+$\mathcal{F}_1$ and $\mathcal{F}_2$ and 0.75--0.83 from
+$\mathcal{F}_3$, when immunophenotype and flow cytometry markers
+entered; the LLM ensemble reached 0.68--0.69 at $\mathcal{F}_3$ and
+$\mathcal{F}_4$ and 0.78--0.79 from $\mathcal{F}_5$.
+The external cohorts did not reproduce this: Lianyungang had no D19
+MRD-positive patient, and in the Fudan cohort, where 4 of the 21
+patients were D19 MRD-positive, both approaches stayed between 0.32 and
+0.48 from $\mathcal{F}_3$.
 
 \textbf{Before MRD, survival discrimination comes mainly from the LLMs.}
-The RSF C-index stayed between 0.53 and 0.61 for EFS and between 0.50
-and 0.65 for OS at every level.
+In the internal test set, the RSF C-index stayed between 0.53 and 0.61
+for EFS and between 0.50 and 0.65 for OS at every level.
 The LLM ensemble reached 0.71 for OS from Day~5, once Initial Risk was
 available, and 0.68 for EFS at $\mathcal{F}_6$, when cytogenetics
 entered.
 Without MRD, which dominates prognosis in contemporary
 protocols~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}, the trained
 models had little signal to learn from the few local events.
+The Fudan relapse cohort showed the same pattern: across levels the LLM
+ensemble ordered the time to relapse at 0.66--0.71 and death after
+relapse at 0.69--0.83, the RSF at 0.40--0.59 and 0.55--0.69.
+Lianyungang, with three events, did not: the RSF was higher at four of
+the six levels (0.64--0.83 versus 0.49--0.79), and the LLM ensemble
+only at $\mathcal{F}_6$.
 
 \textbf{Relapse and D46 MRD remain close to chance.}
-With clinical features alone, neither approach exceeded an AUROC of
-0.70 for either target at any level.
+In the internal test set, with clinical features alone, neither
+approach exceeded an AUROC of 0.70 for either target at any level.
+D46 MRD could not be evaluated externally.
+Relapse AUROC in Lianyungang ranged from 0.51 to 0.86 across levels and
+approaches but rested on two relapsed patients, and was 0.54 (LLM
+ensemble) and 0.51 (RF) at $\mathcal{F}_6$; in the Fudan cohort the
+LLM ensemble flagged 10--29\% and the RF 29--43\% of the relapsed
+patients, depending on the level.
 Results for each LLM and each level are given in Supplementary
 Tables~\ref{tab:phase1_full}--\ref{tab:phase2_ext}.
 
@@ -810,12 +832,12 @@ patients and needs confirmation.
 Because all predictions were made before treatment response was
 measured, they test what can be anticipated from diagnostic data alone.
 In this setting the trained survival forests stayed at C-indices of
-0.50 to 0.65, consistent with the established role of MRD, which our
+0.50 to 0.65 in the internal test set, consistent with the established role of MRD, which our
 design withholds, as the dominant prognostic
 factor~\cite{[CITE:Borowitz2008],[CITE:Conter2010]}; the LLM ensemble
 reached 0.68 to 0.71, and 0.71 to 0.72 with morphology.
 Relapse and D46 MRD remained the hardest targets: with clinical
-features they were near chance at every level, and with morphology the
+features they were near chance at every level internally, and with morphology the
 LLM ensemble reached AUROCs of 0.66 and 0.67, consistent with the
 failure of computational flow cytometry at
 diagnosis~\cite{[CITE:Martinez2025]} and the modest discrimination of
