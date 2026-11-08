@@ -61,8 +61,8 @@ residual disease (MRD), relapse, event-free survival (EFS) and overall
 survival (OS) from six nested feature sets available before any MRD
 assessment.
 Cell size, cytoplasm, chromatin, nucleoli and vacuoles were measured
-automatically on the Day-1 smear, checked against haematologists'
-reports, and given to the LLMs as a short text report, without images,
+automatically on the Day-1 smear and given to the LLMs as a short
+text report, without images,
 and to random forests and random survival forests as variables.
 An equal-weight ensemble of five LLMs matched random forests trained on
 about 50 local patients for Final Risk and 100 for day-19 MRD.
@@ -186,12 +186,12 @@ but none of these studies concerns paediatric oncology.
 
 A second source of information is examined in every patient but rarely
 reaches a prediction model.
-The diagnostic bone marrow smear is read on Day~1, and the
-morphologist's description of the blasts—their size, the amount of
-cytoplasm, the nucleoli and the presence of vacuoles—once defined the
-FAB subtypes of ALL~\cite{[CITE:Bennett1976]}.
-In current risk stratification this description serves diagnosis, and
-it is recorded as free text rather than as quantitative variables.
+The diagnostic bone marrow smear is read on Day~1, and the morphology
+of the blasts—their size, the amount of cytoplasm, the nucleoli and
+the presence of vacuoles—once defined the FAB subtypes of
+ALL~\cite{[CITE:Bennett1976]}.
+In current risk stratification the smear serves diagnosis and does not
+enter prediction as quantitative variables.
 Turning the smear into a few quantitative, interpretable measures would
 make it usable by both kinds of model: as variables for a trained
 model and, without passing any image, as a short report that an LLM
@@ -228,8 +228,8 @@ Risk at Day~5, day-19 MRD becomes predictable once immunophenotype is
 available, and relapse and day-46 MRD remain the hardest targets.
 (\textit{ii})~An automated, image-free route from the diagnostic
 marrow smear to prediction: measures of cell size, cytoplasm,
-chromatin, nucleoli and vacuoles, checked against the haematologists'
-reports and passed to the LLMs as a short text report, with which the
+chromatin, nucleoli and vacuoles, passed to the LLMs as a short text
+report, with which the
 LLM ensemble improved for all six targets (for example, AUROC 0.93 to
 0.95 for Final Risk and 0.78 to 0.81 for day-19 MRD, and C-index 0.68
 to 0.71 for EFS).
@@ -485,19 +485,6 @@ Lianyungang D19 MRD, D46 MRD and OS; Fudan D46 MRD).}
 \subsection{Automated marrow morphology improves the LLM ensemble}
 \label{sec:morph_results}
 %%--------------------------------------------------------------%%
-
-The automated measures agreed with the haematologists' written
-descriptions of the blasts where those descriptions were specific
-(Supplementary Table~\ref{tab:morph_validation}).
-Among 285 patients whose diagnostic report described the blast
-population, the fraction of vacuolated cells separated reports that
-mentioned vacuoles from those that did not (AUROC 0.69, 95\% CI 0.62
-to 0.76, averaged within imaging batch), and the fraction of large
-cells separated blasts described as medium or large from small ones
-(0.67, 0.54 to 0.83); the fraction of cells with visible cytoplasm
-agreed more weakly (0.60, 0.44 to 0.75).
-Size variation and nuclear shape did not agree with the reports (0.48
-for both) and were left out of the report given to the LLMs.
 
 Adding morphology raised the discrimination of the LLM ensemble for
 all six targets in the 2018--19 test set (Table~\ref{tab:main}):
@@ -804,9 +791,8 @@ The marrow smear is examined in every patient, yet its content rarely
 reaches a prediction model.
 Passing it to the LLMs as a few measured statements rather than as
 images has practical advantages.
-Each statement can be checked against the smear and against the
-haematologist's reading, which let us drop the measures that did not
-agree (size variation and nuclear shape); expressing each measure as a
+Each statement can be checked against the smear; expressing each
+measure as a
 percentile within its imaging batch put batches with different
 staining and image acquisition on a common scale without retraining,
 and carried the pipeline to smears from two other hospitals after
@@ -872,10 +858,9 @@ statistical significance in any single test set, and most of the
 morphology gains have confidence intervals that include zero.
 The morphology measures are approximate: cell types were not
 separated, so all nucleated cells on the diagnostic smear were treated
-as the leukaemic population; batch differences in staining and imaging
-were handled by within-batch percentiles rather than by stain
-normalisation; and only some measures agreed with the haematologists'
-reports.
+as the leukaemic population, and batch differences in staining and
+imaging were handled by within-batch percentiles rather than by stain
+normalisation.
 The external smears were few (two images per patient in Lianyungang)
 and were brought to the internal scale only by rescaling to a common
 red-cell diameter, so the external morphology results are indicative
@@ -911,8 +896,8 @@ Ethics approval was obtained from [ETHICS NUMBER]; all data were
 de-identified prior to analysis.
 Each patient record includes structured clinical data (demographics,
 haematological indices, immunophenotype, 51-marker flow cytometry panel,
-cytogenetics, MRD values), digitised images of the diagnostic (Day~1)
-bone marrow smear and the haematologist's written morphology report.
+cytogenetics, MRD values) and digitised images of the diagnostic
+(Day~1) bone marrow smear.
 
 Two external hospitals provided 41 patients in a single file with a
 recorded hospital field, and the two hospitals are analysed as separate
@@ -1031,23 +1016,12 @@ reliability, the typical cell diameter in red-cell units and
 micrometres, the share of large cells, the share of cells with a
 visible cytoplasm rim and the share of vacuolated cells, each with its
 within-batch percentile and the batch's typical value, and notes that
-the measurements are automated and supportive only; it is limited to
-the measures that agreed with the expert reports (below).
+the measurements are automated and supportive only.
 Patients without a profile were scored with the prompt of the same
 level without morphology.
 For RF and RSF, the 16 percentile descriptors and a missing-profile
 indicator were appended to the level's variables and preprocessed as
 above.
-
-\textbf{Agreement with expert reports.}
-For 285 internal patients the haematologist's diagnostic report
-described the blast population.
-From this description we extracted six labels—cell size (small versus
-medium or large), size uniformity, amount of cytoplasm, vacuoles,
-nuclear shape and nucleoli—and measured the agreement of each
-descriptor with its label as the AUROC averaged over imaging batches,
-so that batch differences cannot contribute (95\% CI from 1,000
-bootstrap resamples).
 
 \subsection{Phase~1: LLM inference}\label{sec:llm_inference}
 
@@ -1697,33 +1671,6 @@ OS & Fudan & LLM & $\mathcal{F}_6$ + M3 & 21/21 & 0.833 & 0.857 & +0.024 [$-$0.0
 \end{tabular}
 \end{table}
 
-\begin{table}[ht]
-\caption{\textbf{Agreement of the morphology measures with the
-haematologists' reports.} Labels were extracted from the description
-of the blast population in the diagnostic morphology report (285
-patients; $n$, patients whose report states the feature). AUROC of the
-descriptor for the label, averaged over the three imaging batches so
-that batch differences cannot contribute, with 95\% CI from 1,000
-bootstrap resamples; 0.5 indicates no agreement (for nuclear solidity,
-agreement would appear as values below 0.5). Report, whether the
-measure is included in the text report given to the LLMs.}
-\label{tab:morph_validation}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}llccc@{}}
-\toprule
-\textbf{Label in the report} & \textbf{Descriptor} & \textbf{Positive / $n$} & \textbf{AUROC [95\% CI]} & \textbf{Report} \\
-\midrule
-Vacuoles present & Vacuolated-cell fraction & 56 / 285 & 0.69 [0.62, 0.76] & yes \\
-Medium or large (vs small) & Large-cell fraction & 33 / 90 & 0.67 [0.54, 0.83] & yes \\
-More cytoplasm (vs scant) & Visible-cytoplasm fraction & 16 / 264 & 0.60 [0.44, 0.75] & yes \\
-Clear nucleoli & Nucleolus-like fraction & 92 / 269 & 0.67 [0.45, 0.90] & no \\
-Varied size (vs uniform) & Size coefficient of variation & 159 / 180 & 0.48 [0.34, 0.62] & no \\
-Irregular nucleus & Nuclear solidity & 157 / 184 & 0.48 [0.29, 0.59] & no \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \clearpage
 
